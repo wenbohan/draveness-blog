@@ -1,33 +1,40 @@
 # Jykell configuration
-#markdown: redcarpet
-#highlighter: pygments
-markdown: kramdown
-highlighter: rouge
-paginate: 5
+markdown: redcarpet
+redcarpet:
+  syntax_highlighter_opts:
+    disable: true
+# highlighter: pygments
+# markdown: kramdown
+# kramdown:
+#   syntax_highlighter_opts:
+#     disable : true
+highlighter: none
+# highlighter: rouge
+paginate: 10
 language: 'en-uk'
 
 # Website info
-name: 'Finding The Way Home'
-description: "A beautiful narrative written with the world's most elegant publishing platform. The story begins here."
+name: 'Draveness'
+description: "分析路径中"
 
 # Author's info
-author: 'Casper McFadden'
+author: 'Draveness'
 # edit 'categories' in the front matter of every post to match this username
 nickname: casper
-bio: 'A paranormal expert and his daughter bunk in an abandoned house populated by 3 mischievous ghosts and one friendly one.'
+bio: 'iOS Developer / Rails / Elixir'
 location: 'Maine, USA'
-url: 'http://biomadeira.github.io/jasper/'
+url: 'http://draveness.me'
 image: 'assets/images/casper.png'
 
-short_url: 'biomadeira.github.io/jasper/'
-google_analytics: UA-69281367-1
-disqus: username
+short_url: 'draveness.me'
+google_analytics: UA-56898419-1
+disqus: draveness
 # edit baseurl to simply '/' if using as your personal page (instead of a project page)
-baseurl: /jasper/
+baseurl: /
 
 # Permalinks
-permalink: /:title
-# permalink: /author/:username
+# permalink: /:title
+permalink: pretty
 # permalink: /tag/:tag
 
 

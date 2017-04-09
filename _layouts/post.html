@@ -22,7 +22,7 @@ class: 'post-template'
 
 <main class="content" role="main">
 
-    <article class="{{ page.subclass }}">
+    <article class="{% if page.subclass %}{{ page.subclass }}{% else %}{{ 'post' }}{% endif %}">
 
         <header class="post-header">
             <h1 class="post-title">{{ page.title }}</h1>
@@ -30,21 +30,21 @@ class: 'post-template'
             <!-- <a href='{{ site.baseurl }}{{ page.about }}'>{{ site.author }}</a> -->
             <time class="post-date" datetime="{{ page.date | date:'%Y-%m-%d' }}">{{ page.date | date_to_string }}</time>
                 <!-- [[tags prefix=" on "]] -->
-                {% if page.tags.size > 0 %} 
-                on 
+                {% if page.tags.size > 0 %}
+                on
                 {% for tag in page.tags %}
                     {% if forloop.index == page.tags.size %}
                        <a href='{{ site.baseurl }}tag/{{ tag }}'>{{ tag | capitalize }}</a>
                     {% else %}
                        <a href='{{ site.baseurl }}tag/{{ tag }}'>{{ tag | capitalize }}</a>,
-                    {% endif %}   
+                    {% endif %}
                 {% endfor %}
                 {% endif %}
             </section>
         </header>
 
         <section class="post-content">
-            
+
             {{ content }}
 
         </section>
@@ -62,15 +62,15 @@ class: 'post-template'
 
             <section class="author">
                 <h4><a href="{{ site.baseurl }}author/{{ site.nickname }}">{{ site.author }}</a></h4>
-                
+
                 {% if site.bio %}
                     <p> {{ site.bio }}</p>
                 {% else %}
                     <p>Read <a href="{{ site.baseurl }}author/{{ site.nickname }}">more posts</a> by this author.</p>
                 {% endif %}
                 <div class="author-meta">
-                    {% if site.location %}<span class="author-location icon-location"> {{ site.location }}</span>{% endif %} 
-                    {% if site.url %}<span class="author-link icon-link"><a href="{{ site.url }}"> {{ site.short_url }}</a></span>{% endif %} 
+                    {% if site.location %}<span class="author-location icon-location"> {{ site.location }}</span>{% endif %}
+                    {% if site.url %}<span class="author-link icon-link"><a href="{{ site.url }}"> {{ site.short_url }}</a></span>{% endif %}
                 </div>
             </section>
 
@@ -91,12 +91,10 @@ class: 'post-template'
                     <span class="hidden">Google+</span>
                 </a>
             </section>
-            
+
             <!-- Add Disqus Comments -->
-            {% if page.disqus %}
-                {% include disqus.html %}
-            {% endif %}
-            
+            {% include disqus.html %}
+
         </footer>
 
     </article>
