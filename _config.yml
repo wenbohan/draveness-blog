@@ -20,10 +20,11 @@ description: "分析路径中"
 # Author's info
 author: 'Draveness'
 # edit 'categories' in the front matter of every post to match this username
-nickname: casper
+nickname: draveness
 bio: 'iOS Developer / Rails / Elixir'
 location: 'Maine, USA'
 url: 'http://draveness.me'
+img_url: 'http://img.draveness.me'
 image: 'assets/images/draven.png'
 
 short_url: 'draveness.me'

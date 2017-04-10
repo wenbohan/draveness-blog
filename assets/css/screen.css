@@ -781,7 +781,8 @@ body.nav-opened .nav {
     padding: 1px 0 5px 0;
     width: auto;
 }
-
+.back-button,
+.rss-button,
 .menu-button {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
@@ -790,8 +791,7 @@ body.nav-opened .nav {
     float: right;
     height: 38px;
     padding: 0 15px;
-    border-style: solid;
-    border-width: 1px;
+    border: transparent 1px solid;
     opacity: 1;
     text-align: center;
     font-size: 12px;
@@ -801,6 +801,11 @@ body.nav-opened .nav {
     border-radius: 3px;
     transition: all 0.5s ease;
 }
+.back-button {
+  float: left;
+}
+.back-button:before,
+.rss-button:before,
 .menu-button:before {
     font-size: 12px;
     font-weight: bold;
@@ -808,30 +813,42 @@ body.nav-opened .nav {
     position: relative;
     top: 1px;
 }
+.back-button:hover,
+.rss-button:hover,
 .menu-button:hover {
     background: #fff;
 }
+.back-button:focus,
+.rss-button:focus,
 .menu-button:focus {
     outline: 0;
 }
 
 /* When the navigation is closed */
+.nav-closed .back-button,
+.nav-closed .rss-button,
 .nav-closed .menu-button {
     color: #fff;
     border-color: rgba(255, 255, 255, 0.6);
 }
+.nav-closed .rss-button:hover,
+.nav-closed .back-button:hover,
 .nav-closed .menu-button:hover {
     color: #222;
 }
 
 /* When the navigation is closed and there is no cover image */
+.nav-closed .no-cover .back-button,
+.nav-closed .no-cover .rss-button,
 .nav-closed .no-cover .menu-button {
-    border-color: #BFC8CD;
-    color: #9EABB3;
+  border-color: rgba(0,0,0,0.01);
+  color: #9EABB3;
 }
+.nav-closed .no-cover .back-button:hover,
+.nav-closed .no-cover .rss-button:hover,
 .nav-closed .no-cover .menu-button:hover {
-    border-color: #555;
-    color: #555;
+  border-color: #BFC8CD;
+  color: #555;
 }
 
 /* When the navigation is opened */
