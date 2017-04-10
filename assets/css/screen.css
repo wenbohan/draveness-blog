@@ -1787,6 +1787,8 @@ body:not(.post-template) .post-title {
         height: 30px;
     }
 
+    .rss-button,
+    .back-button,
     .menu-button {
         padding: 0 5px;
         border-radius: 0;
@@ -1794,6 +1796,8 @@ body:not(.post-template) .post-title {
         color: #2e2e2e;
         background: transparent;
     }
+    .rss-button:hover,
+    .back-button:hover,
     .menu-button:hover {
         color: #2e2e2e;
         border-color: transparent;
@@ -1813,10 +1817,14 @@ body:not(.post-template) .post-title {
     .no-cover .main-nav.overlay {
         background: none;
     }
+    .no-cover .main-nav.overlay .rss-button,
+    .no-cover .main-nav.overlay .back-button,
     .no-cover .main-nav.overlay .menu-button {
         border: none;
     }
 
+    .main-nav.overlay .rss-button,
+    .main-nav.overlay .back-button,
     .main-nav.overlay .menu-button {
         border-color: transparent;
     }
