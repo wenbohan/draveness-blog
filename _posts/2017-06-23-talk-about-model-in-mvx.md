@@ -3,15 +3,15 @@ layout: post
 title: 谈谈 MVX 中的 Model
 date: 2017-06-23 00:34:44.000000000 +08:00
 permalink: /:title
+content: 在大多数 iOS 的项目中，Model 层只是一个单纯的数据结构，你可以看到的绝大部分模型都是这样的；模型起到了定义一堆『坑』的作用，只是一个简单的模板，并没有参与到实际的业务逻辑，只是在模型层进行了一层抽象，将服务端发回的 JSON 或者说 Dictionary 对象中的字段一一取出并装填到预先定义好的模型中。
 ---
-
-Follow GitHub: [Draveness](https://github.com/Draveness)
 
 + [谈谈 MVX 中的 Model](http://draveness.me/mvx-model.html)
 + [谈谈 MVX 中的 View](http://draveness.me/mvx-view.html)
 + [谈谈 MVX 中的 Controller](http://draveness.me/mvx-controller.html)
 + [谈谈 MVX 架构模式](http://draveness.me/mvx.html)
 
+Follow GitHub: [Draveness](https://github.com/Draveness)
 
 ## 常见的 Model 层
 
