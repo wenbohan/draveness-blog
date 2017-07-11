@@ -9,9 +9,9 @@ content: 在大多数 iOS 的项目中，Model 层只是一个单纯的数据结
 + [谈谈 MVX 中的 Model](http://draveness.me/mvx-model.html)
 + [谈谈 MVX 中的 View](http://draveness.me/mvx-view.html)
 + [谈谈 MVX 中的 Controller](http://draveness.me/mvx-controller.html)
-+ [谈谈 MVX 架构模式](http://draveness.me/mvx.html)
++ [浅谈 MVC、MVP 和 MVVM 架构模式](http://draveness.me/mvx.html)
 
-Follow GitHub: [Draveness](https://github.com/Draveness)
+> Follow GitHub: [Draveness](https://github.com/Draveness)
 
 ## 常见的 Model 层
 
