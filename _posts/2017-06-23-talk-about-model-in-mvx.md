@@ -4,6 +4,7 @@ title: 谈谈 MVX 中的 Model
 date: 2017-06-23 00:34:44.000000000 +08:00
 permalink: /mvx-model.html
 content: 在大多数 iOS 的项目中，Model 层只是一个单纯的数据结构，你可以看到的绝大部分模型都是这样的；模型起到了定义一堆『坑』的作用，只是一个简单的模板，并没有参与到实际的业务逻辑，只是在模型层进行了一层抽象，将服务端发回的 JSON 或者说 Dictionary 对象中的字段一一取出并装填到预先定义好的模型中。
+cover: http://img.draveness.me/JSON-to-Model.jpg
 ---
 
 + [谈谈 MVX 中的 Model](http://draveness.me/mvx-model.html)
@@ -32,7 +33,7 @@ struct User {
 
 模型起到了定义一堆『坑』的作用，只是一个简单的模板，并没有参与到实际的业务逻辑，只是在模型层进行了一层**抽象**，将服务端发回的 JSON 或者说 `Dictionary` 对象中的字段一一取出并装填到预先定义好的模型中。
 
-![JSON-to-Mode](http://img.draveness.me/JSON-to-Model.jpg)
+![JSON-to-Model](http://img.draveness.me/JSON-to-Model.jpg)
 
 我们可以将这种模型层中提供的对象理解为『即开即用』的 `Dictionary` 实例；在使用时，可以直接从模型中取出属性，省去了从 `Dictionary` 中抽出属性以及验证是否合法的过程。
 
