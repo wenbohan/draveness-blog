@@ -16,7 +16,7 @@ pre[class*="language-"] {
 	word-break: normal;
 	word-wrap: normal;
 	line-height: 1.5;
-	font-size: 17px;
+	font-size: 1.5rem;
 
 	-moz-tab-size: 4;
 	-o-tab-size: 4;
@@ -26,6 +26,16 @@ pre[class*="language-"] {
 	-moz-hyphens: none;
 	-ms-hyphens: none;
 	hyphens: none;
+}
+
+/* scrollbar */
+::-webkit-scrollbar {
+	width: 0;
+	height: 0px;
+}
+
+::-webkit-scrollbar-thumb {
+    /*background: white;*/
 }
 
 pre[class*="language-"],
@@ -39,7 +49,7 @@ pre[class*="language-"] {
 	#border-radius: .5em;
 	#border: .3em solid hsl(0, 0%, 33%); /* #282A2B */
 	#box-shadow: 1px 1px .5em black inset;
-	margin: .5em 0;
+	margin: 1em 0;
 	overflow: auto;
 	padding: 1.5em;
 }
@@ -287,6 +297,8 @@ pre.line-numbers > code {
 		}
 div.prism-show-language {
 	position: relative;
+	/* hidden for now */
+	display: none;
 }
 
 div.prism-show-language > div.prism-show-language-label {
