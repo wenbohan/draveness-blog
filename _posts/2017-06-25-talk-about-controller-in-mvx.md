@@ -4,7 +4,7 @@ title: 谈谈 MVX 中的 Controller
 date: 2017-06-23 02:34:44.000000000 +08:00
 permalink: /mvx-controller.html
 content: 在前两篇文章中，我们已经对 iOS 中的 Model 层以及 View 层进行了分析，划分出了它们的具体职责，其中 Model 层除了负责数据的持久存储、缓存工作，还要负责所有 HTTP 请求的发出等工作；而对于 View 层的职责，我们并没有做出太多的改变，有的只是细分其内部的视图种类，以及分离 UIView 不应该具有的属性和功能。
-cover: http://img.draveness.me/MVC-in-iOS.jpg
+cover: http://img.draveness.me/MVC-MVVM-MVP.jpg
 ---
 
 + [谈谈 MVX 中的 Model](http://draveness.me/mvx-model.html)
