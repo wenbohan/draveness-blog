@@ -29,14 +29,11 @@ pre[class*="language-"] {
 }
 
 /* scrollbar */
-::-webkit-scrollbar {
+pre[class*="language-"]::-webkit-scrollbar {
 	width: 0;
 	height: 0px;
 }
 
-::-webkit-scrollbar-thumb {
-    /*background: white;*/
-}
 
 pre[class*="language-"],
 :not(pre) > code[class*="language-"] {
