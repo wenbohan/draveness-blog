@@ -15,8 +15,9 @@ current: home
         style="background-image: url({{ site.baseurl }}{{ page.cover }}) {% else %}no-cover{% endif %}">
     <nav class="main-nav overlay clearfix">
         {% if page.logo %}<a class="blog-logo" href="{{ site.baseurl }}"><img src="{{ site.baseurl }}{{ page.logo }}" alt="Blog Logo" /></a>{% endif %}
-        <a class="rss-button icon-feed" href="{{ site.baseurl }}feed.xml"><span class="word">Subscribe</span></a>
-    </nav>
+        <!-- <a class="rss-button icon-feed" href="{{ site.baseurl }}feed.xml"><span class="word">Subscribe</span></a> -->
+        <a class="menu-button icon-menu" href="#"><span class="word">Menu</span></a>
+      </nav>
     <div class="vertical">
         <div class="main-header-content inner">
             <h1 class="page-title">{{ site.name }}</h1>
