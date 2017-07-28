@@ -3,6 +3,7 @@ layout: post
 title: 验证 HTTPS 请求的证书（五）
 date: 2016-04-16 12:40:52.000000000 +08:00
 permalink: /:title
+tags: iOS AFNetworking
 ---
 
 Blog: [Draveness](http://draveness.me)
@@ -135,7 +136,7 @@ _out:
 
 		allowedCertificate = SecCertificateCreateWithData(NULL, (__bridge CFDataRef)certificate);
 		__Require_Quiet(allowedCertificate != NULL, _out);
-	
+
 	+ 这里使用了一个非常神奇的宏 `__Require_Quiet`，它会判断 `allowedCertificate != NULL` 是否成立，如果 `allowedCertificate` 为空就会跳到 `_out` 标签处继续执行
 
 			#ifndef __Require_Quiet
@@ -153,14 +154,14 @@ _out:
 
 		allowedCertificates[0] = allowedCertificate;
 		tempCertificates = CFArrayCreate(NULL, (const void **)allowedCertificates, 1, NULL);
-	
+
 	+ 下面的 `SecTrustCreateWithCertificates` 只会接收数组作为参数。
 4. 创建一个默认的符合 X509 标准的 `SecPolicyRef`，通过默认的 `SecPolicyRef` 和证书创建一个 `SecTrustRef` 用于信任评估，对该对象进行信任评估，确认生成的 `SecTrustRef` 是值得信任的。
-	
+
 	    policy = SecPolicyCreateBasicX509();
 	    __Require_noErr_Quiet(SecTrustCreateWithCertificates(tempCertificates, policy, &allowedTrust), _out);
 	    __Require_noErr_Quiet(SecTrustEvaluate(allowedTrust, &result), _out);
-	
+
 	+ 这里使用的 `__Require_noErr_Quiet` 和上面的宏差不多，只是会根据返回值判断是否存在错误。
 5. 获取公钥
 
@@ -172,19 +173,19 @@ _out:
 		if (allowedTrust) {
 		    CFRelease(allowedTrust);
 		}
-		
+
 		if (policy) {
 		    CFRelease(policy);
 		}
-		
+
 		if (tempCertificates) {
 		    CFRelease(tempCertificates);
 		}
-		
+
 		if (allowedCertificate) {
 		    CFRelease(allowedCertificate);
 		}
-	
+
 > 每一个 `SecTrustRef` 的对象都是包含多个 `SecCertificateRef` 和 `SecPolicyRef`。其中 `SecCertificateRef` 可以使用 DER 进行表示，并且其中存储着公钥信息。
 
 对它的操作还有 `AFCertificateTrustChainForServerTrust` 和 `AFPublicKeyTrustChainForServerTrust` 但是它们几乎调用了相同的 API。
@@ -216,13 +217,13 @@ static NSArray * AFCertificateTrustChainForServerTrust(SecTrustRef serverTrust) 
 {
 
 	#1: 不能隐式地信任自己签发的证书
-	
+
 	#2: 设置 policy
-	
+
 	#3: 验证证书是否有效
-	
+
 	#4: 根据 SSLPinningMode 对服务端进行验证
-    
+
     return NO;
 }
 ```
@@ -239,7 +240,7 @@ static NSArray * AFCertificateTrustChainForServerTrust(SecTrustRef serverTrust) 
 
 	+ 所以如果没有提供证书或者不验证证书，并且还设置 `allowInvalidCertificates` 为**真**，满足上面的所有条件，说明这次的验证是不安全的，会直接返回 `NO`
 2. 设置 policy
-	
+
 		NSMutableArray *policies = [NSMutableArray array];
 		if (self.validatesDomainName) {
 		    [policies addObject:(__bridge_transfer id)SecPolicyCreateSSL(true, (__bridge CFStringRef)domain)];
@@ -281,22 +282,22 @@ static NSArray * AFCertificateTrustChainForServerTrust(SecTrustRef serverTrust) 
 			    [pinnedCertificates addObject:(__bridge_transfer id)SecCertificateCreateWithData(NULL, (__bridge CFDataRef)certificateData)];
 			}
 			SecTrustSetAnchorCertificates(serverTrust, (__bridge CFArrayRef)pinnedCertificates);
-			
+
 			if (!AFServerTrustIsValid(serverTrust)) {
 			    return NO;
 			}
-			
+
 			// obtain the chain after being validated, which *should* contain the pinned certificate in the last position (if it's the Root CA)
 			NSArray *serverCertificates = AFCertificateTrustChainForServerTrust(serverTrust);
-			
+
 			for (NSData *trustChainCertificate in [serverCertificates reverseObjectEnumerator]) {
 			    if ([self.pinnedCertificates containsObject:trustChainCertificate]) {
 			        return YES;
 			    }
 			}
-			
+
 			return NO;
-	
+
 		1. 从 `self.pinnedCertificates` 中获取 DER 表示的数据
 		2. 使用 `SecTrustSetAnchorCertificates` 为服务器信任设置证书
 		3. 判断服务器信任的有效性
@@ -307,7 +308,7 @@ static NSArray * AFCertificateTrustChainForServerTrust(SecTrustRef serverTrust) 
 
 			NSUInteger trustedPublicKeyCount = 0;
 			NSArray *publicKeys = AFPublicKeyTrustChainForServerTrust(serverTrust);
-			
+
 			for (id trustChainPublicKey in publicKeys) {
 			    for (id pinnedPublicKey in self.pinnedPublicKeys) {
 			        if (AFSecKeyIsEqualToKey((__bridge SecKeyRef)trustChainPublicKey, (__bridge SecKeyRef)pinnedPublicKey)) {

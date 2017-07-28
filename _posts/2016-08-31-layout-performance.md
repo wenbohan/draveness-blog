@@ -3,6 +3,7 @@ layout: post
 title: 从 Auto Layout 的布局算法谈性能
 date: 2016-08-31 21:52:25.000000000 +08:00
 permalink: /:title
+tags: iOS ASDK
 ---
 > 这是使用 ASDK 性能调优系列的第二篇文章，前一篇文章中讲到了如何提升 iOS 应用的渲染性能，你可以点击 [这里](https://github.com/Draveness/iOS-Source-Code-Analyze/blob/master/contents/AsyncDisplayKit/提升%20iOS%20界面的渲染性能.md) 了解这部分的内容。
 
@@ -225,7 +226,7 @@ ASDK 的文档中推荐在子类中覆写 `- layoutSpecThatFits:` 方法，返�
 	  layout.flattened = YES;
 	  [flattenedSublayouts addObject:layout];
 	}
-	
+
 	for (ASLayout *sublayout in context.layout.sublayouts) {
 	  if (sublayout.isFlattened == NO) queue.push({sublayout, context.absolutePosition + sublayout.position});
   }
@@ -315,9 +316,7 @@ ASDK 的文档中推荐在子类中覆写 `- layoutSpecThatFits:` 方法，返�
 + [AsyncDisplayKit 介绍（二）布局系统](https://medium.com/@jasonyuh/asyncdisplaykit介绍-二-布局系统-1f1a674cf644#.8jskykm15)
 
 > Github Repo：[iOS-Source-Code-Analyze](https://github.com/draveness/iOS-Source-Code-Analyze)
-> 
+>
 > Follow: [Draveness · GitHub](https://github.com/Draveness)
 >
 > Source: http://draveness.me/layout-performance
-
-

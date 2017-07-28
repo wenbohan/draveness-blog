@@ -4,6 +4,7 @@ title: 如何优雅地使用 KVO
 date: 2017-03-06 00:34:44.000000000 +08:00
 cover: http://img.draveness.me/kvoobserver-cover.jpg
 permalink: /:title
+tags: iOS KVO
 ---
 KVO 作为 iOS 中一种强大并且有效的机制，为 iOS 开发者们提供了很多的便利；我们可以使用 KVO 来检测对象属性的变化、快速做出响应，这能够为我们在开发强交互、响应式应用以及实现视图和模型的双向绑定时提供大量的帮助。
 

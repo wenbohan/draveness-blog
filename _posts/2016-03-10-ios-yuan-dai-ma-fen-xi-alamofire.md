@@ -3,6 +3,7 @@ layout: post
 title: iOS 源代码分析 ---- Alamofire
 date: 2016-03-10 17:41:36.000000000 +08:00
 permalink: /:title
+tags: iOS Alamofire
 ---
 
 
@@ -12,7 +13,7 @@ permalink: /:title
 
 > Elegant HTTP Networking in Swift
 
-为什么这次我选择阅读 Alamofire 的源代码而不是 AFNetworking 呢, 其实有两点原因. 
+为什么这次我选择阅读 Alamofire 的源代码而不是 AFNetworking 呢, 其实有两点原因.
 
 1. AFNetworking 作为一个有着很多年的历史的框架, 它虽然有着强大的社区, 不过因为时间太久了, 可能有一些历史上的包袱. 而 Alamofire 是在 Swift 诞生之后才开始出现的, 到现在为止也并没有多长时间, 它的源代码都是**新鲜**的.
 2. 由于最近在写 Swift 的项目, 所以没有选择 AFNetworking.
@@ -26,7 +27,7 @@ $ find Source -name "*.swift" | xargs cat |wc -l
 
 也就是说 Alamofire 在包含注释以及空行的情况下, 只使用了 3000 多行代码就实现了一个用于处理 HTTP 请求的框架.
 
-所以它描述中的 `Elegant` 也可以说是名副其实. 
+所以它描述中的 `Elegant` 也可以说是名副其实.
 
 ## 目录结构
 
@@ -240,7 +241,7 @@ init(session: NSURLSession, task: NSURLSessionTask) {
 
 `ResponseSerialization` 是用来对 `Reponse` 返回的值进行序列化显示的一个 extension.
 
-它的设计非常的巧妙, 同时可以处理 `Data` `String` 和 `JSON` 格式的数据, 
+它的设计非常的巧妙, 同时可以处理 `Data` `String` 和 `JSON` 格式的数据,
 
 #### ResponseSerializer 协议
 

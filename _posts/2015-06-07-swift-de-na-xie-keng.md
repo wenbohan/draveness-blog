@@ -3,6 +3,7 @@ layout: post
 title: MagicMove 在 iOS 中的实现
 date: 2015-06-07 21:33:57.000000000 +08:00
 permalink: /:title
+tags: iOS
 ---
 最近由于去武汉参加 hackday, 十多天没有更新博客了. 今天就来说一说, 我在 hackday 上使用 swift 开发 App 遇到的哪些问题吧.
 

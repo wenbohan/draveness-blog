@@ -3,6 +3,7 @@ layout: post
 title: 懒惰的 initialize 方法
 date: 2016-04-30 17:50:08.000000000 +08:00
 permalink: /:title
+tags: iOS Runtime
 ---
 <iframe src="http://ghbtns.com/github-btn.html?user=draveness&type=follow&size=large" height="30" width="240" frameborder="0" scrolling="0" style="width:240px; height: 30px;" allowTransparency="true"></iframe>
 
@@ -127,7 +128,7 @@ void _class_initialize(Class cls)
     if (supercls  &&  !supercls->isInitialized()) {
         _class_initialize(supercls);
     }
-    
+
     {
         // 2. 通过加锁来设置 RW_INITIALIZING 标志位
         monitor_locker_t lock(classInitLock);
@@ -136,7 +137,7 @@ void _class_initialize(Class cls)
             reallyInitialize = YES;
         }
     }
-    
+
     if (reallyInitialize) {
         // 3. 成功设置标志位，向当前类发送 +initialize 消息
         _setThisThreadIsInitializingClass(cls);
@@ -199,18 +200,18 @@ void _class_initialize(Class cls)
 
 4. 完成初始化，如果父类已经初始化完成，设置 `RW_INITIALIZED` 标志位。否则，在父类初始化完成之后再设置标志位
 
-        
+
         monitor_locker_t lock(classInitLock);
         if (!supercls  ||  supercls->isInitialized()) {
             _finishInitializing(cls, supercls);
         } else {
             _finishInitializingAfter(cls, supercls);
         }
-        
+
 
 5. 如果当前线程正在初始化当前类，直接返回，否则，会等待其它线程初始化结束后，再返回，**保证线程安全**
 
-    
+
         if (_thisThreadIsInitializingClass(cls)) {
             return;
         } else {
@@ -220,10 +221,10 @@ void _class_initialize(Class cls)
             }
             return;
         }
-    
+
 
 6. 初始化成功后，直接返回
-    
+
         return;
 
 
@@ -270,7 +271,7 @@ static void _finishInitializing(Class cls, Class supercls)
     PendingInitialize *pending;
 
     cls->setInitialized();
-    
+
     if (!pendingInitializeMap) return;
     pending = (PendingInitialize *)NXMapGet(pendingInitializeMap, cls);
     if (!pending) return;

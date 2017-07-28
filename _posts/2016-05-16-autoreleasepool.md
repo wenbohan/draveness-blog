@@ -3,9 +3,10 @@ layout: post
 title: 自动释放池的前世今生 ---- 深入解析 autoreleasepool
 date: 2016-05-16 01:20:23.000000000 +08:00
 permalink: /:title
+tags: iOS Runtime
 ---
 > 关注仓库，及时获得更新：[iOS-Source-Code-Analyze](https://github.com/draveness/iOS-Source-Code-Analyze)
-> 
+>
 > Follow: [Draveness · Github](https://github.com/Draveness)
 
 > 由于 Objective-C 中的内存管理是一个比较大的话题，所以会分为两篇文章来对内存管理中的一些机制进行剖析，一部分分析自动释放池以及 `autorelease` 方法，另一部分分析 `retain`、`release` 方法的实现以及自动引用计数。
@@ -75,9 +76,9 @@ struct __AtAutoreleasePool {
 int main(int argc, const char * argv[]) {
     {
         void * atautoreleasepoolobj = objc_autoreleasePoolPush();
-        
+
         // do whatever you want
-        
+
         objc_autoreleasePoolPop(atautoreleasepoolobj);
     }
     return 0;
@@ -178,9 +179,9 @@ class AutoreleasePoolPage {
 int main(int argc, const char * argv[]) {
     {
         void * atautoreleasepoolobj = objc_autoreleasePoolPush();
-        
+
         // do whatever you want
-        
+
         objc_autoreleasePoolPop(atautoreleasepoolobj);
     }
     return 0;
@@ -547,6 +548,5 @@ static inline id autorelease(id obj) {
 + [黑幕背后的 Autorelease](http://blog.sunnyxx.com/2014/10/15/behind-autorelease/)
 
 > 关注仓库，及时获得更新：[iOS-Source-Code-Analyze](https://github.com/draveness/iOS-Source-Code-Analyze)
-> 
+>
 > Follow: [Draveness · Github](https://github.com/Draveness)
-

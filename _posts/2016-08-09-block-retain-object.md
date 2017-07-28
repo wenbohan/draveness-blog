@@ -3,10 +3,11 @@ layout: post
 title: iOS 中的 block 是如何持有对象的
 date: 2016-08-09 22:02:56.000000000 +08:00
 permalink: /:title
+tags: iOS Runtime
 ---
 
 > 关注仓库，及时获得更新：[iOS-Source-Code-Analyze](https://github.com/draveness/iOS-Source-Code-Analyze)
-> 
+>
 > Follow: [Draveness · Github](https://github.com/Draveness)
 
 Block 是 Objective-C 中笔者最喜欢的特性，它为 Objective-C 这门语言提供了强大的函数式编程能力，而最近苹果推出的很多新的 API 都已经开始原生的支持 block 语法，可见它在 Objective-C 中变得越来越重要。
@@ -99,7 +100,7 @@ Objective-C 中的三种 block `__NSMallocBlock__`、`__NSStackBlock__` 和 `__N
 ```objectivec
 BOOL FBObjectIsBlock(void *object) {
 	Class blockClass = _BlockClass();
-	
+
 	Class candidate = object_getClass((__bridge id)object);
 	return [candidate isSubclassOfClass:blockClass];
 }
@@ -273,12 +274,12 @@ struct _block_byref_block;
 ```objectivec
 + (id)alloc {
 	FBBlockStrongRelationDetector *obj = [super alloc];
-	
+
 	// Setting up block fakery
 	obj->forwarding = obj;
 	obj->byref_keep = byref_keep_nop;
 	obj->byref_dispose = byref_dispose_nop;
-	
+
 	return obj;
 }
 
@@ -293,12 +294,12 @@ static void byref_dispose_nop(struct _block_byref_block *param) {}
 ```objectivec
 static NSIndexSet *_GetBlockStrongLayout(void *block) {
 	struct BlockLiteral *blockLiteral = block;
-	
+
 	if ((blockLiteral->flags & BLOCK_HAS_CTOR)
 		|| !(blockLiteral->flags & BLOCK_HAS_COPY_DISPOSE)) {
 		return nil;
 	}
-	
+
 	...
 }
 ```
@@ -310,17 +311,17 @@ static NSIndexSet *_GetBlockStrongLayout(void *block) {
 static NSIndexSet *_GetBlockStrongLayout(void *block) {
 	...
 	void (*dispose_helper)(void *src) = blockLiteral->descriptor->dispose_helper;
-	const size_t ptrSize = sizeof(void *);	
+	const size_t ptrSize = sizeof(void *);
 	const size_t elements = (blockLiteral->descriptor->size + ptrSize - 1) / ptrSize;
-	
+
 	void *obj[elements];
 	void *detectors[elements];
-	
+
 	for (size_t i = 0; i < elements; ++i) {
 		FBBlockStrongRelationDetector *detector = [FBBlockStrongRelationDetector new];
 		obj[i] = detectors[i] = detector;
 	}
-	
+
 	@autoreleasepool {
 		dispose_helper(obj);
 	}
@@ -337,16 +338,16 @@ static NSIndexSet *_GetBlockStrongLayout(void *block) {
 static NSIndexSet *_GetBlockStrongLayout(void *block) {
 	...
 	NSMutableIndexSet *layout = [NSMutableIndexSet indexSet];
-	
+
 	for (size_t i = 0; i < elements; ++i) {
 		FBBlockStrongRelationDetector *detector = (FBBlockStrongRelationDetector *)(detectors[i]);
 		if (detector.isStrong) {
 			[layout addIndex:i];
 		}
-		
+
 		[detector trueRelease];
 	}
-	
+
 	return layout;
 }
 ```
@@ -387,6 +388,5 @@ FBRetainCycleDetector *detector = [FBRetainCycleDetector new];
 其实最开始笔者对这个 `dispose_helper` 实现的机制并不是特别的肯定，只是有一个猜测，但是在询问了 `FBBlockStrongRelationDetector` 的作者之后，才确定 `dispose_helper` 确实会负责向所有捕获的变量发送 `release` 消息，如果有兴趣可以看这个 [issue](https://github.com/facebook/FBRetainCycleDetector/issues/15)。这部分的代码其实最开始源于 mikeash 大神的 [Circle](https://github.com/mikeash/Circle)，不过对于他是如何发现这一点的，笔者并不清楚，如果各位有相关的资料或者合理的解释，可以随时联系我。
 
 > 关注仓库，及时获得更新：[iOS-Source-Code-Analyze](https://github.com/draveness/iOS-Source-Code-Analyze)
-> 
+>
 > Follow: [Draveness · Github](https://github.com/Draveness)
-

@@ -3,6 +3,7 @@ layout: post
 title: DKNightVersion 的实现 --- 如何为 iOS 应用添加夜间模式
 date: 2015-05-09 15:13:35.000000000 +08:00
 permalink: /:title
+tags: iOS
 ---
 **最新: [成熟的夜间模式解决方案](http://draveness.me/night)**
 
@@ -11,11 +12,11 @@ permalink: /:title
 
 在很多重阅读或者需要在夜间观看的软件其实都会把夜间模式当做一个 App 所需要具备的特性. 而如何在不改变原有的架构, 甚至不改变原有的代码的基础上, 就能为应用优雅地添加夜间模式就成为一个在很多应用开发的过程中不得不面对的一个问题.
 
-就是以上事情的驱动, 使我思考如何才能使用一种优雅并且简洁的方法解决这一问题. 
+就是以上事情的驱动, 使我思考如何才能使用一种优雅并且简洁的方法解决这一问题.
 
 而 [DKNightVersion](https://github.com/Draveness/DKNightVersion) 就是我带来的解决方案.
 
-到目前为止, 这个框架的大部分的工作都已经完成了, 或许它现在不够完善, 不过我会持续地维护这个框架, 帮助饱受实现夜间模式之苦的工程师们解决这个~~坑的一逼的~~需求. 
+到目前为止, 这个框架的大部分的工作都已经完成了, 或许它现在不够完善, 不过我会持续地维护这个框架, 帮助饱受实现夜间模式之苦的工程师们解决这个~~坑的一逼的~~需求.
 
 ## 实现
 
@@ -132,14 +133,14 @@ DKNightVersion 为大多数常用的 `color` 比如说: `backgroundColor` `tintC
 
 ### 实现默认颜色
 
-我们要在 DKNightVersion 实现默认的夜间模式配色, 以便减少开发者的工作量. 
+我们要在 DKNightVersion 实现默认的夜间模式配色, 以便减少开发者的工作量.
 
 但是因为我们对每种 `color` 只在父类中实现一次, 这样使得子类能够继承父类的实现, 但是同样**不想让 UIKit 系子类继承父类的默认颜色**.
 
 ```objectivec
 - (UIColor *)defaultNightBackgroundColor {
-    BOOL notUIKitSubclass = [self isKindOfClass:[UIView class]] && ![NSStringFromClass(self.class) hasPrefix:@"UI"]; 
-    if ([self isMemberOfClass:[UIView class]] || notUIKitSubclass) { 
+    BOOL notUIKitSubclass = [self isKindOfClass:[UIView class]] && ![NSStringFromClass(self.class) hasPrefix:@"UI"];
+    if ([self isMemberOfClass:[UIView class]] || notUIKitSubclass) {
         return UIColorFromRGB(0x343434);
     } else {
         UIColor *resultColor = self.normalBackgroundColor ?: [UIColor clearColor];

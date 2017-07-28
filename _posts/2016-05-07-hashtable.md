@@ -3,6 +3,7 @@ layout: post
 title: 上古时代 Objective-C 中哈希表的实现
 date: 2016-05-07 00:12:56.000000000 +08:00
 permalink: /:title
+tags: iOS Runtime
 ---
 > 关注仓库，及时获得更新：[iOS-Source-Code-Analyze](https://github.com/draveness/iOS-Source-Code-Analyze)
 
@@ -19,7 +20,7 @@ permalink: /:title
 `NXHashTable` 的实现有着将近 30 年的历史，不过仍然作为重要的底层数据结构存储整个应用中的类。
 
 > 文中会涉及一些数据结构方面的简单知识，例如[拉链法](https://en.wikipedia.org/wiki/Hash_table#Separate_chaining_with_linked_lists)。
-> 
+>
 > 注意：**文章中分析的不是 `NSHashTable` 而是 `NXHashTable`。**
 
 ## NXHashTable
@@ -88,7 +89,7 @@ NXHashTable *NXCreateHashTableFromZone (NXHashTablePrototype prototype, unsigned
     NXHashTablePrototype	 *proto;
 
     table = ALLOCTABLE(z);
-    
+
     ...
 
     table->count = 0;
@@ -111,7 +112,7 @@ NXHashTable *NXCreateHashTableFromZone (NXHashTablePrototype prototype, unsigned
 
 ```
 c   binary  result
-1   1       1 
+1   1       1
 2   10      3(0b11)
 6   110     7(0b111)
 100 1100100 127(0b111 1111)
@@ -226,7 +227,7 @@ while (j--) {
 ```
 
 + `count == 0`，直接返回
-+ `count == 1`，使用 `ISEQUAL` 比较查找的数据与 `bucket->elements.one` 
++ `count == 1`，使用 `ISEQUAL` 比较查找的数据与 `bucket->elements.one`
 + `count > 1`，依次与 `bucket->elements.many` 中的值进行比较
 
     > 你可能觉得到这里的时间复杂度比较糟糕，然而这个列表并不会很长，具体会在 [NXHashInsert](#nxhashinsert) 中解释。
@@ -234,9 +235,9 @@ while (j--) {
 ### NXHashGet
 
 > 其实我一直觉得这个方法可能用处不是很大，尤其是在使用默认的 `NXHashTablePrototype` 时，因为默认的 `NXHashTablePrototype` 中的 `isEqual` 函数指针只是比较两个数据的指针是否相同。
-> 
+>
 > 其最大作用就是查看当前 `data` 是不是在表中。
-> 
+>
 > 如果当前数据在表中，那么这个方法只会返回一个相同的指针，没有太多的意义。
 
 它的实现跟上面的 `NXHashMember` 区别并不大，这里就不过多介绍了：
@@ -306,7 +307,7 @@ void *NXHashInsert (NXHashTable *table, const void *data) {
     if (bucket->count) bcopy ((const char*)bucket->elements.many, (char*)(newt+1), bucket->count * PTRSIZE);
     *newt = data;
     FREEPAIRS (bucket->elements.many);
-    bucket->count++; 
+    bucket->count++;
     bucket->elements.many = newt;
     table->count++;
     if (table->count > table->nbBuckets) _NXHashRehash (table);
@@ -324,7 +325,7 @@ void *NXHashInsert (NXHashTable *table, const void *data) {
 
 ```objectivec
 if (! j) {
-    bucket->count++; 
+    bucket->count++;
     bucket->elements.one = data;
     table->count++;
     return NULL;
@@ -350,7 +351,7 @@ if (j == 1) {
     bucket->count++;
     bucket->elements.many = newt;
     table->count++;
-    
+
     ...
 
     return NULL;
@@ -429,7 +430,7 @@ void _NXHashRehashToCapacity (NXHashTable *table, unsigned newCapacity) {
     while (NXNextHashState (old, &state, &aux))
         (void) NXHashInsert (table, aux);
     freeBuckets (old, NO);
-    
+
     free (old->buckets);
     free (old);
 }
@@ -599,7 +600,7 @@ int main(int argc, const char * argv[]) {
 
 代码中初始化了一个 `capacities` 存储需要测量的数据量级，然后调用 `NXHashInsert` 方法将相当数量级的数据添加到哈希表中：
 
-|Capacities|Execution Time| Mean Time| 
+|Capacities|Execution Time| Mean Time|
 |-------:|---------:|-------------:|
 |     100|  0.000334| 0.0000033402 |
 |    1000|  0.001962| 0.0000019619 |
@@ -634,7 +635,7 @@ NXHashTable *NXCreateHashTable (NXHashTablePrototype prototype, unsigned capacit
 
 重新运行代码，测量性能：
 
-|Capacities|Execution Time| Mean Time| 
+|Capacities|Execution Time| Mean Time|
 |-------:|---------:|-------------:|
 |     100|  0.000740| 0.0000073999 |
 |    1000|  0.003442| 0.0000034420 |
@@ -664,7 +665,7 @@ NXHashTable *NXCreateHashTable (NXHashTablePrototype prototype, unsigned capacit
 
 首先是使用 `init` 创建的 `NSMutableArray` 数组，也就是没有传入 `capacity`：
 
-|Capacities|Execution Time| Mean Time| 
+|Capacities|Execution Time| Mean Time|
 |--------:|---------:|-------------:|
 |      100|  0.000539| 0.0000053900|
 |     1000|  0.003185| 0.0000031850|
@@ -678,7 +679,7 @@ NXHashTable *NXCreateHashTable (NXHashTablePrototype prototype, unsigned capacit
 
 下面是使用 `initWithCapacity:` 创建的数组：
 
-|Capacities|Execution Time| Mean Time| 
+|Capacities|Execution Time| Mean Time|
 |--------:|---------:|-------------:|
 |      100|  0.000256| 0.0000025600|
 |     1000|  0.001775| 0.0000017750|
@@ -732,7 +733,7 @@ objc_copyClassList(unsigned int *outCount)
         }
         result[count] = nil;
     }
-        
+
     if (outCount) *outCount = count;
     return result;
 }
@@ -766,4 +767,3 @@ Created by Bertrand Serlet, Feb 89
 <iframe src="http://ghbtns.com/github-btn.html?user=draveness&type=follow&size=large" height="30" width="240" frameborder="0" scrolling="0" style="width:240px; height: 30px;" allowTransparency="true"></iframe>
 
 > 关注仓库，及时获得更新：[iOS-Source-Code-Analyze](https://github.com/draveness/iOS-Source-Code-Analyze)
-

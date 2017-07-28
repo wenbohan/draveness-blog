@@ -3,6 +3,7 @@ layout: post
 title: 使用 ASDK 性能调优 - 提升 iOS 界面的渲染性能
 date: 2016-08-22 20:57:31.000000000 +08:00
 permalink: /:title
+tags: iOS ASDK
 ---
 
 > 这一系列的文章会从几个方面对 [ASDK](http://asyncdisplaykit.org) 在性能调优方面策略的实现进行分析，帮助读者理解 ASDK 如何做到使复杂的 UI 界面达到 60 FPS 的刷新频率的；本篇文章会从视图的渲染层面讲解 ASDK 对于渲染过程的优化并对 ASDK 进行概述。
@@ -267,7 +268,7 @@ ASDK 中到底使用了哪些方法来对视图进行渲染呢？本文主要会
 		# 更新 layer 显示的内容
 	}
 }
-		
+
 ```
 
 > `_flags` 是 `ASDisplayNodeFlags` 结构体，用于标记当前 `ASDisplayNode` 的一些 BOOL 值，比如，异步显示、栅格化子视图等等，你不需要知道都有什么，根据这些值的字面意思理解就已经足够了。
@@ -303,7 +304,7 @@ ASDK 中到底使用了哪些方法来对视图进行渲染呢？本文主要会
 	 if (!_flags.isInHierarchy && !_flags.visibilityNotificationsDisabled && ![self __selfOrParentHasVisibilityNotificationsDisabled]) {
 
 		# 标记节点的 flag
-		
+
 		if (self.contents == nil) {
 			CALayer *layer = self.layer;
 			[layer setNeedsDisplay];
@@ -378,9 +379,9 @@ ASDK 中到底使用了哪些方法来对视图进行渲染呢？本文主要会
   ...
 
   asyncdisplaykit_async_transaction_operation_block_t displayBlock = [self _displayBlockWithAsynchronous:asynchronously isCancelledBlock:isCancelledBlock rasterizing:NO];
-  
+
   if (!displayBlock) return;
-  
+
   asyncdisplaykit_async_transaction_operation_completion_block_t completionBlock = ^(id<NSObject> value, BOOL canceled){
 	ASDisplayNodeCAssertMainThread();
 	if (!canceled && !isCancelledBlock()) {
@@ -475,7 +476,7 @@ ASDK 中到底使用了哪些方法来对视图进行渲染呢？本文主要会
 	#：栅格化
   } else if (flags.implementsInstanceImageDisplay || flags.implementsImageDisplay) {
 	id drawParameters = [self drawParameters];
-	
+
 	displayBlock = ^id{
 	  UIImage *result = nil;
 	  if (flags.implementsInstanceImageDisplay) {
@@ -518,7 +519,7 @@ ASDK 中到底使用了哪些方法来对视图进行渲染呢？本文主要会
 	  } else {
 		[[self class] drawRect:bounds withParameters:drawParameters isCancelled:isCancelledBlock isRasterizing:rasterizing];
 	  }
-	  
+
 	  UIImage *image = nil;
 	  if (!rasterizing) {
 		image = UIGraphicsGetImageFromCurrentImageContext();
@@ -598,26 +599,26 @@ ASDK 提供了一个私有的管理事务的机制，由三部分组成 `_ASAsyn
 void ASAsyncTransactionQueue::GroupImpl::schedule(NSInteger priority, dispatch_queue_t queue, dispatch_block_t block) {
   ASAsyncTransactionQueue &q = _queue;
   ASDN::MutexLocker locker(q._mutex);
-  
+
   DispatchEntry &entry = q._entries[queue];
-  
+
   Operation operation;
   operation._block = block;
   operation._group = this;
   operation._priority = priority;
   entry.pushOperation(operation);
-  
+
   ++_pendingOperations;
-  
+
   NSUInteger maxThreads = [NSProcessInfo processInfo].activeProcessorCount * 2;
 
   if ([[NSRunLoop mainRunLoop].currentMode isEqualToString:UITrackingRunLoopMode])
 	--maxThreads;
-  
+
   if (entry._threadCount < maxThreads) {
 	bool respectPriority = entry._threadCount > 0;
 	++entry._threadCount;
-	
+
 	dispatch_async(queue, ^{
 	  while (!entry._operationQueue.empty()) {
 		Operation operation = entry.popNextOperation(respectPriority);
@@ -630,7 +631,7 @@ void ASAsyncTransactionQueue::GroupImpl::schedule(NSInteger priority, dispatch_q
 		}
 	  }
 	  --entry._threadCount;
-	  
+
 	  if (entry._threadCount == 0) {
 		q._entries.erase(queue);
 	  }
@@ -683,7 +684,7 @@ static void _transactionGroupRunLoopObserverCallback(CFRunLoopObserverRef observ
 - (void)commit {
   ASDisplayNodeAssertMainThread();
   __atomic_store_n(&_state, ASAsyncTransactionStateCommitted, __ATOMIC_SEQ_CST);
-	
+
   _group->notify(_callbackQueue, ^{
 	ASDisplayNodeAssertMainThread();
 	[self completeTransaction];
@@ -724,7 +725,7 @@ void ASAsyncTransactionQueue::GroupImpl::leave() {
   if (_pendingOperations == 0) {
 	std::list<GroupNotify> notifyList;
 	_notifyList.swap(notifyList);
-	
+
 	for (GroupNotify & notify : notifyList) {
 	  dispatch_async(notify._queue, notify._block);
 	}
@@ -741,7 +742,7 @@ void ASAsyncTransactionQueue::GroupImpl::leave() {
 	for (ASDisplayNodeAsyncTransactionOperation *operation in _operations) {
 	  [operation callAndReleaseCompletionBlock:isCanceled];
 	}
-	
+
 	__atomic_store_n(&_state, ASAsyncTransactionStateComplete, __ATOMIC_SEQ_CST);
   }
 }
@@ -805,8 +806,7 @@ ASDK 对于绘制过程的优化有三部分：分别是栅格化子视图、绘
 ## 其它
 
 > Github Repo：[iOS-Source-Code-Analyze](https://github.com/draveness/iOS-Source-Code-Analyze)
-> 
+>
 > Follow: [Draveness · Github](https://github.com/Draveness)
 >
 > Source: http://draveness.me/asdk-rendering
-

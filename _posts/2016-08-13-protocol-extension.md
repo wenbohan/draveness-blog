@@ -3,6 +3,7 @@ layout: post
 title: 如何在 Objective-C 中实现协议扩展
 date: 2016-08-13 13:33:58.000000000 +08:00
 permalink: /:title
+tags: iOS
 ---
 ![](http://img.draveness.me/2016-08-13-protocol-recordings.jpeg)
 
@@ -120,7 +121,7 @@ ProtocolKit 中有两条重要的执行路线：
 上面的这一坨宏并不需要一个一个来分析，只需要看一下最后展开会变成什么：
 
 ```objectivec
-@protocol TestProtocol; 
+@protocol TestProtocol;
 
 @interface __PKContainer_TestProtocol_0 : NSObject <TestProtocol>
 
@@ -129,7 +130,7 @@ ProtocolKit 中有两条重要的执行路线：
 @implementation __PKContainer_TestProtocol_0
 
 + (void)load {
-	_pk_extension_load(@protocol(TestProtocol), __PKContainer_TestProtocol_0.class); 
+	_pk_extension_load(@protocol(TestProtocol), __PKContainer_TestProtocol_0.class);
 }
 ```
 
@@ -144,9 +145,9 @@ ProtocolKit 中有两条重要的执行路线：
 
 ```objectivec
 void _pk_extension_load(Protocol *protocol, Class containerClass) {
-	
+
 	pthread_mutex_lock(&protocolsLoadingLock);
-	
+
 	if (extendedProtcolCount >= extendedProtcolCapacity) {
 		size_t newCapacity = 0;
 		if (extendedProtcolCapacity == 0) {
@@ -157,7 +158,7 @@ void _pk_extension_load(Protocol *protocol, Class containerClass) {
 		allExtendedProtocols = realloc(allExtendedProtocols, sizeof(*allExtendedProtocols) * newCapacity);
 		extendedProtcolCapacity = newCapacity;
 	}
-	
+
 	...
 
 	pthread_mutex_unlock(&protocolsLoadingLock);
@@ -223,7 +224,7 @@ void _pk_extension_merge(PKExtendedProtocol *extendedProtocol, Class containerCl
 	free(extendedProtocol->instanceMethods);
 	extendedProtocol->instanceMethods = mergedInstanceMethods;
 	extendedProtocol->instanceMethodCount += appendingInstanceMethodCount;
-	
+
 	// Class methods
 	...
 }
@@ -237,7 +238,7 @@ void _pk_extension_merge(PKExtendedProtocol *extendedProtocol, Class containerCl
 
 ```objectivec
 Method *_pk_extension_create_merged(Method *existMethods, unsigned existMethodCount, Method *appendingMethods, unsigned appendingMethodCount) {
-	
+
 	if (existMethodCount == 0) {
 		return appendingMethods;
 	}
@@ -266,7 +267,7 @@ __attribute__((constructor)) static void _pk_extension_inject_entry(void) {
 	#1：加锁
 	unsigned classCount = 0;
 	Class *allClasses = objc_copyClassList(&classCount);
-	
+
 	@autoreleasepool {
 		for (unsigned protocolIndex = 0; protocolIndex < extendedProtcolCount; ++protocolIndex) {
 			PKExtendedProtocol extendedProtcol = allExtendedProtocols[protocolIndex];
@@ -287,20 +288,20 @@ __attribute__((constructor)) static void _pk_extension_inject_entry(void) {
 
 ```objectivec
 static void _pk_extension_inject_class(Class targetClass, PKExtendedProtocol extendedProtocol) {
-	
+
 	for (unsigned methodIndex = 0; methodIndex < extendedProtocol.instanceMethodCount; ++methodIndex) {
 		Method method = extendedProtocol.instanceMethods[methodIndex];
 		SEL selector = method_getName(method);
-		
+
 		if (class_getInstanceMethod(targetClass, selector)) {
 			continue;
 		}
-		
+
 		IMP imp = method_getImplementation(method);
 		const char *types = method_getTypeEncoding(method);
 		class_addMethod(targetClass, selector, imp, types);
 	}
-	
+
 	#1: 注射类方法
 }
 ```
@@ -312,14 +313,14 @@ Class targetMetaClass = object_getClass(targetClass);
 for (unsigned methodIndex = 0; methodIndex < extendedProtocol.classMethodCount; ++methodIndex) {
 	Method method = extendedProtocol.classMethods[methodIndex];
 	SEL selector = method_getName(method);
-	
+
 	if (selector == @selector(load) || selector == @selector(initialize)) {
 		continue;
 	}
 	if (class_getInstanceMethod(targetMetaClass, selector)) {
 		continue;
 	}
-	
+
 	IMP imp = method_getImplementation(method);
 	const char *types = method_getTypeEncoding(method);
 	class_addMethod(targetMetaClass, selector, imp, types);
@@ -341,5 +342,5 @@ ProtocolKit 通过宏和 runtime 实现了类似协议扩展的功能，其实�
 + [懒惰的 initialize 方法](https://github.com/Draveness/iOS-Source-Code-Analyze/blob/master/objc/懒惰的%20initialize%20方法.md)
 
 > Github Repo：[iOS-Source-Code-Analyze](https://github.com/draveness/iOS-Source-Code-Analyze)
-> 
+>
 > Follow: [Draveness · Github](https://github.com/Draveness)

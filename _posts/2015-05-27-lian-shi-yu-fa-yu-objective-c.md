@@ -3,6 +3,7 @@ layout: post
 title: 链式语法与 Objective-C
 date: 2015-05-27 15:44:22.000000000 +08:00
 permalink: /:title
+tags: iOS
 ---
 作为一个 Objective-C 语言的使用者已经有近两年的时间了. 在逐渐熟悉手中的工具, Objective-C 语言的同时, 我也开始从更高的角度来观察这一门语言.
 

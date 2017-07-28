@@ -3,6 +3,7 @@ layout: post
 title: Pull-Driven 的数据流 RACSequence
 date: 2017-02-04 22:15:57.000000000 +08:00
 permalink: /:title
+tags: iOS RAC
 ---
 ReactiveCocoa 在设计上很大程度借鉴了 Reactive Extension 中的概念，可以说 ReactiveCocoa 是 Rx 在 Objective-C 语言中的实现。
 

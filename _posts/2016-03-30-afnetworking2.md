@@ -3,6 +3,7 @@ layout: post
 title: AFNetworking 的核心 AFURLSessionManager（二）
 date: 2016-03-30 09:50:43.000000000 +08:00
 permalink: /:title
+tags: iOS AFNetworking
 ---
 Blog: [Draveness](http://draveness.me)
 
@@ -54,7 +55,7 @@ Blog: [Draveness](http://draveness.me)
 
     self.lock = [[NSLock alloc] init];
     self.lock.name = AFURLSessionManagerLockName;
-    
+
     #1: 为已有的 task 设置代理, 略
 
     return self;
@@ -145,7 +146,7 @@ Blog: [Draveness](http://draveness.me)
 - (void)setDelegate:(AFURLSessionManagerTaskDelegate *)delegate
             forTask:(NSURLSessionTask *)task
 {
-		
+
 	#1: 检查参数, 略
 
     [self.lock lock];
@@ -215,7 +216,7 @@ didBecomeInvalidWithError:(NSError *)error
 - (void)setupProgressForTask:(NSURLSessionTask *)task {
 
 	#1：设置在上传进度或者下载进度状态改变时的回调
-	
+
 	#2：KVO
 
 }
@@ -443,7 +444,7 @@ didFinishDownloadingToURL:(NSURL *)location
     NSAssert([self respondsToSelector:@selector(state)], @"Does not respond to state");
     NSURLSessionTaskState state = [self state];
     [self af_resume];
-    
+
     if (state != NSURLSessionTaskStateRunning) {
         [[NSNotificationCenter defaultCenter] postNotificationName:AFNSURLSessionTaskDidResumeNotification object:self];
     }
@@ -453,7 +454,7 @@ didFinishDownloadingToURL:(NSURL *)location
     NSAssert([self respondsToSelector:@selector(state)], @"Does not respond to state");
     NSURLSessionTaskState state = [self state];
     [self af_suspend];
-    
+
     if (state != NSURLSessionTaskStateSuspended) {
         [[NSNotificationCenter defaultCenter] postNotificationName:AFNSURLSessionTaskDidSuspendNotification object:self];
     }
@@ -477,7 +478,7 @@ didFinishDownloadingToURL:(NSURL *)location
 #pragma clang diagnostic pop
         IMP originalAFResumeIMP = method_getImplementation(class_getInstanceMethod([self class], @selector(af_resume)));
         Class currentClass = [localDataTask class];
-        
+
         while (class_getInstanceMethod(currentClass, @selector(resume))) {
             Class superClass = [currentClass superclass];
             IMP classResumeIMP = method_getImplementation(class_getInstanceMethod(currentClass, @selector(resume)));
@@ -488,7 +489,7 @@ didFinishDownloadingToURL:(NSURL *)location
             }
             currentClass = [currentClass superclass];
         }
-        
+
         [localDataTask cancel];
         [session finishTasksAndInvalidate];
     }
@@ -502,7 +503,7 @@ didFinishDownloadingToURL:(NSURL *)location
 	+ 真：5
 	+ 假：7
 5. 使用 `swizzleResumeAndSuspendMethodForClass:` 调剂该类的 `resume` 和 `suspend` 方法
-6. `currentClass = [currentClass superclass]` 
+6. `currentClass = [currentClass superclass]`
 
 > 这里复杂的实现是为了解决 bug [#2702](https://github.com/AFNetworking/AFNetworking/pull/2702)
 

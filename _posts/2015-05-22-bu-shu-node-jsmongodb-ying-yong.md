@@ -3,6 +3,7 @@ layout: post
 title: 部署 Node.js+MongoDB App
 date: 2015-05-22 17:55:22.000000000 +08:00
 permalink: /:title
+tags: Node.js MongoDB
 ---
 因为最近在为 SportJoin 写 Web API, 由于对大部分的工作已经完成, 所以开始尝试将 Node 代码部署到服务器上.
 

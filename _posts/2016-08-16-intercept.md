@@ -3,6 +3,7 @@ layout: post
 title: iOS 开发中使用 NSURLProtocol 拦截 HTTP 请求
 date: 2016-08-16 21:46:58.000000000 +08:00
 permalink: /:title
+tags: iOS HTTP
 ---
 
 这篇文章会提供一种在 Cocoa 层拦截所有 HTTP 请求的方法，其实标题已经说明了拦截 HTTP 请求需要的了解的就是 `NSURLProtocol`。
@@ -47,7 +48,7 @@ permalink: /:title
 	BOOL shouldAccept;
 	NSURL *url;
 	NSString *scheme;
-	
+
 	shouldAccept = (request != nil);
 	if (shouldAccept) {
 		url = [request URL];
@@ -94,7 +95,7 @@ permalink: /:title
 ```objectivec
 - (void)URLSession:(NSURLSession *)session dataTask:(NSURLSessionDataTask *)dataTask didReceiveResponse:(NSURLResponse *)response completionHandler:(void (^)(NSURLSessionResponseDisposition))completionHandler {
 	[[self client] URLProtocol:self didReceiveResponse:response cacheStoragePolicy:NSURLCacheStorageAllowed];
-	
+
 	completionHandler(NSURLSessionResponseAllow);
 }
 
@@ -138,7 +139,7 @@ permalink: /:title
  + [NSURLProtocol]([http://nshipster.com/nsurlprotocol/])
 
 > Github Repo：[iOS-Source-Code-Analyze](https://github.com/draveness/iOS-Source-Code-Analyze)
-> 
+>
 > Follow: [Draveness · Github](https://github.com/Draveness)
 >
 > Source: http://draveness.me/intercept

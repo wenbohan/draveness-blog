@@ -3,10 +3,11 @@ layout: post
 title: 如何实现 iOS 中的 Associated Object
 date: 2016-08-02 23:13:01.000000000 +08:00
 permalink: /:title
+tags: iOS
 ---
 
 > 关注仓库，及时获得更新：[iOS-Source-Code-Analyze](https://github.com/draveness/iOS-Source-Code-Analyze)
-> 
+>
 > Follow: [Draveness · Github](https://github.com/Draveness)
 
 这一篇文章是对 [FBRetainCycleDetector]([https://github.com/facebook/FBRetainCycleDetector]) 中实现的关联对象机制的分析；因为追踪的需要， FBRetainCycleDetector 重新实现了关联对象，本文主要就是对其实现关联对象的方法进行分析。
@@ -51,10 +52,10 @@ FBRetainCycleDetector 在对关联对象进行追踪时，修改了底层处理�
 namespace FB { namespace AssociationManager {
 	using ObjectAssociationSet = std::unordered_set<void *>;
 	using AssociationMap = std::unordered_map<id, ObjectAssociationSet *>;
-	
+
 	static auto _associationMap = new AssociationMap();
 	static auto _associationMutex = new std::mutex;
-	
+
 	static std::mutex *hookMutex(new std::mutex);
 	static bool hookTaken = false;
 
@@ -87,7 +88,7 @@ static void fb_objc_setAssociatedObject(id object, void *key, id value, objc_Ass
 			_threadUnsafeResetAssociationAtKey(object, key);
 		}
 	}
-	
+
 	fb_orig_objc_setAssociatedObject(object, key, value, policy);
 }
 ```
@@ -119,11 +120,11 @@ void _threadUnsafeSetStrongAssociation(id object, void *key, id value) {
 ```objectivec
 void _threadUnsafeResetAssociationAtKey(id object, void *key) {
 	auto i = _associationMap->find(object);
-	
+
 	if (i == _associationMap->end()) {
 		return;
 	}
-	
+
 	auto *refs = i->second;
 	auto j = refs->find(key);
 	if (j != refs->end()) {
@@ -226,5 +227,5 @@ FBRetainCycleDetector 为了追踪某一 `NSObject` 对关联对象的引用，�
 这是 FBRetainCycleDetector 系列文章中的第三篇，第四篇也是最后一篇文章会介绍 FBRetainCycleDetector 是如何获取 block 持有的强引用的，这也是我觉得整个框架中实现最精彩的一部分。
 
 > 关注仓库，及时获得更新：[iOS-Source-Code-Analyze](https://github.com/draveness/iOS-Source-Code-Analyze)
-> 
+>
 > Follow: [Draveness · Github](https://github.com/Draveness)

@@ -3,6 +3,7 @@ layout: post
 title: Redis 和 I/O 多路复用
 date: 2016-11-26 14:07:18.000000000 +08:00
 permalink: /:title
+tags: Redis
 ---
 最近在看 UNIX 网络编程并研究了一下 Redis 的实现，感觉 Redis 的源代码十分适合阅读和分析，其中 I/O 多路复用（mutiplexing）部分的实现非常干净和优雅，在这里想对这部分的内容进行简单的整理。
 

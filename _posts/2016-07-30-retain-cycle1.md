@@ -3,9 +3,10 @@ layout: post
 title: 如何在 iOS 中解决循环引用的问题
 date: 2016-07-30 11:13:16.000000000 +08:00
 permalink: /:title
+tags: iOS
 ---
 > 关注仓库，及时获得更新：[iOS-Source-Code-Analyze](https://github.com/draveness/iOS-Source-Code-Analyze)
-> 
+>
 > Follow: [Draveness · Github](https://github.com/Draveness)
 
 稍有常识的人都知道在 iOS 开发时，我们经常会遇到循环引用的问题，比如两个强指针相互引用，但是这种简单的情况作为稍有经验的开发者都会轻松地查找出来。
@@ -96,7 +97,7 @@ NSLog(@"%@", retainCycles);
 		[allRetainCycles unionSet:retainCycles];
 	}
 	[_candidates removeAllObjects];
-	
+
 	return allRetainCycles;
 }
 ```
@@ -110,9 +111,9 @@ NSLog(@"%@", retainCycles);
 																 stackDepth:(NSUInteger)stackDepth {
 	NSMutableSet<NSArray<FBObjectiveCGraphElement *> *> *retainCycles = [NSMutableSet new];
 	FBNodeEnumerator *wrappedObject = [[FBNodeEnumerator alloc] initWithObject:graphElement];
-	
+
 	NSMutableArray<FBNodeEnumerator *> *stack = [NSMutableArray new];
-	
+
 	NSMutableSet<FBNodeEnumerator *> *objectsOnPath = [NSMutableSet new];
 
 	...
@@ -130,7 +131,7 @@ NSLog(@"%@", retainCycles);
 																 stackDepth:(NSUInteger)stackDepth {
 	...
 	[stack addObject:wrappedObject];
-	
+
 	while ([stack count] > 0) {
 		@autoreleasepool {
 			FBNodeEnumerator *top = [stack lastObject];
@@ -140,24 +141,24 @@ NSLog(@"%@", retainCycles);
 			if (firstAdjacent) {
 
 				BOOL shouldPushToStack = NO;
-				
+
 				if ([objectsOnPath containsObject:firstAdjacent]) {
 					NSUInteger index = [stack indexOfObject:firstAdjacent];
 					NSInteger length = [stack count] - index;
-					
+
 					if (index == NSNotFound) {
 						shouldPushToStack = YES;
 					} else {
 						NSRange cycleRange = NSMakeRange(index, length);
 						NSMutableArray<FBNodeEnumerator *> *cycle = [[stack subarrayWithRange:cycleRange] mutableCopy];
 						[cycle replaceObjectAtIndex:0 withObject:firstAdjacent];
-						
+
 						[retainCycles addObject:[self _shiftToUnifiedCycle:[self _unwrapCycle:cycle]]];
 					}
 				} else {
 					shouldPushToStack = YES;
 				}
-				
+
 				if (shouldPushToStack) {
 					if ([stack count] < stackDepth) {
 						[stack addObject:firstAdjacent];
@@ -183,13 +184,13 @@ NSLog(@"%@", retainCycles);
 		_retainedObjectsSnapshot = [_object allRetainedObjects];
 		_enumerator = [_retainedObjectsSnapshot objectEnumerator];
 	}
-	
+
 	FBObjectiveCGraphElement *next = [_enumerator nextObject];
-	
+
 	if (next) {
 		return [[FBNodeEnumerator alloc] initWithObject:next];
 	}
-	
+
 	return nil;
 }
 ```
@@ -210,7 +211,7 @@ NSLog(@"%@", retainCycles);
 	for (FBNodeEnumerator *wrapped in cycle) {
 		[unwrappedArray addObject:wrapped.object];
 	}
-	
+
 	return unwrappedArray;
 }
 ```
@@ -237,5 +238,5 @@ NSLog(@"%@", retainCycles);
 到目前为止整个 `FBRetainCycleDetector` 的原理介绍大概就结束了，其原理完全是基于 DFS 算法：把整个对象的之间的引用情况当做图进行处理，查找其中的环，就找到了循环引用。不过原理真的很简单，如果这个 lib 的实现仅仅是这样的话，我也不会写几篇文章来专门分析这个框架，真正让我感兴趣的还是 `- allRetainedObjects` 方法**在各种对象以及 block 中获得它们强引用的对象的过程**，这也是之后的文章要分析的主要内容。
 
 > 关注仓库，及时获得更新：[iOS-Source-Code-Analyze](https://github.com/draveness/iOS-Source-Code-Analyze)
-> 
+>
 > Follow: [Draveness · Github](https://github.com/Draveness)

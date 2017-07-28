@@ -3,6 +3,7 @@ layout: post
 title: AFNetworking 概述（一）
 date: 2016-03-21 10:57:28.000000000 +08:00
 permalink: /:title
+tags: iOS AFNetworking
 ---
 
 ![afnetworking-logo](http://7xrlu3.com1.z0.glb.clouddn.com/2016-03-21-afnetworking-logo.png)
@@ -87,9 +88,9 @@ AFHTTPSessionManager *manager = [[AFHTTPSessionManager alloc] initWithBaseURL:[[
 ```
 
 > 注意：在 iOS9 中，苹果默认全局 HTTPs，如果你要发送不安全的 HTTP 请求，需要在 info.plist 中加入如下键值对才能发出不安全的 HTTP 请求
-> 
+>
 > ![afnetworking-plist](http://7xrlu3.com1.z0.glb.clouddn.com/2016-03-21-afnetworking-plist.png)
-> 
+>
 > 还有一件事情是要注意的是，AFNetworking 默认接收 json 格式的响应（因为这是在 iOS 平台上的框架，一般不需要 text/html），如果想要返回 html，需要设置 `acceptableContentTypes`
 
 ## AFNetworking 的调用栈

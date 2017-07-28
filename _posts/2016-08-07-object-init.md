@@ -3,9 +3,10 @@ layout: post
 title: 对象是如何初始化的（iOS）
 date: 2016-08-07 12:09:48.000000000 +08:00
 permalink: /:title
+tags: iOS Runtime
 ---
 > 关注仓库，及时获得更新：[iOS-Source-Code-Analyze](https://github.com/draveness/iOS-Source-Code-Analyze)
-> 
+>
 > Follow: [Draveness · Github](https://github.com/Draveness)
 
 在之前，我们已经讨论了非常多的问题了，关于 objc 源代码系列的文章也快结束了，其实关于对象是如何初始化的这篇文章本来是我要写的第一篇文章，但是由于有很多前置内容不得不说，所以留到了这里。
@@ -16,7 +17,7 @@ permalink: /:title
 
 ## alloc 方法分析
 
-先来看一下 `+ alloc` 方法的调用栈(在调用栈中省略了很多不必要的方法的调用):open 
+先来看一下 `+ alloc` 方法的调用栈(在调用栈中省略了很多不必要的方法的调用):open
 
 ```objectivec
 id _objc_rootAlloc(Class cls)
@@ -105,7 +106,7 @@ uint32_t unalignedInstanceSize() {
 在对象的初始化过程中除了使用 `calloc` 来分配内存之外，还需要根据类初始化 `isa_t` 结构体：
 
 ```objectivec
-inline void objc_object::initIsa(Class cls, bool indexed, bool hasCxxDtor) { 
+inline void objc_object::initIsa(Class cls, bool indexed, bool hasCxxDtor) {
     if (!indexed) {
         isa.cls = cls;
     } else {
@@ -122,10 +123,10 @@ inline void objc_object::initIsa(Class cls, bool indexed, bool hasCxxDtor) {
 union isa_t {
    isa_t() { }
    isa_t(uintptr_t value) : bits(value) { }
-    
+
    Class cls;
    uintptr_t bits;
-    
+
    struct {
        uintptr_t indexed           : 1;
        uintptr_t has_assoc         : 1;
@@ -161,7 +162,7 @@ id _objc_rootInit(id obj) {
 在 iOS 中一个对象的初始化过程很符合直觉，只是分配内存空间、然后初始化 `isa_t` 结构体，其实现也并不复杂，这篇文章也是这个系列文章中较为简单并且简短的一篇。
 
 > 关注仓库，及时获得更新：[iOS-Source-Code-Analyze](https://github.com/draveness/iOS-Source-Code-Analyze)
-> 
+>
 > Follow: [Draveness · Github](https://github.com/Draveness)
 >
 > 原文链接： http://draveness.me/object-init

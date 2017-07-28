@@ -3,6 +3,7 @@ layout: post
 title: 处理请求和响应 AFURLSerialization（三）
 date: 2016-04-12 22:01:09.000000000 +08:00
 permalink: /:title
+tags: iOS AFNetworking
 ---
 
 Blog: [Draveness](http://draveness.me)
@@ -81,7 +82,7 @@ Blog: [Draveness](http://draveness.me)
 
 #### 验证响应的有效性
 
-`AFHTTPResponseSerializer` 中方法的实现最长，并且最重要的就是 `- [AFHTTPResponseSerializer validateResponse:data:error:]` 
+`AFHTTPResponseSerializer` 中方法的实现最长，并且最重要的就是 `- [AFHTTPResponseSerializer validateResponse:data:error:]`
 
 ```objectivec
 - (BOOL)validateResponse:(NSHTTPURLResponse *)response
@@ -201,7 +202,7 @@ responseIsValid = NO;
 	#2: 解决一个由只包含一个空格的响应引起的 bug, 略
 
 	#3: 序列化 JSON
-	
+
 	#4: 移除 JSON 中的 null
 
     if (error) {
@@ -233,7 +234,7 @@ responseIsValid = NO;
 		        // Workaround for a bug in NSJSONSerialization when Unicode character escape codes are used instead of the actual character
 		        // See http://stackoverflow.com/a/12843465/157142
 		        data = [responseString dataUsingEncoding:NSUTF8StringEncoding];
-		
+
 		        if (data) {
 		            if ([data length] > 0) {
 		                responseObject = [NSJSONSerialization JSONObjectWithData:data options:self.readingOptions error:&serializationError];
@@ -245,7 +246,7 @@ responseIsValid = NO;
 		                                       NSLocalizedDescriptionKey: NSLocalizedStringFromTable(@"Data failed decoding as a UTF-8 string", @"AFNetworking", nil),
 		                                       NSLocalizedFailureReasonErrorKey: [NSString stringWithFormat:NSLocalizedStringFromTable(@"Could not decode string: %@", @"AFNetworking", nil), responseString]
 		                                       };
-		
+
 		            serializationError = [NSError errorWithDomain:AFURLResponseSerializationErrorDomain code:NSURLErrorCannotDecodeContentData userInfo:userInfo];
 		        }
 		    }
@@ -686,4 +687,3 @@ for (NSString *keyPath in AFHTTPRequestSerializerObservedKeyPaths()) {
 <iframe src="http://ghbtns.com/github-btn.html?user=draveness&type=follow&size=large" height="30" width="240" frameborder="0" scrolling="0" style="width:240px; height: 30px;" allowTransparency="true"></iframe>
 
 Blog: [Draveness](http://draveness.me)
-

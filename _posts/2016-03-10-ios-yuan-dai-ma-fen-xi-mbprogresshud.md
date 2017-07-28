@@ -3,6 +3,7 @@ layout: post
 title: iOS 源代码分析 ---- MBProgressHUD
 date: 2016-03-10 17:40:48.000000000 +08:00
 permalink: /:title
+tags: iOS
 ---
 [MBProgressHUD]() 是一个为 iOS app 添加透明浮层 HUD 的第三方框架. 作为一个 UI 层面的框架, 它的实现很简单, 但是其中也有一些非常有意思的代码.
 
@@ -32,7 +33,7 @@ permalink: /:title
 
 首先调用 `+ alloc` `- initWithView:` 方法返回一个 `MBProgressHUD` 的实例, `- initWithView:` 方法会调用当前类的 `- initWithFrame:` 方法.
 
-通过 `- initWithFrame:` 方法的执行, 会为 `MBProgressHUD` 的一些属性设置一系列的默认值. 
+通过 `- initWithFrame:` 方法的执行, 会为 `MBProgressHUD` 的一些属性设置一系列的默认值.
 
 ```objectivec
 - (id)initWithFrame:(CGRect)frame {
@@ -67,8 +68,8 @@ permalink: /:title
         NSTimer *newGraceTimer = [NSTimer timerWithTimeInterval:self.graceTime target:self selector:@selector(handleGraceTimer:) userInfo:nil repeats:NO];
         [[NSRunLoop currentRunLoop] addTimer:newGraceTimer forMode:NSRunLoopCommonModes];
         self.graceTimer = newGraceTimer;
-	} 
-	// ... otherwise show the HUD imediately 
+	}
+	// ... otherwise show the HUD imediately
 	else {
 		[self showUsingAnimation:useAnimation];
 	}
@@ -130,7 +131,7 @@ typedef NS_ENUM(NSInteger, MBProgressHUDAnimation) {
 self.showStarted = [NSDate date]
 ```
 
-### `+ hideHUDForView:animated:` 
+### `+ hideHUDForView:animated:`
 
 ```objectivec
 + (BOOL)hideHUDForView:(UIView *)view animated:(BOOL)animated {
@@ -219,7 +220,7 @@ self.showStarted = [NSDate date]
 - (void)showWhileExecuting:(SEL)method onTarget:(id)target withObject:(id)object animated:(BOOL)animated {
 	methodForExecution = method;
 	targetForExecution = MB_RETAIN(target);
-	objectForExecution = MB_RETAIN(object);	
+	objectForExecution = MB_RETAIN(object);
 	// Launch execution in new thread
 	self.taskInProgress = YES;
 	[NSThread detachNewThreadSelector:@selector(launchExecution) toTarget:self withObject:nil];

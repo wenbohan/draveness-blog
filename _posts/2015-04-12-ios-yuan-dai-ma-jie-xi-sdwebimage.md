@@ -3,8 +3,9 @@ layout: post
 title: iOS 源代码分析----SDWebImage
 date: 2015-04-12 13:44:09.000000000 +08:00
 permalink: /:title
+tags: iOS SDWebImage
 ---
-世人都说阅读源代码对于功力的提升是十分显著的, 但是很多的著名开源框架源代码动辄上万行, 复杂度实在太高, 在暑假的时候我曾经试图读一些开源框架的源代码, 比如说 `AFNetworking`, `SDWebImage`, `ReactiveCocoa` 但是由于当时比较浮躁, 实在没法静下心来看, 而且有一些急功近利, 所以面对宝藏实在无力挖掘. 
+世人都说阅读源代码对于功力的提升是十分显著的, 但是很多的著名开源框架源代码动辄上万行, 复杂度实在太高, 在暑假的时候我曾经试图读一些开源框架的源代码, 比如说 `AFNetworking`, `SDWebImage`, `ReactiveCocoa` 但是由于当时比较浮躁, 实在没法静下心来看, 而且有一些急功近利, 所以面对宝藏实在无力挖掘.
 
 而最近, 由于时间比较充裕, 也终于能静下心来一段一段分析这些著名项目的源代码, 也准备开始写一些关于 iOS 源代码分析的 post.
 
@@ -48,21 +49,21 @@ permalink: /:title
 接下来我们就以 `UIImageView+WebCache` 中的
 
 ```objectivec
-- (void)sd_setImageWithURL:(NSURL *)url 
+- (void)sd_setImageWithURL:(NSURL *)url
           placeholderImage:(UIImage *)placeholder;
 ```
 
-这一方法为入口研究一下 `SDWebImage` 是怎样工作的. 我们打开上面这段方法的实现代码 [UIImageView+WebCache.m](https://github.com/rs/SDWebImage/blob/master/SDWebImage/UIImageView%2BWebCache.m) 
+这一方法为入口研究一下 `SDWebImage` 是怎样工作的. 我们打开上面这段方法的实现代码 [UIImageView+WebCache.m](https://github.com/rs/SDWebImage/blob/master/SDWebImage/UIImageView%2BWebCache.m)
 
 当然你也可以 `git clone git@github.com:rs/SDWebImage.git` 到本地来查看.
 
 ```objectivec
-- (void)sd_setImageWithURL:(NSURL *)url 
+- (void)sd_setImageWithURL:(NSURL *)url
           placeholderImage:(UIImage *)placeholder {
-    [self sd_setImageWithURL:url 
-            placeholderImage:placeholder 
-                     options:0 
-                    progress:nil 
+    [self sd_setImageWithURL:url
+            placeholderImage:placeholder
+                     options:0
+                    progress:nil
                    completed:nil];
 }
 ```
@@ -188,7 +189,7 @@ dispatch_main_sync_safe(^{
 
 它将 `opertion` 存储到 `operationDictionary` 中方便以后的 `cancel`.
 
-到此为止我们已经对 `SDWebImage` 框架中的这一方法分析完了, 接下来我们将要分析 `SDWebImageManager` 中的方法 
+到此为止我们已经对 `SDWebImage` 框架中的这一方法分析完了, 接下来我们将要分析 `SDWebImageManager` 中的方法
 
 ```objectivec
 [SDWebImageManager.sharedManager downloadImageWithURL:options:progress:completed:]
@@ -267,8 +268,8 @@ NSString *key = [self cacheKeyForURL:url];
 下一步是使用 `key` 在缓存中查找以前是否下载过相同的图片.
 
 ```objectivec
-operation.cacheOperation = [self.imageCache 
-		queryDiskCacheForKey:key 
+operation.cacheOperation = [self.imageCache
+		queryDiskCacheForKey:key
         			    done:^(UIImage *image, SDImageCacheType cacheType) { ... }];
 ```
 
@@ -289,19 +290,19 @@ dispatch_main_sync_safe(^{
 
 ```objectivec
 id <SDWebImageOperation> subOperation =
-  [self.imageDownloader downloadImageWithURL:url 
-                                     options:downloaderOptions 
-                                    progress:progressBlock 
+  [self.imageDownloader downloadImageWithURL:url
+                                     options:downloaderOptions
+                                    progress:progressBlock
                                    completed:^(UIImage *downloadedImage, NSData *data, NSError *error, BOOL finished) { ... }];
 ```
 
 如果这个方法返回了正确的 `downloadedImage`, 那么我们就会在全局的缓存中存储这个图片的数据:
 
 ```objectivec
-[self.imageCache storeImage:downloadedImage 
-	   recalculateFromImage:NO 
-                  imageData:data 
-                     forKey:key 
+[self.imageCache storeImage:downloadedImage
+	   recalculateFromImage:NO
+                  imageData:data
+                     forKey:key
                      toDisk:cacheOnDisk];
 ```
 
@@ -324,7 +325,7 @@ operation.cancelBlock = ^{
 它维护了一个内存缓存和一个可选的磁盘缓存, 我们先来看一下在上一阶段中没有解读的两个方法, 首先是:
 
 ```objectivec
-- (NSOperation *)queryDiskCacheForKey:(NSString *)key 
+- (NSOperation *)queryDiskCacheForKey:(NSString *)key
                                  done:(SDWebImageQueryCompletedBlock)doneBlock;
 ```
 
@@ -378,9 +379,9 @@ if (diskImage) {
 这个类的核心功能就是下载图片, 而核心方法就是上面提到的:
 
 ```objectivec
-- (id <SDWebImageOperation>)downloadImageWithURL:(NSURL *)url 
-        options:(SDWebImageDownloaderOptions)options 
-       progress:(SDWebImageDownloaderProgressBlock)progressBlock 
+- (id <SDWebImageOperation>)downloadImageWithURL:(NSURL *)url
+        options:(SDWebImageDownloaderOptions)options
+       progress:(SDWebImageDownloaderProgressBlock)progressBlock
       completed:(SDWebImageDownloaderCompletedBlock)completedBlock;
 ```
 
@@ -389,9 +390,9 @@ if (diskImage) {
 这个方法直接调用了另一个关键的方法:
 
 ```objectivec
-- (void)addProgressCallback:(SDWebImageDownloaderProgressBlock)progressBlock 
-          andCompletedBlock:(SDWebImageDownloaderCompletedBlock)completedBlock 
-                     forURL:(NSURL *)url 
+- (void)addProgressCallback:(SDWebImageDownloaderProgressBlock)progressBlock
+          andCompletedBlock:(SDWebImageDownloaderCompletedBlock)completedBlock
+                     forURL:(NSURL *)url
              createCallback:(SDWebImageNoParamsBlock)createCallback
 ```
 
@@ -420,7 +421,7 @@ if (first) {
 }
 ```
 
-方法会先查看这个 `url` 是否有对应的 `callback`, 使用的是 `downloader` 持有的一个字典 `URLCallbacks`. 
+方法会先查看这个 `url` 是否有对应的 `callback`, 使用的是 `downloader` 持有的一个字典 `URLCallbacks`.
 
 如果是第一次添加回调的话, 就会执行 `first = YES`, 这个赋值非常的关键, 因为 `first` 不为 `YES` 那么 HTTP 请求就不会被初始化, 图片也无法被获取.
 
@@ -452,21 +453,21 @@ self.URLCallbacks[url] = callbacksForURL;
 // SDWebImageDownloader
 // downloadImageWithURL:options:progress:completed: #11
 
-NSMutableURLRequest *request = [[NSMutableURLRequest alloc] 
-		initWithURL:url 
+NSMutableURLRequest *request = [[NSMutableURLRequest alloc]
+		initWithURL:url
         cachePolicy:...
     timeoutInterval:timeoutInterval];
 ```
 
 这个 `request` 就用于在之后发送 `HTTP` 请求.
 
-在初始化了这个 `request` 之后, 又初始化了一个 `SDWebImageDownloaderOperation` 的实例, 这个实例, 就是用于请求网络资源的操作. 它是一个 `NSOperation` 的子类, 
+在初始化了这个 `request` 之后, 又初始化了一个 `SDWebImageDownloaderOperation` 的实例, 这个实例, 就是用于请求网络资源的操作. 它是一个 `NSOperation` 的子类,
 
 ```objectivec
 // SDWebImageDownloader
 // downloadImageWithURL:options:progress:completed: #20
 
-operation = [[SDWebImageDownloaderOperation alloc] 
+operation = [[SDWebImageDownloaderOperation alloc]
 		initWithRequest:request
                 options:options
                progress:...
@@ -537,7 +538,7 @@ operation = [[SDWebImageDownloaderOperation alloc]
 
 而最后一个代理方法会在图片下载完成之后调用 `completionBlock` 来完成最后 `UIImageView.image` 的更新.
 
-而这里调用的 `progressBlock` `completionBlock` `cancelBlock` 都是在之前存储在 `URLCallbacks` 字典中的. 
+而这里调用的 `progressBlock` `completionBlock` `cancelBlock` 都是在之前存储在 `URLCallbacks` 字典中的.
 
 ----
 
@@ -561,16 +562,16 @@ operation = [[SDWebImageDownloaderOperation alloc]
 ## SDWebImage 如何为 UIImageView 添加图片(面试回答)
 
 SDWebImage 中为 UIView 提供了一个分类叫做 WebCache, 这个分类中有一个最常用的接口, `sd_setImageWithURL:placeholderImage:`, 这个分类同时提供了很多类似的方法, 这些方法最终会调用一个同时具有 `option` `progressBlock` `completionBlock` 的方法, 而在这个类最终被调用的方法首先会检查是否传入了 `placeholderImage` 以及对应的参数, 并设置 `placeholderImage`.
-    
+
 然后会获取 `SDWebImageManager` 中的单例调用一个 `downloadImageWithURL:...` 的方法来获取图片, 而这个 manager 获取图片的过程有大体上分为两部分, 它首先会在 `SDWebImageCache` 中寻找图片是否有对应的缓存, 它会以 url 作为数据的索引先在内存中寻找是否有对应的缓存, 如果缓存未命中就会在磁盘中利用 MD5 处理过的 key 来继续查询对应的数据, 如果找到了, 就会把磁盘中的缓存备份到内存中.
-    
+
 然而, 假设我们在内存和磁盘缓存中都没有命中, 那么 manager 就会调用它持有的一个 `SDWebImageDownloader` 对象的方法 `downloadImageWithURL:...` 来下载图片, 这个方法会在执行的过程中调用另一个方法 `addProgressCallback:andCompletedBlock:fotURL:createCallback:` 来存储下载过程中和下载完成的回调, 当回调块是第一次添加的时候, 方法会实例化一个 `NSMutableURLRequest` 和 `SDWebImageDownloaderOperation`, 并将后者加入 downloader 持有的下载队列开始图片的异步下载.
-    
+
 而在图片下载完成之后, 就会在主线程设置 `image` 属性, 完成整个图像的异步下载和配置.
 
 ##总结
 
-`SDWebImage` 的图片加载过程其实很符合我们的直觉: 
+`SDWebImage` 的图片加载过程其实很符合我们的直觉:
 
 * 查看缓存
 	* 缓存命中

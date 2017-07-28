@@ -3,12 +3,13 @@ layout: post
 title: iOS 为 UIKit 属性增加钩子方法
 date: 2015-04-15 13:34:03.000000000 +08:00
 permalink: /:title
+tags: iOS
 ---
 最近在做一个用于实现夜间模式的开源框架, 需监听 UIKit 中的属性, 而这个监听的通知者就是 UIKit **实例**本身, 当我最开始想要做的时候, 我感觉这个东西实在太简单了, 不过之后...
 
 ##KVO
 
-我想到的第一个解决方案是使用 `KVO` 来解决. `KVO` 是一个很好的方式来为已有的属性添加观察者. 
+我想到的第一个解决方案是使用 `KVO` 来解决. `KVO` 是一个很好的方式来为已有的属性添加观察者.
 
 ###继承 or 分类?
 
@@ -20,7 +21,7 @@ permalink: /:title
 
 而第二个解决方案就是使用 `objc/runtime` 中**方法调剂**来实现的, 我们在运行时**动态**替换原有的属性的 setter 的实现, 换成我们自己实现的添加钩子的 setter 方法.
 
-为什么要这么做呢, 因为我们并不清楚系统底层是怎么实现 setter 方法的, 所以重写一个 setter 方法可能会有意想不到的事情发生. 
+为什么要这么做呢, 因为我们并不清楚系统底层是怎么实现 setter 方法的, 所以重写一个 setter 方法可能会有意想不到的事情发生.
 
 在最开始直接覆写 setter 方法的时候, 因为在**分类中无法访问属性**例如:
 
@@ -38,7 +39,7 @@ dispatch_once(&onceToken, ^{
     Class class = [self class];                                           
     SEL originalSelector = @selector(#origin#);
     SEL swizzledSelector = @selector(#swizzle#);
-    
+
     Method originalMethod = class_getInstanceMethod(class, originalSelector);  
     Method swizzledMethod = class_getInstanceMethod(class, swizzledSelector);  
     BOOL didAddMethod =
@@ -54,7 +55,7 @@ dispatch_once(&onceToken, ^{
     } else {
         method_exchangeImplementations(originalMethod, swizzledMethod);
     }
-}); 
+});
 ```
 
 这段代码来自于 [NSHipster](http://nshipster.com/method-swizzling/), 实现还是很清楚的, 我们只需要在 `#origin#` 和 `#swizzle#` 处填上需要交换的**选择子**就可以了.
@@ -73,7 +74,7 @@ dispatch_once(&onceToken, ^{
 }
 ```
 
-有人看到这里可能会有疑问: **方法调用自己是否会导致无限递归?**. 其实并不会, 因为我们在运行时交换了方法的实现. 
+有人看到这里可能会有疑问: **方法调用自己是否会导致无限递归?**. 其实并不会, 因为我们在运行时交换了方法的实现.
 
 在方法的实现交换之后:
 

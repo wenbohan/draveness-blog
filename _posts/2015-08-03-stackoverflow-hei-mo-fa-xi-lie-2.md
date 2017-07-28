@@ -3,6 +3,7 @@ layout: post
 title: StackOverflow 黑魔法系列 <2>
 date: 2015-08-03 11:08:19.000000000 +08:00
 permalink: /:title
+tags: iOS
 ---
 距离上一次的 StackOverflow 黑魔法系列的 post 已经很久了, 自己也很久没有写技术博客了, 虽然这次带来的又是一篇水文. 但是好久没有写了, 写写水文也好试试手.
 
@@ -44,7 +45,7 @@ UIEventTypeRemoteControl,
 
 ## GCD, NSThread 和 NSOperationQueue 之间有什么区别?
 
-1. 当你需要**直接控制你所创建的线程**时, 使用 `NSThread`. e.g. 
+1. 当你需要**直接控制你所创建的线程**时, 使用 `NSThread`. e.g.
     * 当你需要对控制线程的优先级有细颗粒度的控制或者与其他直接消耗线程对象的子系统直接交互并且需要停留在同一页上时, 就需要使用 `NSThread` 但是这种情况是及其罕见的, 但是它们确实发生, 特别是在实时应用中.
 2. 当你的任务是简单的并行时, 使用 `GCD`. e.g.
     * 你想要将一些工作简单的抛到后台去执行
@@ -88,8 +89,8 @@ UIEventTypeRemoteControl,
         [super motionEnded:motion withEvent:event];
 }
 
-- (BOOL)canBecomeFirstResponder { 
-    return YES; 
+- (BOOL)canBecomeFirstResponder {
+    return YES;
 }
 
 @end

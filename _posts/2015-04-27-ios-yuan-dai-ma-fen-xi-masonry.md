@@ -3,8 +3,9 @@ layout: post
 title: iOS 源代码分析----Masonry
 date: 2015-04-27 16:40:22.000000000 +08:00
 permalink: /:title
+tags: iOS Masonry
 ---
-[Masonry](https://github.com/SnapKit/Masonry) 是 Objective-C 中用于自动布局的第三方框架, 我们一般使用它来代替冗长, 繁琐的 AutoLayout 代码. 
+[Masonry](https://github.com/SnapKit/Masonry) 是 Objective-C 中用于自动布局的第三方框架, 我们一般使用它来代替冗长, 繁琐的 AutoLayout 代码.
 
 Masonry 的使用还是很简洁的:
 
@@ -19,7 +20,7 @@ Masonry 的使用还是很简洁的:
 
 ## 从 mas_makeConstraints: 开始
 
-其中最常用的方法就是 
+其中最常用的方法就是
 
 ```objectivec
 // View+MASAdditions.h
@@ -59,7 +60,7 @@ Masonry 的使用还是很简洁的:
 
 因为 Masonry 是封装的苹果的 AutoLayout 框架, 所以我们要在为视图添加约束前将 `translatesAutoresizingMaskIntoConstraints` 属性设置为 `NO`. 如果这个属性没有被正确设置, 那么视图的约束不会被成功添加.
 
-在设置 `translatesAutoresizingMaskIntoConstraints` 属性之后, 
+在设置 `translatesAutoresizingMaskIntoConstraints` 属性之后,
 
 * 我们会初始化一个 `MASConstraintMaker` 的实例.
 * 然后将 maker 传入 block 配置其属性.
@@ -79,10 +80,10 @@ Masonry 的使用还是很简洁的:
 - (id)initWithView:(MAS_VIEW *)view {
     self = [super init];
     if (!self) return nil;
-    
+
     self.view = view;
     self.constraints = NSMutableArray.new;
-    
+
     return self;
 }
 ```
@@ -194,7 +195,7 @@ make.height.equalTo(@38);
 
 - (MASConstraint * (^)(id, NSLayoutRelation))equalToWithRelation {
     return ^id(id attribute, NSLayoutRelation relation) {
-        if ([attribute isKindOfClass:NSArray.class]) { ... } 
+        if ([attribute isKindOfClass:NSArray.class]) { ... }
         else {
             ...
             self.layoutRelation = relation;
@@ -323,7 +324,7 @@ MASLayoutConstraint *layoutConstraint
 layoutConstraint.priority = self.layoutPriority;                                    
 ```
 
-接下来它会寻找 `firstLayoutItem` 和 `secondLayoutItem` 两个视图的公共 `superview`, 相当于求两个数的最小公倍数. 
+接下来它会寻找 `firstLayoutItem` 和 `secondLayoutItem` 两个视图的公共 `superview`, 相当于求两个数的最小公倍数.
 
 ```objectivec
 // View+MASAdditions.m
@@ -363,11 +364,11 @@ if (existingConstraint) {
    [self.installedView addConstraint:layoutConstraint];
    self.layoutConstraint = layoutConstraint;
 }
-    
+
 [firstLayoutItem.mas_installedConstraints addObject:self];
 ```
 
-如果原来的 `view` 中不存在可以升级的约束, 或者没有调用 `mas_updateConstraint:` 方法, 那么就会在上一步寻找到的 `installedView` 上面添加约束. 
+如果原来的 `view` 中不存在可以升级的约束, 或者没有调用 `mas_updateConstraint:` 方法, 那么就会在上一步寻找到的 `installedView` 上面添加约束.
 
 ```objectivec
 [self.installedView addConstraint:layoutConstraint];
@@ -438,11 +439,11 @@ if (existingConstraint) {
 // MASConstraintMaker.m
 
 NSMutableArray *children = [NSMutableArray arrayWithCapacity:attributes.count];
-    
+
 for (MASViewAttribute *a in attributes) {
    [children addObject:[[MASViewConstraint alloc] initWithFirstViewAttribute:a]];
 }
-    
+
 MASCompositeConstraint *constraint = [[MASCompositeConstraint alloc] initWithChildren:children];
 constraint.delegate = self;
 [self.constraints addObject:constraint];
@@ -459,7 +460,7 @@ Masonry 中还有一个类似与 magic 的宏, 这个宏将 C 和 Objective-C �
 
 Masonry 与其它的第三方开源框架一样选择了使用分类的方式为 UIKit 添加一个方法 `mas_makeConstraint`, 这个方法接受了一个 block, 这个 block 有一个 `MASConstraintMaker` 类型的参数, 这个 maker 会持有一个**约束的数组**, 这里保存着所有将被加入到视图中的约束.
 
-我们通过链式的语法配置 maker, 设置它的 `left` `right` 等属性, 比如说 `make.left.equalTo(view)`, 其实这个 `left` `equalTo` 还有像 `with` `offset` 之类的方法都会返回一个 `MASConstraint` 的实例, 所以在这里才可以用类似 Ruby 中链式的语法. 
+我们通过链式的语法配置 maker, 设置它的 `left` `right` 等属性, 比如说 `make.left.equalTo(view)`, 其实这个 `left` `equalTo` 还有像 `with` `offset` 之类的方法都会返回一个 `MASConstraint` 的实例, 所以在这里才可以用类似 Ruby 中链式的语法.
 
 在配置结束后, 首先会调用 maker 的 `install` 方法, 而这个 maker 的 `install` 方法会遍历其持有的约束数组, 对其中的每一个约束发送 `install` 消息. 在这里就会使用到在上一步中配置的属性, 初始化 `NSLayoutConstraint` 的子类 `MASLayoutConstraint` 并添加到合适的视图上.
 
@@ -467,6 +468,6 @@ Masonry 与其它的第三方开源框架一样选择了使用分类的方式为
 
 ## 总结
 
-虽然 Masonry 这个框架中的代码并不是非常的多, 只有 1,2 万行的代码, 但是感觉这个项目阅读起来十分的困难, 没有 SDWebImage 清晰, 因为代码中类的属性非常的多, 而且有很多相似的属性会干扰我们对这个项目的阅读, 整个框架运用了大量的 block 语法进行回调. 
+虽然 Masonry 这个框架中的代码并不是非常的多, 只有 1,2 万行的代码, 但是感觉这个项目阅读起来十分的困难, 没有 SDWebImage 清晰, 因为代码中类的属性非常的多, 而且有很多相似的属性会干扰我们对这个项目的阅读, 整个框架运用了大量的 block 语法进行回调.
 
 虽然代码十分整洁不过我觉得却降低了可读性, 但是还是那句话, 把简洁留给别人复杂留给自己, 只要为开发者提供简洁的接口就可以了.

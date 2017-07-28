@@ -3,6 +3,7 @@ layout: post
 title: 优雅的 RACCommand
 date: 2017-02-10 20:35:23.000000000 +08:00
 permalink: /:title
+tags: iOS RAC
 ---
 `RACCommand` 是一个在 ReactiveCocoa 中比较复杂的类，大多数使用 ReactiveCocoa 的人，尤其是初学者并不会经常使用它。
 
@@ -133,7 +134,7 @@ RACCommand *command = [[RACCommand alloc] initWithSignalBlock:^RACSignal * _Nonn
 	RACMulticastConnection *connection = [[signal
 		subscribeOn:RACScheduler.mainThreadScheduler]
 		multicast:[RACReplaySubject subject]];
-	
+
 	[self.addedExecutionSignalsSubject sendNext:connection.signal];
 
 	[connection connect];
@@ -421,8 +422,7 @@ RACCommand *command = [[RACCommand alloc] initWithSignalBlock:^RACSignal * _Nonn
 + [ReactiveCocoa 中 RACCommand 底层实现分析](https://halfrost.com/reactivecocoa_raccommand/)
 
 > Github Repo：[iOS-Source-Code-Analyze](https://github.com/draveness/iOS-Source-Code-Analyze)
-> 
+>
 > Follow: [Draveness · GitHub](https://github.com/Draveness)
 >
 > Source: http://draveness.me/raccommand
-

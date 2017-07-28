@@ -3,9 +3,10 @@ layout: post
 title: 检测 NSObject 对象持有的强指针
 date: 2016-08-01 20:16:22.000000000 +08:00
 permalink: /:title
+tags: iOS
 ---
 > 关注仓库，及时获得更新：[iOS-Source-Code-Analyze](https://github.com/draveness/iOS-Source-Code-Analyze)
-> 
+>
 > Follow: [Draveness · Github](https://github.com/Draveness)
 
 在上一篇文章中介绍了 `FBRetainCycleDetector` 的基本工作原理，这一篇文章中我们开始分析它是如何从每一个对象中获得它持有的强指针的。
@@ -74,7 +75,7 @@ __unused NSSet *cycles = [detector findRetainCycles];
 			}
 		}
 	}
-	
+
 	...
 }
 ```
@@ -85,17 +86,17 @@ __unused NSSet *cycles = [detector findRetainCycles];
 NSArray<id<FBObjectReference>> *FBGetObjectStrongReferences(id obj,
 															NSMutableDictionary<Class, NSArray<id<FBObjectReference>> *> *layoutCache) {
 	NSMutableArray<id<FBObjectReference>> *array = [NSMutableArray new];
-	
+
 	__unsafe_unretained Class previousClass = nil;
 	__unsafe_unretained Class currentClass = object_getClass(obj);
-	
+
 	while (previousClass != currentClass) {
 		NSArray<id<FBObjectReference>> *ivars;
-		
+
 		if (layoutCache && currentClass) {
 			ivars = layoutCache[currentClass];
 		}
-		
+
 		if (!ivars) {
 			ivars = FBGetStrongReferencesForClass(currentClass);
 			if (layoutCache && currentClass) {
@@ -103,11 +104,11 @@ NSArray<id<FBObjectReference>> *FBGetObjectStrongReferences(id obj,
 			}
 		}
 		[array addObjectsFromArray:ivars];
-		
+
 		previousClass = currentClass;
 		currentClass = class_getSuperclass(currentClass);
 	}
-	
+
 	return [array copy];
 }
 ```
@@ -344,7 +345,7 @@ NSArray<id<FBObjectReference>> *filteredIvars =
 			}
 		}
 	}
-	
+
 	...
 }
 ```
@@ -389,7 +390,7 @@ FBObjectiveCGraphElement *FBWrapObjectGraphElementWithContext(id object,
 	if (class_isMetaClass(aCls)) {
 		return nil;
 	}
-	
+
 	...
 }
 ```

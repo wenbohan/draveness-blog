@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Hexo 中 LaTeX的使用
+title: Hexo 中 LaTeX 的使用
 date: 2015-03-26 04:22:48.000000000 +08:00
 permalink: /:title
 ---
@@ -49,7 +49,7 @@ $T(n) = \Theta(n)$
 ```
 
 $T(n) = \Theta(n)$
-	
+
 `LaTeX` 需要使用 `$` 符号进行包围, 当我最开始使用的时候不知道在公式的两边都要加入 `$` 符号, 所以出现了这样的错误
 
 $T(n) = \Theta(n)

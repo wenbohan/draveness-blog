@@ -3,6 +3,7 @@ layout: post
 title: Redis 中的事件循环
 date: 2016-12-09 23:42:05.000000000 +08:00
 permalink: /:title
+tags: Redis
 ---
 在目前的很多服务中，由于需要持续接受客户端或者用户的输入，所以需要一个事件循环来等待并处理外部事件，这篇文章主要会介绍 Redis 中的事件循环是如何处理事件的。
 
@@ -29,7 +30,7 @@ permalink: /:title
 ```c
 int main(int argc, char **argv) {
     ...
-    
+
     aeMain(server.el);
 }
 ```
@@ -60,7 +61,7 @@ int aeProcessEvents(aeEventLoop *eventLoop, int flags) {
         struct timeval *tvp;
 
         #1：计算 I/O 多路复用的等待时间 tvp
-        
+
         numevents = aeApiPoll(eventLoop, tvp);
         for (int j = 0; j < numevents; j++) {
             aeFileEvent *fe = &eventLoop->events[eventLoop->fired[j].fd];
@@ -330,4 +331,3 @@ Redis 对于事件的处理方式十分精巧，通过传入函数指针以及�
 > Follow: [Draveness · GitHub](https://github.com/Draveness)
 >
 > Source: http://draveness.me/redis-eventloop
-

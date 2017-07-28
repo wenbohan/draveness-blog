@@ -3,12 +3,13 @@ layout: post
 title: NSUserDefaults 的默认值
 date: 2016-03-10 17:39:45.000000000 +08:00
 permalink: /:title
+tags: iOS
 ---
 `NSUserDefaults` 提供了一个与默认设置交互的接口. 这些默认设置允许一个 App 为每一个单独的用户的设置提供定制化的行为.
 
 ## 数据的同步
 
-我们可以通过 `NSUserDefaults` 对象在运行时从数据库读取用户的数据, 并添加到缓存中. 在我们正常获取或者设置 `NSUserDefaults` 的值时, 数据库和缓存中的数据其实并没有同步更新, 因为这样会影响效率. `NSUserDefaults` 在需要同步时会**自动调用** `synchronize` 方法更新数据库数据. 
+我们可以通过 `NSUserDefaults` 对象在运行时从数据库读取用户的数据, 并添加到缓存中. 在我们正常获取或者设置 `NSUserDefaults` 的值时, 数据库和缓存中的数据其实并没有同步更新, 因为这样会影响效率. `NSUserDefaults` 在需要同步时会**自动调用** `synchronize` 方法更新数据库数据.
 我们也可以手动调用 `synchronize` 来同步数据.
 
 ## 不可变

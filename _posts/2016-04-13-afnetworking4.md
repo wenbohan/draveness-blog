@@ -3,6 +3,7 @@ layout: post
 title: AFNetworkReachabilityManager 监控网络状态（四）
 date: 2016-04-13 22:58:12.000000000 +08:00
 permalink: /:title
+tags: iOS AFNetworking
 ---
 
 Blog: [Draveness](http://draveness.me)
@@ -110,7 +111,7 @@ Blog: [Draveness](http://draveness.me)
 		    if (!self.networkReachability) {
 		        return;
 		    }
-		
+
 		    SCNetworkReachabilityUnscheduleFromRunLoop((__bridge SCNetworkReachabilityRef)self.networkReachability, CFRunLoopGetMain(), kCFRunLoopCommonModes);
 		}
 
@@ -119,12 +120,12 @@ Blog: [Draveness](http://draveness.me)
 		__weak __typeof(self)weakSelf = self;
 		AFNetworkReachabilityStatusBlock callback = ^(AFNetworkReachabilityStatus status) {
 		    __strong __typeof(weakSelf)strongSelf = weakSelf;
-		
+
 		    strongSelf.networkReachabilityStatus = status;
 		    if (strongSelf.networkReachabilityStatusBlock) {
 		        strongSelf.networkReachabilityStatusBlock(status);
 		    }
-		
+
 		};
 
 	+ 每次回调被调用时
@@ -139,15 +140,15 @@ Blog: [Draveness](http://draveness.me)
 			void		(* __nullable release)(const void *info);
 			CFStringRef	__nonnull (* __nullable copyDescription)(const void *info);
 		} SCNetworkReachabilityContext;
-		
+
 		SCNetworkReachabilityContext context = {
 		    0,
 		    (__bridge void *)callback,
-		    AFNetworkReachabilityRetainCallback, 
-		    AFNetworkReachabilityReleaseCallback, 
+		    AFNetworkReachabilityRetainCallback,
+		    AFNetworkReachabilityReleaseCallback,
 		    NULL
 		};
-	
+
 	+ 其中的 `callback` 就是上一步中的创建的 block 对象
 	+ 这里的 `AFNetworkReachabilityRetainCallback` 和 `AFNetworkReachabilityReleaseCallback` 都是非常简单的 block，在回调被调用时，只是使用 `Block_copy` 和 `Block_release` 这样的宏
 	+ 传入的 `info` 会以参数的形式在 `AFNetworkReachabilityCallback` 执行时传入
@@ -155,7 +156,7 @@ Blog: [Draveness](http://draveness.me)
 		static const void * AFNetworkReachabilityRetainCallback(const void *info) {
 		    return Block_copy(info);
 		}
-		
+
 		static void AFNetworkReachabilityReleaseCallback(const void *info) {
 		    if (info) {
 		        Block_release(info);
@@ -164,10 +165,10 @@ Blog: [Draveness](http://draveness.me)
 
 
 4. 当目标的网络状态改变时，会调用传入的回调
-	
+
 		SCNetworkReachabilitySetCallback(
 		    (__bridge SCNetworkReachabilityRef)networkReachability,
-		    AFNetworkReachabilityCallback, 
+		    AFNetworkReachabilityCallback,
 		    &context
 		);
 
@@ -175,8 +176,8 @@ Blog: [Draveness](http://draveness.me)
 5. 在 Main Runloop 中对应的模式开始监控网络状态
 
 		SCNetworkReachabilityScheduleWithRunLoop(
-		    (__bridge SCNetworkReachabilityRef)networkReachability, 
-		    CFRunLoopGetMain(), 
+		    (__bridge SCNetworkReachabilityRef)networkReachability,
+		    CFRunLoopGetMain(),
 		    kCFRunLoopCommonModes
 		);
 
@@ -315,4 +316,3 @@ self.reachabilityManager = [AFNetworkReachabilityManager sharedManager];
 <iframe src="http://ghbtns.com/github-btn.html?user=draveness&type=follow&size=large" height="30" width="240" frameborder="0" scrolling="0" style="width:240px; height: 30px;" allowTransparency="true"></iframe>
 
 Blog: [Draveness](http://draveness.me)
-

@@ -3,6 +3,7 @@ layout: post
 title: 深入解析 ObjC 中方法的结构
 date: 2016-04-23 13:26:37.000000000 +08:00
 permalink: /:title
+tags: iOS Runtime
 ---
 Blog: [Draveness](http://draveness.me)
 
@@ -78,7 +79,7 @@ class_rw_t* data() {
 // objc_class 中的 data() 方法
 class_data_bits_t bits;
 
-class_rw_t *data() { 
+class_rw_t *data() {
    return bits.data();
 }
 
@@ -120,7 +121,7 @@ struct class_ro_t {
     uint32_t reserved;
 
     const uint8_t * ivarLayout;
-    
+
     const char * name;
     method_list_t * baseMethodList;
     protocol_list_t * baseProtocols;
