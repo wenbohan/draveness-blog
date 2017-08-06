@@ -1,6 +1,7 @@
 ---
 layout: post
 title: 『浅入浅出』MySQL 和 InnoDB
+permalink: /mysql-innodb.html
 tags: server database
 ---
 
