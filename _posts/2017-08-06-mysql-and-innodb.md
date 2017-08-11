@@ -2,7 +2,7 @@
 layout: post
 title: 『浅入浅出』MySQL 和 InnoDB
 permalink: /mysql-innodb.html
-tags: server database MySQL InnoDB
+tags: Server MySQL InnoDB database
 cover: http://img.draveness.me/2017-08-06-mysql-cover.jpg
 ---
 
