@@ -4,7 +4,7 @@ title: 浅谈 MVC、MVP 和 MVVM 架构模式
 permalink: /mvx.html
 date: 2017-07-12 09:00:00.000000000 +08:00
 content: 这是 MVX 系列的第四篇文章，在前面的文章中，我们先后介绍了 iOS 中的 Model、View 和 Controller 的现状，对比了其他平台中的设计，最后给出了作者理想中的结构。而这一篇文章，作者会依次介绍 MVC、MVP 以及 MVVM 架构模式以及不同平台对它们的使用，虽然参考了很多资料，不过文中观点难免掺入作者的主观意见，作者也希望文中的错误与不足之处能被各位读者指出。
-cover: http://img.draveness.me/MVC-MVVM-MVP.jpg
+cover: https://raw.githubusercontent.com/Draveness/analyze/master/contents/architecture/images/mvx/MVC-MVVM-MVP.jpg
 tags: MVC iOS
 ---
 
@@ -17,7 +17,7 @@ tags: MVC iOS
 
 而在这一篇文章中，作者会依次介绍 MVC、MVP 以及 MVVM 架构模式以及不同平台对它们的使用；虽然参考了诸多资料，不过文中观点难免掺入作者的主观意见，作者也希望文中的错误与不足之处能被各位读者指出。
 
-![MVC-MVVM-MVP](http://img.draveness.me/MVC-MVVM-MVP.jpg)
+![MVC-MVVM-MVP](https://raw.githubusercontent.com/Draveness/analyze/master/contents/architecture/images/mvx/MVC-MVVM-MVP.jpg)
 
 前面的几篇文章中重点都是介绍 iOS 平台上的 Model、View 和 Controller 如何设计，而这篇文章会对目前 GUI 应用中的 MVC、MVP 和 MVVM 架构模式进行详细地介绍。
 
@@ -29,7 +29,7 @@ tags: MVC iOS
 
 而本文的内容就是从 MVC 开始的，作为最出名并且应用最广泛的架构模式，MVC 并没有一个**明确的**定义，网上流传的 MVC 架构图也是形态各异，作者查阅了很多资料也没有办法确定到底什么样的架构图才是**标准的** MVC 实现。
 
-![MVC-1979](http://img.draveness.me/MVC-1979.jpg)
+![MVC-1979](https://raw.githubusercontent.com/Draveness/analyze/master/contents/architecture/images/mvx/MVC-1979.jpg)
 
 设计 MVC 的重要目的就是在人的心智模型与计算机的模型之间建立一个桥梁，而 MVC 能够解决这一问题并**为用户提供直接看到信息和操作信息的功能**。
 
@@ -43,7 +43,7 @@ tags: MVC iOS
 
 在最近的几个月，作者发现不同人对于 MVC 的理解有巨大的差异，这是 [ASP.NET MVC Overview](https://msdn.microsoft.com/en-us/library/dd381412(v=vs.108).aspx) 一文中对于 MVC 模式描述的示意图。
 
-![MVC-with-ASP.NET](http://img.draveness.me/MVC-with-ASP.NET.jpg)
+![MVC-with-ASP.NET](https://raw.githubusercontent.com/Draveness/analyze/master/contents/architecture/images/mvx/MVC-with-ASP.NET.jpg)
 
 图片中并没有对 Model、View 和 Controller 三者之间如何交互进行说明，有的也只是几个箭头。我们应该可以这么简单地理解：
 
@@ -56,7 +56,7 @@ tags: MVC iOS
 
 与 ASP.NET 不同，Spring MVC 对于 MVC 架构模式的实现就更加复杂了，增加了一个用于分发请求、管理视图的 DispatchServlet：
 
-![MVC-with-Spring](http://img.draveness.me/MVC-with-Spring.jpg)
+![MVC-with-Spring](https://raw.githubusercontent.com/Draveness/analyze/master/contents/architecture/images/mvx/MVC-with-Spring.jpg)
 
 在这里不再介绍 Spring MVC 对于 HTTP 请求的处理流程，我们对其中 Model、View 和 Controller 之间的关系进行简单的分析：
 
@@ -69,7 +69,7 @@ tags: MVC iOS
 
 iOS 客户端中的 Cocoa Touch 自古以来就遵循 MVC 架构模式，不过 Cocoa Touch 中的 MVC 与 ASP.NET 和 Spring 中的 MVC 截然不同。
 
-![MVC-with-iOS](http://img.draveness.me/MVC-with-iOS.jpg)
+![MVC-with-iOS](https://raw.githubusercontent.com/Draveness/analyze/master/contents/architecture/images/mvx/MVC-with-iOS.jpg)
 
 在 iOS 中，由于 `UIViewController` 类持有一个根视图 `UIView`，所以视图层与控制器层是紧密耦合在一起的，这也是 iOS 项目经常遇到视图控制器非常臃肿的重要原因之一。
 
@@ -77,11 +77,11 @@ iOS 客户端中的 Cocoa Touch 自古以来就遵循 MVC 架构模式，不过 
 
 Rails 作为著名的 MVC 框架，视图层和模型层没有直接的耦合，而是通过控制器作为中间人对信息进行传递：
 
-![MVC-with-Rails](http://img.draveness.me/MVC-with-Rails.jpg)
+![MVC-with-Rails](https://raw.githubusercontent.com/Draveness/analyze/master/contents/architecture/images/mvx/MVC-with-Rails.jpg)
 
 这种 MVC 的设计分离了视图层和模型层之间的耦合，作为承担数据存储功能的模型层，可以通过控制器同时为多种不同的视图提供数据：
 
-![MVC-in-Rails-with-different-view](http://img.draveness.me/MVC-in-Rails-with-different-view.jpg)
+![MVC-in-Rails-with-different-view](https://raw.githubusercontent.com/Draveness/analyze/master/contents/architecture/images/mvx/MVC-in-Rails-with-different-view.jpg)
 
 控制器根据用户发出的 HTTP 请求，从模型中取出相同的数据，然后传给不同的视图以渲染出不同的结果。Rails 中的 MVC 架构模式能够很好地将用于展示的视图和用于存储数据的数据库进行分离，两者之间通过控制器解耦，能够实现同一数据库对应多种视图的架构。
 
@@ -89,7 +89,7 @@ Rails 作为著名的 MVC 框架，视图层和模型层没有直接的耦合，
 
 除了上述框架中的 MVC 架构模式，还有一些其它的书籍或者资料对于 MVC 也有着不同的解释，比如维基百科的 [Model-view-controller](https://en.wikipedia.org/wiki/Model–view–controller) 条目，该条目是我们在 Google 搜索 [MVC](https://www.google.com/search?q=MVC) 时能够出现的前几个条目，这也是维基百科中的架构图能够出现在这篇文章中的原因 —— 有着广泛的受众。
 
-![MVC-in-Wikipedia](http://img.draveness.me/MVC-in-Wikipedia.jpg)
+![MVC-in-Wikipedia](https://raw.githubusercontent.com/Draveness/analyze/master/contents/architecture/images/mvx/MVC-in-Wikipedia.jpg)
 
 维基百科中对于 MVC 架构模式交互图的描述其实相比上面的图片还都是比较清晰的，这主要是因为它对架构图中的箭头进行了详细的说明，指出了这个关系到底表示什么。
 
@@ -112,7 +112,7 @@ Rails 作为著名的 MVC 框架，视图层和模型层没有直接的耦合，
 
 作者所理解的真正 MVC 架构模式其实与 ASP.NET 中对于 MVC 的设计完全相同：
 
-![Standard-MV](http://img.draveness.me/Standard-MVC.jpg)
+![Standard-MV](https://raw.githubusercontent.com/Draveness/analyze/master/contents/architecture/images/mvx/Standard-MVC.jpg)
 
 控制器负责对模型中的数据进行更新，而视图向模型中请求数据；当有用户的行为触发操作时，会有控制器更新模型，并通知视图进行更新，在这时视图向模型请求新的数据，而这就是**作者所理解的**标准 MVC 模式下，Model、View 和 Controller 之间的协作方式。
 
@@ -120,7 +120,7 @@ Rails 作为著名的 MVC 框架，视图层和模型层没有直接的耦合，
 
 虽然我们对 MVC 中的各个模块的交互不是特别了解，但是三者之间的依赖关系却是非常明确的；在 MVC 中，模型层可以单独工作，而视图层和控制器层都依赖与模型层中的数据。
 
-![Essential-Dependencies-in-MVC](http://img.draveness.me/Essential-Dependencies-in-MVC.jpg)
+![Essential-Dependencies-in-MVC](https://raw.githubusercontent.com/Draveness/analyze/master/contents/architecture/images/mvx/Essential-Dependencies-in-MVC.jpg)
 
 > 虽然如上图所示，视图和控制器之间没有相互依赖，不过因为视图和控制器之间的依赖并不常用，所以图中将视图和控制器之间的依赖省略了。
 
@@ -130,7 +130,7 @@ Rails 作为著名的 MVC 框架，视图层和模型层没有直接的耦合，
 
 GUI 应用程序由于其需要展示内容的特点，分为两个部分：一部分是用于展示内容的展示层（Presentation Layer），另一部分包含领域和数据逻辑的领域层（Domain Layer）。
 
-![Presentation-Domain](http://img.draveness.me/Presentation-Domain.jpg)
+![Presentation-Domain](https://raw.githubusercontent.com/Draveness/analyze/master/contents/architecture/images/mvx/Presentation-Domain.jpg)
 
 展示层依赖于领域层中存储的数据，而领域层对于展示层一无所知，领域层其实也是 MVC 模式中的模型层，而展示层可以理解为 VC 部分。
 
@@ -140,7 +140,7 @@ MVC 最重要的目的并不是规定各个模块应该如何交互和联系，�
 
 除了分离展示层，MVC 还与观察者同步 [Observer Synchronization](https://www.martinfowler.com/eaaDev/MediatedSynchronization.html) 关系紧密。因为在 MVC 模式中，模型可以单独工作，同时它对使用模型中数据的视图和控制器一无所知，为了保持模型的独立性，我们需要一种机制，当模型发生改变时，能够同时更新多个视图和控制器的内容；在这时，就需要以观察者同步的方式解决这个问题。
 
-![Observer-Synchronization](http://img.draveness.me/Observer-Synchronization.jpg)
+![Observer-Synchronization](https://raw.githubusercontent.com/Draveness/analyze/master/contents/architecture/images/mvx/Observer-Synchronization.jpg)
 
 我们将所有需要实时更新的组件注册成为模型的观察者，在模型的属性发生变化时，通过观察者模式推送给所有注册的观察者（视图和控制器）。
 
@@ -152,7 +152,7 @@ MVC 最重要的目的并不是规定各个模块应该如何交互和联系，�
 
 MVC 架构模式的三个组成部分：Model、View 和 Controller 中最重要的就是控制器，它承担了整个架构中的大部分业务逻辑，同时在用户请求到达或者事件发生时都会首先通知控制器并由它来决定如何响应这次请求或者事件。
 
-![Main-Controlle](http://img.draveness.me/Main-Controller.jpg)
+![Main-Controlle](https://raw.githubusercontent.com/Draveness/analyze/master/contents/architecture/images/mvx/Main-Controller.jpg)
 
 在 MVC 中，所有的用户请求都会首先交给控制器，再由控制器来决定如何响应用户的输入，无论是更新模型中的信息还是渲染相应的视图，都是通过控制器来决定的；也就是说，在 MVC 中，控制器占据主导地位，它决定用户的输入是如何被处理的。
 
@@ -160,7 +160,7 @@ MVC 架构模式的三个组成部分：Model、View 和 Controller 中最重要
 
 在绝大多数的 MVC 架构模式中，模型都不会主动向视图或者控制器推送消息；模型都是被动的，它只存储整个应用中的数据，而信息的获取和更新都是由控制器来驱动的。
 
-![Passive-Mode](http://img.draveness.me/Passive-Model.jpg)
+![Passive-Mode](https://raw.githubusercontent.com/Draveness/analyze/master/contents/architecture/images/mvx/Passive-Model.jpg)
 
 但是当模型中的数据发生变化时，却需要通过一些方式通知对应的视图进行更新，在这种情况下其实也不需要模型**主动**将数据变化的消息推送给视图；因为所有对于模型层的改变都是**由用户的操作导致的**，而用户的操作都是通过控制器来处理的，所以只需要在控制器改变模型时，将更新的信息发送给视图就可以了；当然，我们也可以通过**观察者模式**向未知的观察者发送通知，以保证状态在不同模块之间能够保持同步。
 
@@ -170,17 +170,17 @@ MVC 架构模式的三个组成部分：Model、View 和 Controller 中最重要
 
 目前的大多数应用程序都非常复杂并且同时包含客户端和服务端，两者分开部署但同时又都遵循 MVC 或者衍生的架构模式；过去的 Web 应用由于并不复杂，前端和服务端往往都部署在同一台服务器上，比如说使用 erb 模板引擎的 Rails 或者使用 jsp 的 Java 等等；这时的 Web 应用都遵循 MVC 架构模式：
 
-![MVC-Web-App](http://img.draveness.me/MVC-Web-App.jpg)
+![MVC-Web-App](https://raw.githubusercontent.com/Draveness/analyze/master/contents/architecture/images/mvx/MVC-Web-App.jpg)
 
 > 上图的 MVC 架构模式的通信方式与标准的 MVC 中不同，上图以 Rails 为例展示其中的 MVC 是如何工作的，其中的 HTML、CSS 和 Javascript 代码就是视图层，控制器负责视图的渲染并且操作模型，模型中包含部分业务逻辑并负责管理数据库。
 
 过去的 Web 应用的非常简单，而现在的应用程序都非常复杂，而整个应用程序无论是 Web 还是客户端其实都包含两个部分，也就是前端/客户端和后端；先抛开后端不谈，无论是 Web 前端、iOS 还是 Android 都遵循 MVC 架构模式或者它的变种。
 
-![MVC-App-Arch](http://img.draveness.me/MVC-App-Arch.jpg)
+![MVC-App-Arch](https://raw.githubusercontent.com/Draveness/analyze/master/contents/architecture/images/mvx/MVC-App-Arch.jpg)
 
 在实际情况下，单独的 iOS、Android 和 Web 应用往往不能单独工作，这些客户端应用需要与服务端一起工作；当前端/客户端与后端一同工作时，其实分别『部署』了两个不同的应用，这两个应用都遵循 MVC 架构模式：
 
-![MVC-MV](http://img.draveness.me/MVC-MVC.jpg)
+![MVC-MV](https://raw.githubusercontent.com/Draveness/analyze/master/contents/architecture/images/mvx/MVC-MVC.jpg)
 
 客户端和服务器通过网络进行连接，并组成了一个更大的 MVC 架构；从这个角度来看，服务端的模型层才存储了真正的数据，而客户端的模型层只不过是一个存储在客户端设备中的本地缓存和临时数据的集合；同理，服务端的视图层也不是整个应用的视图层，用于为用户展示数据的视图层位于客户端，也就是整个架构的最顶部；中间的五个部分，也就是从低端的模型层到最上面的视图共同组成了整个应用的控制器，将模型中的数据以合理的方式传递给最上层的视图层用于展示。
 
@@ -190,7 +190,7 @@ MVP 架构模式是 MVC 的一个变种，很多框架都自称遵循 MVC 架构
 
 MVP 作为一个比较有争议的架构模式，在维基百科的 [Model-view-presenter](https://en.wikipedia.org/wiki/Model–view–presenter) 词条中被描述为 MVC 设计模式的变种（derivation），自上个世纪 90 年代出现在 IBM 之后，随着不断的演化，虽然有着很多分支，不过 Martin Fowler 对 MVP 架构模式的定义最终被广泛接受和讨论。
 
-![Standard-MVP](http://img.draveness.me/Standard-MVP.jpg)
+![Standard-MVP](https://raw.githubusercontent.com/Draveness/analyze/master/contents/architecture/images/mvx/Standard-MVP.jpg)
 
 在 MVP 中，Presenter 可以理解为松散的控制器，其中包含了视图的 UI 业务逻辑，所有从视图发出的事件，都会通过代理给 Presenter 进行处理；同时，Presenter 也通过视图暴露的接口与其进行通信。
 
@@ -200,7 +200,7 @@ MVP 作为一个比较有争议的架构模式，在维基百科的 [Model-view-
 
 MVP 的第一个主要变种就是被动视图（Passive View）；顾名思义，在该变种的架构模式中，视图层是被动的，它本身不会改变自己的任何的状态，所有的状态都是通过 Presenter 来间接改变的。
 
-![PassIve-Vie](http://img.draveness.me/PassIve-View.jpg)
+![PassIve-Vie](https://raw.githubusercontent.com/Draveness/analyze/master/contents/architecture/images/mvx/PassIve-View.jpg)
 
 被动的视图层就像前端中的 HTML 和 CSS 代码，只负责展示视图的结构和内容，本身不具有任何的逻辑：
 
@@ -224,7 +224,7 @@ MVP 的第一个主要变种就是被动视图（Passive View）；顾名思义�
 
 视图成为了完全被动的并且不再根据模型来更新视图本身的内容，也就是说，不同于 MVC 中的依赖关系；在被动视图中，视图层对于模型层没有任何的依赖：
 
-![Essential-Dependencies-in-Passive-Vie](http://img.draveness.me/Essential-Dependencies-in-Passive-View.jpg)
+![Essential-Dependencies-in-Passive-Vie](https://raw.githubusercontent.com/Draveness/analyze/master/contents/architecture/images/mvx/Essential-Dependencies-in-Passive-View.jpg)
 
 因为视图层不依赖与其他任何层级也就最大化了视图层的可测试性，同时也将视图层和模型层进行了合理的分离，两者不再相互依赖。
 
@@ -232,7 +232,7 @@ MVP 的第一个主要变种就是被动视图（Passive View）；顾名思义�
 
 被动视图的示意图中一共有四条线，用于表示 Model、View 和 Presenter 之间的通信：
 
-![Passive-View-with-Tags](http://img.draveness.me/Passive-View-with-Tags.jpg)
+![Passive-View-with-Tags](https://raw.githubusercontent.com/Draveness/analyze/master/contents/architecture/images/mvx/Passive-View-with-Tags.jpg)
 
 1. 当视图接收到来自用户的事件时，会将事件转交给 Presenter 进行处理；
 2. 被动的视图向外界暴露接口，当需要更新视图时 Presenter 通过视图暴露的接口更新视图的内容；
@@ -245,7 +245,7 @@ MVP 的第一个主要变种就是被动视图（Passive View）；顾名思义�
 
 与被动视图中状态同步都需要**显式**的操作不同，监督控制器（Supervising Controller）就将部分需要显式同步的操作变成了隐式的：
 
-![Supervising-Controller](http://img.draveness.me/Supervising-Controller.jpg)
+![Supervising-Controller](https://raw.githubusercontent.com/Draveness/analyze/master/contents/architecture/images/mvx/Supervising-Controller.jpg)
 
 在监督控制器中，视图层接管了一部分视图逻辑，主要内容就是同步**简单的**视图和模型的状态；而监督控制器就需要负责响应用户的输入以及一部分更加复杂的视图、模型状态同步工作。
 
@@ -261,7 +261,7 @@ MVP 的第一个主要变种就是被动视图（Passive View）；顾名思义�
 
 监督控制器中的视图和模型层之间增加了两者之间的耦合，也就增加了整个架构的复杂性：
 
-![Supervising-Controller-With-Tag](http://img.draveness.me/Supervising-Controller-With-Tag.jpg)
+![Supervising-Controller-With-Tag](https://raw.githubusercontent.com/Draveness/analyze/master/contents/architecture/images/mvx/Supervising-Controller-With-Tag.jpg)
 
 视图和监督控制器、模型与监督控制器的关系与被动视图中两者与 Presenter 的关系几乎相同，视图和模型之间新增的依赖就是数据绑定的产物；视图通过声明式的语法与模型中的简单属性进行绑定，当模型发生改变时，会通知其观察者视图作出相应的更新。
 
@@ -271,7 +271,7 @@ MVP 的第一个主要变种就是被动视图（Passive View）；顾名思义�
 
 无论是在被动视图还是监督控制器版本的 MVP 架构模式中，视图层在整个架构中都是占主导地位的：
 
-![Main-View-in-MVP](http://img.draveness.me/Main-View-in-MVP.jpg)
+![Main-View-in-MVP](https://raw.githubusercontent.com/Draveness/analyze/master/contents/architecture/images/mvx/Main-View-in-MVP.jpg)
 
 在 MVC 中，控制器负责**以不同的视图响应客户端请求的不同动作**；然而，不同于 MVC 模式，MVP 中视图将所有的动作交给 Presenter 进行处理；MVC 中的所有的动作都对应着一个控制器的方法调用，Web 应用中的每一个动作都是对某一个 URL 进行的操作，控制器根据访问的路由和方法（GET 等）对数据进行操作，最终选择正确的视图进行返回。
 
@@ -289,7 +289,7 @@ MVC 中控制器返回的视图没有直接绑定到模型上，它仅仅被控�
 
 早在 2004 年，Martin Fowler 发表了一篇名为 [Presentation Model](https://www.martinfowler.com/eaaDev/PresentationModel.html) （以下简称为 PM 模式）的文章，PM 模式与 MVP 比较相似，它从视图层中分离了行为和状态；PM 模式中创建了一个视图的抽象，叫做 Presentation Model，而视图也成为了这个模型的『渲染』结果。
 
-![PM-and-MVV](http://img.draveness.me/PM-and-MVVM.jpg)
+![PM-and-MVV](https://raw.githubusercontent.com/Draveness/analyze/master/contents/architecture/images/mvx/PM-and-MVVM.jpg)
 
 2005 年，John Gossman 在他的博客上公布了 [Introduction to Model/View/ViewModel pattern for building WPF apps](https://blogs.msdn.microsoft.com/johngossman/2005/10/08/introduction-to-modelviewviewmodel-pattern-for-building-wpf-apps/) 一文。MVVM 与 Martin Fowler 所说的 PM 模式其实是完全相同的，Fowler 提出的 PM 模式是一种与平台无关的创建视图抽象的方法，而 Gossman 的 MVVM 是专门用于 WPF 框架来简化用户界面的创建的模式；我们可以认为 **MVVM 是在 WPF 平台上对于 PM 模式的实现**。
 
@@ -307,7 +307,7 @@ MVC 中控制器返回的视图没有直接绑定到模型上，它仅仅被控�
 
 在监督控制器中，视图层与模型层中的一些简单属性进行绑定，在模型属性变化时直接更新视图，而 PM 通过引入展示模型将**模型层中的数据与复杂的业务逻辑封装成属性与简单的数据同时暴露给视图，让视图和展示模型中的属性进行同步**。
 
-![Presentation-Mode](http://img.draveness.me/Presentation-Model.jpg)
+![Presentation-Mode](https://raw.githubusercontent.com/Draveness/analyze/master/contents/architecture/images/mvx/Presentation-Model.jpg)
 
 展示模型中包含所有的视图渲染需要的动态信息，包括视图的内容（text、color）、组件是否启用（enable），除此之外还会将一些方法暴露给视图用于某些事件的响应。
 
@@ -325,7 +325,7 @@ MVC 中控制器返回的视图没有直接绑定到模型上，它仅仅被控�
 
 在 PM 模式中，同一个展示模型可以与多个领域对象交互，多个视图可以使用相同的展示模型，但是每一个视图只能持有一个展示模型。
 
-![PM-View-Domain-Object](http://img.draveness.me/PM-View-Domain-Object.jpg)
+![PM-View-Domain-Object](https://raw.githubusercontent.com/Draveness/analyze/master/contents/architecture/images/mvx/PM-View-Domain-Object.jpg)
 
 PM 模式中不同层级之间的关系还是非常容易理解的，在这里就不做具体解释了。
 
@@ -333,13 +333,13 @@ PM 模式中不同层级之间的关系还是非常容易理解的，在这里�
 
 MVVM 架构模式是微软在 2005 年诞生的，从诞生一开始就与 WPF 框架的联系非常紧密，在这一节中，我们将介绍 MVVM 模式是如何遵循 PM 模式实现的，WPF 作为微软用于处理 GUI 软件的框架，提供了一套非常优雅的解决方案。
 
-![Model-View-ViewModel](http://img.draveness.me/Model-View-ViewModel.jpg)
+![Model-View-ViewModel](https://raw.githubusercontent.com/Draveness/analyze/master/contents/architecture/images/mvx/Model-View-ViewModel.jpg)
 
 从 Model-View-ViewModel 这个名字来看，它由三个部分组成，也就是 Model、View 和 ViewModel；其中视图模型（ViewModel）其实就是 PM 模式中的展示模型，在 MVVM 中叫做视图模型。
 
 除了我们非常熟悉的 Model、View 和 ViewModel 这三个部分，在 MVVM 的实现中，还引入了**隐式的**一个 Binder 层，而声明式的数据和命令的绑定在 MVVM 模式中就是通过它完成的。
 
-![Binder-View-ViewModel](http://img.draveness.me/Binder-View-ViewModel.jpg)
+![Binder-View-ViewModel](https://raw.githubusercontent.com/Draveness/analyze/master/contents/architecture/images/mvx/Binder-View-ViewModel.jpg)
 
 在实现 PM 模式时，我们需要处理视图和展示模型之间状态的同步，也就是 MVVM 中的视图和视图模型，我们使用隐式的 Binder 和 XAML 文件来完成视图和视图模型两者之间的双向绑定：
 
