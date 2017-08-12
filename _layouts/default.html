@@ -27,6 +27,7 @@
     {% include analytics.html %}
   </head>
   <body class="{% if paginator.page > 1 %}paged archive-template{% elsif page.class %}{{ page.class }}{% else %}home-template{% endif %} nav-closed">
+    {% include tag_manager.html %}
 
     {% include navigation.html %}
 
