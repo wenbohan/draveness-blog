@@ -10,7 +10,7 @@ redcarpet:
 #     disable : true
 highlighter: none
 # highlighter: rouge
-paginate: 40
+paginate: 30
 language: 'en-uk'
 
 # Website info
