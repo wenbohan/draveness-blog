@@ -7,6 +7,7 @@ content: 这是 MVX 系列的第四篇文章，在前面的文章中，我们先
 cover: https://raw.githubusercontent.com/Draveness/analyze/master/contents/architecture/images/mvx/MVC-MVVM-MVP.jpg
 tags: MVC iOS
 cover: http://img.draveness.me/MVC-MVVM-MVP.jpg
+---
 
 + [谈谈 MVX 中的 Model](http://draveness.me/mvx-model.html)
 + [谈谈 MVX 中的 View](http://draveness.me/mvx-view.html)
