@@ -373,6 +373,8 @@ CREATE TABLE test(
 
 由于篇幅所限仅能对数据库中一些重要内容进行简单的介绍和总结，文中内容难免有所疏漏，如果对文章内容的有疑问，可以在博客下面评论留言（评论系统使用 Disqus，需要翻墙）。
 
+> Follow: [Draveness · GitHub](https://github.com/Draveness)
+
 ## Reference
 
 + [mysqld_safe version different than mysqld?](https://dba.stackexchange.com/questions/35962/mysqld-safe-version-different-than-mysqld)

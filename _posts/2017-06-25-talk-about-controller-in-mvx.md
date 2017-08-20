@@ -592,6 +592,8 @@ extension ViewController {}
 
 本文虽然对 Controller 层的职责进行了分析，但是由于 Controller 在 MVC 中所处的位置，如果不脱离 MVC 架构模式，那么 Controller 的职责很难简化，只能在代码规范和职责划分上进行限制，而在下一篇文章中我们会详细讨论 MVC 以及衍化出来的MVP 以及 MVVM 到底是什么、以及它们有什么样的差异。
 
+> Follow: [Draveness · GitHub](https://github.com/Draveness)
+
 ## Reference
 
 + [Lighter View Controllers](https://www.objc.io/issues/1-view-controllers/lighter-view-controllers/)
