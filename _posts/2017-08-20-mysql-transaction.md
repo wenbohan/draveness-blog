@@ -1,6 +1,6 @@
 ---
 layout: post
-title: 浅谈 MySQL 中事务的实现
+title: 浅入深出 MySQL 中事务的实现
 permalink: /mysql-transaction.html
 tags: Server Database MySQL PostgreSQL
 cover: http://img.draveness.me/2017-08-20-Transaction-Cover.jpg
