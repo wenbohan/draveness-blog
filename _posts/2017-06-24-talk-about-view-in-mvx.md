@@ -3,7 +3,7 @@ layout: post
 title: 谈谈 MVX 中的 View
 date: 2017-06-23 01:34:44.000000000 +08:00
 permalink: /mvx-view.html
-content: 这是谈谈 MVX 系列的第二篇文章，上一篇文章中对 iOS 中 Model 层的设计进行了简要的分析；而在这里，我们会对 MVC 中的视图层进行讨论，谈一谈现有的视图层有着什么样的问题，如何在框架的层面上去改进，同时与服务端的视图层进行对比，分析它们的差异。
+desc: 这是谈谈 MVX 系列的第二篇文章，上一篇文章中对 iOS 中 Model 层的设计进行了简要的分析；而在这里，我们会对 MVC 中的视图层进行讨论，谈一谈现有的视图层有着什么样的问题，如何在框架的层面上去改进，同时与服务端的视图层进行对比，分析它们的差异。
 cover: http://img.draveness.me/Frame-And-Components.jpg
 tags: iOS MVC
 ---

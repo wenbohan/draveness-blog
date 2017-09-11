@@ -10,7 +10,6 @@ cover: http://img.draveness.me/2017-08-06-mysql-cover.jpg
 
 ![mysql](https://raw.githubusercontent.com/Draveness/Analyze/master/contents/Database/images/mysql/mysql.png)
 
-
 本文中对于数据库的介绍以及研究都是在 MySQL 上进行的，如果涉及到了其他数据库的内容或者实现会在文中单独指出。
 
 ## 数据库的定义
