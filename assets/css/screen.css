@@ -1088,8 +1088,8 @@ body:not(.post-template) .post-title {
  @media only screen and (max-width: 1400px) {
    #markdown-toc {
      /*left: 60px;*/
-     display: hidden;
-     visibility: hidden;
+     display: none;
+     /*visibility: hidden;*/
    }
 }
 
