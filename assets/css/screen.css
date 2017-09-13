@@ -1067,7 +1067,7 @@ body:not(.post-template) .post-title {
    5. Single Post - When you click on an individual post
    ========================================================================== */
 #markdown-toc {
-  transform: translateX(-110%);
+  transform: translateX(-120%);
 }
 
 #markdown-toc a {
