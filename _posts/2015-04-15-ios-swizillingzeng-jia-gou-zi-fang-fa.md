@@ -25,15 +25,15 @@ tags: iOS
 
 在最开始直接覆写 setter 方法的时候, 因为在**分类中无法访问属性**例如:
 
-```objectivec
+~~~objectivec
 self.backgroundColor
-```
+~~~
 
 而使用别的办法没有达到想要的效果(动态为分类添加属性覆写 setter 和 getter), 每次为属性`backgroundColor` 都不会使颜色正确的渲染, 所以我就放弃了, 最终选择 runtime 中的方法调剂实现这一功能.
 
 我直接展示一下方法调剂的代码:
 
-```objectivec
+~~~objectivec
 static dispatch_once_t onceToken;              
 dispatch_once(&onceToken, ^{                                               
     Class class = [self class];                                           
@@ -56,13 +56,13 @@ dispatch_once(&onceToken, ^{
         method_exchangeImplementations(originalMethod, swizzledMethod);
     }
 });
-```
+~~~
 
 这段代码来自于 [NSHipster](http://nshipster.com/method-swizzling/), 实现还是很清楚的, 我们只需要在 `#origin#` 和 `#swizzle#` 处填上需要交换的**选择子**就可以了.
 
 找对了方法, 接下来的工作就很简单了, 我们需要在哪里加入方法调剂的代码呢, 我的建议是在 `load` 方法中, 因为这个方法只会在程序的运行中执行一次, 不会导致线程之类的问题.
 
-```objectivec
+~~~objectivec
 + (void)load {
 	// Here is your method swizzling code.
 }
@@ -72,7 +72,7 @@ dispatch_once(&onceToken, ^{
 	[self hook_setTextColor:textColor];
     NSLog(@"After");
 }
-```
+~~~
 
 有人看到这里可能会有疑问: **方法调用自己是否会导致无限递归?**. 其实并不会, 因为我们在运行时交换了方法的实现.
 

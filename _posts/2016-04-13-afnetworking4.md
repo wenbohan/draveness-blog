@@ -30,7 +30,7 @@ Blog: [Draveness](http://draveness.me)
 
 在初始化方法中，使用 `SCNetworkReachabilityCreateWithAddress` 或者 `SCNetworkReachabilityCreateWithName` 生成一个 `SCNetworkReachabilityRef` 的引用。
 
-```objectivec
+~~~objectivec
 + (instancetype)managerForDomain:(NSString *)domain {
     SCNetworkReachabilityRef reachability = SCNetworkReachabilityCreateWithName(kCFAllocatorDefault, [domain UTF8String]);
 
@@ -45,14 +45,14 @@ Blog: [Draveness](http://draveness.me)
 
     return manager;
 }
-```
+~~~
 
 1. 这两个方法会通过一个**域名**或者一个 `sockaddr_in` 的指针生成一个 `SCNetworkReachabilityRef`
 2. 调用 `- [AFNetworkReachabilityManager initWithReachability:]` 将生成的 `SCNetworkReachabilityRef` 引用传给 `networkReachability`
 3. 设置一个默认的 `networkReachabilityStatus`
 
 
-```objectivec
+~~~objectivec
 - (instancetype)initWithReachability:(SCNetworkReachabilityRef)reachability {
     self = [super init];
     if (!self) {
@@ -64,7 +64,7 @@ Blog: [Draveness](http://draveness.me)
 
     return self;
 }
-```
+~~~
 
 > 当调用 `CFBridgingRelease(reachability)` 后，会把 `reachability` 桥接成一个 NSObject 对象赋值给 `self.networkReachability`，然后释放原来的 CoreFoundation 对象。
 
@@ -72,7 +72,7 @@ Blog: [Draveness](http://draveness.me)
 
 在初始化 `AFNetworkReachabilityManager` 后，会调用 `startMonitoring` 方法开始监控网络状态。
 
-```objectivec
+~~~objectivec
 - (void)startMonitoring {
     [self stopMonitoring];
 
@@ -103,7 +103,7 @@ Blog: [Draveness](http://draveness.me)
         }
     });
 }
-```
+~~~
 
 1. 先调用 `- stopMonitoring` 方法，如果之前设置过对网络状态的监听，使用 `SCNetworkReachabilityUnscheduleFromRunLoop` 方法取消之前在 Main Runloop 中的监听
 
@@ -198,15 +198,15 @@ Blog: [Draveness](http://draveness.me)
 
 在 Main Runloop 中对网络状态进行监控之后，在每次网络状态改变，就会调用 `AFNetworkReachabilityCallback` 函数：
 
-```objectivec
+~~~objectivec
 static void AFNetworkReachabilityCallback(SCNetworkReachabilityRef __unused target, SCNetworkReachabilityFlags flags, void *info) {
     AFPostReachabilityStatusChange(flags, (__bridge AFNetworkReachabilityStatusBlock)info);
 }
-```
+~~~
 
 这里会从 `info` 中取出之前存在 `context` 中的 `AFNetworkReachabilityStatusBlock`。
 
-```objectivec
+~~~objectivec
 __weak __typeof(self)weakSelf = self;
 AFNetworkReachabilityStatusBlock callback = ^(AFNetworkReachabilityStatus status) {
     __strong __typeof(weakSelf)strongSelf = weakSelf;
@@ -217,11 +217,11 @@ AFNetworkReachabilityStatusBlock callback = ^(AFNetworkReachabilityStatus status
     }
 
 };
-```
+~~~
 
 取出这个 block 之后，传入 `AFPostReachabilityStatusChange` 函数：
 
-```objectivec
+~~~objectivec
 static void AFPostReachabilityStatusChange(SCNetworkReachabilityFlags flags, AFNetworkReachabilityStatusBlock block) {
     AFNetworkReachabilityStatus status = AFNetworkReachabilityStatusForFlags(flags);
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -233,13 +233,13 @@ static void AFPostReachabilityStatusChange(SCNetworkReachabilityFlags flags, AFN
         [notificationCenter postNotificationName:AFNetworkingReachabilityDidChangeNotification object:nil userInfo:userInfo];
     });
 }
-```
+~~~
 
 1. 调用 `AFNetworkReachabilityStatusForFlags` 获取当前的网络可达性状态
 2. **在主线程中异步执行**上面传入的 `callback` block（设置 `self` 的网络状态，调用 `networkReachabilityStatusBlock`）
 3. 发送 `AFNetworkingReachabilityDidChangeNotification` 通知.
 
-```objectivec
+~~~objectivec
 static AFNetworkReachabilityStatus AFNetworkReachabilityStatusForFlags(SCNetworkReachabilityFlags flags) {
     BOOL isReachable = ((flags & kSCNetworkReachabilityFlagsReachable) != 0);
     BOOL needsConnection = ((flags & kSCNetworkReachabilityFlagsConnectionRequired) != 0);
@@ -262,11 +262,11 @@ static AFNetworkReachabilityStatus AFNetworkReachabilityStatusForFlags(SCNetwork
 
     return status;
 }
-```
+~~~
 
 因为 `flags` 是一个 `SCNetworkReachabilityFlags`，它的不同位代表了不同的网络可达性状态，通过 `flags` 的位操作，获取当前的状态信息 `AFNetworkReachabilityStatus`。
 
-```objectivec
+~~~objectivec
 typedef CF_OPTIONS(uint32_t, SCNetworkReachabilityFlags) {
 	kSCNetworkReachabilityFlagsTransientConnection	= 1<<0,
 	kSCNetworkReachabilityFlagsReachable		= 1<<1,
@@ -282,7 +282,7 @@ typedef CF_OPTIONS(uint32_t, SCNetworkReachabilityFlags) {
 
 	kSCNetworkReachabilityFlagsConnectionAutomatic	= kSCNetworkReachabilityFlagsConnectionOnTraffic
 };
-```
+~~~
 
 这里就是在 `SystemConfiguration` 中定义的全部的网络状态的标志位。
 
@@ -290,9 +290,9 @@ typedef CF_OPTIONS(uint32_t, SCNetworkReachabilityFlags) {
 
 其实这个类与 `AFNetworking` 整个框架并没有太多的耦合。正相反，它在整个框架中作为一个**即插即用**的类使用，每一个 `AFURLSessionManager` 都会持有一个 `AFNetworkReachabilityManager` 的实例。
 
-```objectivec
+~~~objectivec
 self.reachabilityManager = [AFNetworkReachabilityManager sharedManager];
-```
+~~~
 
 这是整个框架中除了 `AFNetworkReachabilityManager.h/m` 文件，**唯一一个**引用到这个类的地方。
 

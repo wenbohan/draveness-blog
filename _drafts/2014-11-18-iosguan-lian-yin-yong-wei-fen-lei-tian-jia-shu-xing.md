@@ -11,7 +11,7 @@ permalink: /:title
 
 使用关联引用为分类添加属性, 首先, 我们新建一个`Person`类, `Person.h`的文件如下
 
-```
+~~~
 //Person.h
 #import <Foundation/Foundation.h>
 
@@ -29,11 +29,11 @@ permalink: /:title
 @implementation Person
 
 @end
-```
+~~~
 
 现在, 我们在`Person`的分类中添加新的属性`emailAddress`, 现在头文件中使用`@property`声明这个属性.
 
-```
+~~~
 //Person+EmailAddress.h	
 #import "Person.h"
 
@@ -42,7 +42,7 @@ permalink: /:title
 @property (copy, nonatomic) NSString *emailAddress;
 
 @end
-```
+~~~
 
 当我们只在分类的`.h`文件中加入属性的时候, 会产生如下的警告.
 
@@ -50,15 +50,15 @@ permalink: /:title
 	
 这时, 我们使用`objc/Runtime`库中的动态方法为生成获取和设置属性的方法.
 
-```
+~~~
 id objc_getAssociatedObject(id object, void *key)
 
 void objc_setAssociatedObject(id object, void *key, id value, objc_AssociationPolicy policy)
-```
+~~~
 	
 `Person+emailAddress.m`方法的实现代码如下
 
-```
+~~~
 #import "Person+EmailAddress.h"
 #import <objc/runtime.h>
 
@@ -76,7 +76,7 @@ static char emailAddressKey;
 }
 
 @end
-```
+~~~
 
 注意:
 

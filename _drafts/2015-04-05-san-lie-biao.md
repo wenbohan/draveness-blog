@@ -19,7 +19,7 @@ permalink: /:title
 
 我们使用 Ruby 来实现我们直接寻址表的操作.
 
-```
+~~~
 class DirectAddressTable
 
 	def initialize
@@ -39,7 +39,7 @@ class DirectAddressTable
 	end
 
 end
-```
+~~~
 
 直接寻址表本身就存放动态集合中的元素. 我们直接把对象存放在表的槽中, 节省了空间. 使用对象内的一个特殊关键字 `nil` 来表明槽为空. 因此我们如果知道一个对象在表中的下标就可以得到它的关键字. 因此如果不使用关键字, 我们就需要有一种方法来确定某个槽是否为空.
 
@@ -69,7 +69,7 @@ $$h:U\rightarrow \big\\{0,1,...,m-1 \big\\}$$
 
 使用链接法后, 散列表中的操作就很容易实现了:
 
-```
+~~~
 class ChainedHashTable
 	
 	def initialize
@@ -97,7 +97,7 @@ class ChainedHashTable
 	end
 
 end
-```
+~~~
 
 插入操作的最坏情况的运行时间为 $O(1)$. 查找操作的最坏情况运行时间与表的长度成正比. 如果散列表中的链表是双向链接的, 则删除一个元素 $x$ 的操作可以在 $O(1)$ 时间内完成.
 
@@ -123,7 +123,7 @@ $$ \big \langle h(k,0),h(k,1),...,h(k,m-1) \big \rangle$$
 
 当向散列表中插入数据时, 我们使用如下的过程:
 
-```
+~~~
 class OpenAddressHashTable
 
 	def initialize(max)
@@ -162,7 +162,7 @@ class OpenAddressHashTable
 	end
 
 end
-```
+~~~
 查找关键字 $k$ 的算法探查序列与将 $k$ 插入时的算法相同.
 
 从开放寻址法的散列表中删除操作元素比较困难, 因为不能直接将其设置为 `nil` 标识它为空. 如果这样做就会有问题, 就是在槽中置一个特定的值 `DELETED` 替代为 `NIL` 来标记该槽. 但是在必须删除关键字的应用中, 最常见的做法是使用链接法来解决冲突.

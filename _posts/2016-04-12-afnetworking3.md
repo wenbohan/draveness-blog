@@ -27,7 +27,7 @@ Blog: [Draveness](http://draveness.me)
 
 协议的内容也非常简单，只有一个必须实现的方法。
 
-```objectivec
+~~~objectivec
 @protocol AFURLResponseSerialization <NSObject, NSSecureCoding, NSCopying>
 
 - (nullable id)responseObjectForResponse:(nullable NSURLResponse *)response
@@ -35,7 +35,7 @@ Blog: [Draveness](http://draveness.me)
                           error:(NSError * _Nullable __autoreleasing *)error NS_SWIFT_NOTHROW;
 
 @end
-```
+~~~
 
 遵循这个协议的类同时也要遵循 NSObject、NSSecureCoding 和 NSCopying 这三个协议，实现安全编码、拷贝以及 Objective-C 对象的基本行为。
 
@@ -56,7 +56,7 @@ Blog: [Draveness](http://draveness.me)
 
 首先是这个类的实例化方法：
 
-```objectivec
+~~~objectivec
 + (instancetype)serializer {
     return [[self alloc] init];
 }
@@ -74,7 +74,7 @@ Blog: [Draveness](http://draveness.me)
 
     return self;
 }
-```
+~~~
 
 因为是对 HTTP 响应进行序列化，所以这里设置了 `stringEncoding` 为 `NSUTF8StringEncoding` 而且没有对接收的内容类型加以限制。
 
@@ -84,7 +84,7 @@ Blog: [Draveness](http://draveness.me)
 
 `AFHTTPResponseSerializer` 中方法的实现最长，并且最重要的就是 `- [AFHTTPResponseSerializer validateResponse:data:error:]`
 
-```objectivec
+~~~objectivec
 - (BOOL)validateResponse:(NSHTTPURLResponse *)response
                     data:(NSData *)data
                    error:(NSError * __autoreleasing *)error
@@ -108,11 +108,11 @@ Blog: [Draveness](http://draveness.me)
 
     return responseIsValid;
 }
-```
+~~~
 
 这个方法根据在初始化方法中初始化的属性 `acceptableContentTypes` 和 `acceptableStatusCodes` 来判断当前响应是否有效。
 
-```objectivec
+~~~objectivec
 if ([data length] > 0 && [response URL]) {
     NSMutableDictionary *mutableUserInfo = [@{
                                               NSLocalizedDescriptionKey: [NSString stringWithFormat:NSLocalizedStringFromTable(@"Request failed: unacceptable content-type: %@", @"AFNetworking", nil), [response MIMEType]],
@@ -127,12 +127,12 @@ if ([data length] > 0 && [response URL]) {
 }
 
 responseIsValid = NO;
-```
+~~~
 
 其中第一、二部分的代码非常相似，出现错误时通过 `AFErrorWithUnderlyingError` 生成格式化之后的错误，最后设置 `responseIsValid`。
 
 
-```objectivec
+~~~objectivec
 NSMutableDictionary *mutableUserInfo = [@{
                                    NSLocalizedDescriptionKey: [NSString stringWithFormat:NSLocalizedStringFromTable(@"Request failed: %@ (%ld)", @"AFNetworking", nil), [NSHTTPURLResponse localizedStringForStatusCode:response.statusCode], (long)response.statusCode],
                                    NSURLErrorFailingURLErrorKey:[response URL],
@@ -146,7 +146,7 @@ if (data) {
 validationError = AFErrorWithUnderlyingError([NSError errorWithDomain:AFURLResponseSerializationErrorDomain code:NSURLErrorBadServerResponse userInfo:mutableUserInfo], validationError);
 
 responseIsValid = NO;
-```
+~~~
 
 第二部分的代码就不说了，实现上都是差不多的。
 
@@ -154,7 +154,7 @@ responseIsValid = NO;
 
 首先是对 `AFURLResponseSerialization` 协议的实现
 
-```objectivec
+~~~objectivec
 - (id)responseObjectForResponse:(NSURLResponse *)response
                            data:(NSData *)data
                           error:(NSError *__autoreleasing *)error
@@ -163,7 +163,7 @@ responseIsValid = NO;
 
     return data;
 }
-```
+~~~
 
 调用上面的方法对响应进行验证，然后返回数据，实在是没什么难度。
 
@@ -175,7 +175,7 @@ responseIsValid = NO;
 
 初始化方法只是在调用父类的初始化方法之后更新了 `acceptableContentTypes` 属性：
 
-```objectivec
+~~~objectivec
 - (instancetype)init {
     self = [super init];
     if (!self) {
@@ -186,13 +186,13 @@ responseIsValid = NO;
 
     return self;
 }
-```
+~~~
 
 #### 协议的实现
 
 这个类中与父类差别最大的就是对 `AFURLResponseSerialization` 协议的实现。
 
-```objectivec
+~~~objectivec
 - (id)responseObjectForResponse:(NSURLResponse *)response
                            data:(NSData *)data
                           error:(NSError *__autoreleasing *)error
@@ -211,7 +211,7 @@ responseIsValid = NO;
 
     return responseObject;
 }
-```
+~~~
 
 1. 验证请求的有效性
 
@@ -261,7 +261,7 @@ responseIsValid = NO;
 
 其中移除 JSON 中 null 的函数 `AFJSONObjectByRemovingKeysWithNullValues` 是一个递归调用的函数：
 
-```objectivec
+~~~objectivec
 static id AFJSONObjectByRemovingKeysWithNullValues(id JSONObject, NSJSONReadingOptions readingOptions) {
     if ([JSONObject isKindOfClass:[NSArray class]]) {
         NSMutableArray *mutableArray = [NSMutableArray arrayWithCapacity:[(NSArray *)JSONObject count]];
@@ -286,7 +286,7 @@ static id AFJSONObjectByRemovingKeysWithNullValues(id JSONObject, NSJSONReadingO
 
     return JSONObject;
 }
-```
+~~~
 
 其中移除 `null` 靠的就是 `[mutableDictionary removeObjectForKey:key]` 这一行代码。
 
@@ -307,7 +307,7 @@ static id AFJSONObjectByRemovingKeysWithNullValues(id JSONObject, NSJSONReadingO
 
 处理查询参数这部分主要是通过 `AFQueryStringPair` 还有一些 C 函数来完成的，这个类有两个属性 `field` 和 `value` 对应 HTTP 请求的查询 URL 中的参数。
 
-```objectivec
+~~~objectivec
 @interface AFQueryStringPair : NSObject
 @property (readwrite, nonatomic, strong) id field;
 @property (readwrite, nonatomic, strong) id value;
@@ -316,20 +316,20 @@ static id AFJSONObjectByRemovingKeysWithNullValues(id JSONObject, NSJSONReadingO
 
 - (NSString *)URLEncodedStringValue;
 @end
-```
+~~~
 
 初始化方法也不必多看，其中的 `- [AFQueryStringPair URLEncodedStringValue]` 方法会返回 `key=value` 这种格式，同时使用 `AFPercentEscapedStringFromString` 函数来对 `field` 和 `value` 进行处理，将其中的 `:#[]@!$&'()*+,;=` 等字符转换为百分号表示的形式。
 
 这一部分代码还负责返回查询参数，将 `AFQueryStringPair` 或者 `key` `value` 转换为以下这种形式：
 
-```
+~~~
 username=dravenss&password=123456&hello[world]=helloworld
-```
+~~~
 
 它的实现主要依赖于一个递归函数 `AFQueryStringPairsFromKeyAndValue`，如果当前的 `value` 是一个集合类型的话，那么它就会不断地递归调用自己。
 
 
-```objectivec
+~~~objectivec
 NSArray * AFQueryStringPairsFromKeyAndValue(NSString *key, id value) {
     NSMutableArray *mutableQueryStringComponents = [NSMutableArray array];
 
@@ -360,21 +360,21 @@ NSArray * AFQueryStringPairsFromKeyAndValue(NSString *key, id value) {
 
     return mutableQueryStringComponents;
 }
-```
+~~~
 
 最后返回一个数组
 
-```objectivec
+~~~objectivec
 [
 	username=draveness,
 	password=123456,
 	hello[world]=helloworld
 ]
-```
+~~~
 
 得到这个数组之后就会调用 `AFQueryStringFromParameters` 使用 `&` 来拼接它们。
 
-```objectivec
+~~~objectivec
 static NSString * AFQueryStringFromParameters(NSDictionary *parameters) {
     NSMutableArray *mutablePairs = [NSMutableArray array];
     for (AFQueryStringPair *pair in AFQueryStringPairsFromDictionary(parameters)) {
@@ -383,13 +383,13 @@ static NSString * AFQueryStringFromParameters(NSDictionary *parameters) {
 
     return [mutablePairs componentsJoinedByString:@"&"];
 }
-```
+~~~
 
 ### 设置 HTTP 头部字段
 
 `AFHTTPRequestSerializer` 在头文件中提供了一些属性方便我们设置 HTTP 头部字段。同时，在类的内部，它提供了 `- [AFHTTPRequestSerializer setValue:forHTTPHeaderField:]` 方法来设置 HTTP 头部，其实它的实现都是基于一个名为 `mutableHTTPRequestHeaders` 的属性的：
 
-```objectivec
+~~~objectivec
 - (void)setValue:(NSString *)value
 forHTTPHeaderField:(NSString *)field
 {
@@ -399,27 +399,27 @@ forHTTPHeaderField:(NSString *)field
 - (NSString *)valueForHTTPHeaderField:(NSString *)field {
     return [self.mutableHTTPRequestHeaders valueForKey:field];
 }
-```
+~~~
 
 在设置 HTTP 头部字段时，都会存储到这个可变字典中。而当真正使用时，会用 `HTTPRequestHeaders` 这个方法，来获取对应版本的不可变字典。
 
-```objectivec
+~~~objectivec
 - (NSDictionary *)HTTPRequestHeaders {
     return [NSDictionary dictionaryWithDictionary:self.mutableHTTPRequestHeaders];
 }
-```
+~~~
 
 到了这里，可以来分析一下，这个类是如何设置一些我们平时常用的头部字段的。首先是 `User-Agent`，在 `AFHTTPRequestSerializer` 刚刚初始化时，就会根据当前编译的平台生成一个 `userAgent` 字符串：
 
-```objectivec
+~~~objectivec
 userAgent = [NSString stringWithFormat:@"%@/%@ (%@; iOS %@; Scale/%0.2f)", [[NSBundle mainBundle] infoDictionary][(__bridge NSString *)kCFBundleExecutableKey] ?: [[NSBundle mainBundle] infoDictionary][(__bridge NSString *)kCFBundleIdentifierKey], [[NSBundle mainBundle] infoDictionary][@"CFBundleShortVersionString"] ?: [[NSBundle mainBundle] infoDictionary][(__bridge NSString *)kCFBundleVersionKey], [[UIDevice currentDevice] model], [[UIDevice currentDevice] systemVersion], [[UIScreen mainScreen] scale]];
 
 [self setValue:userAgent forHTTPHeaderField:@"User-Agent"];
-```
+~~~
 
 设置验证字段时，可以使用 `- [AFHTTPRequestSerializer setAuthorizationHeaderFieldWithUsername:password:]` 方法
 
-```objectivec
+~~~objectivec
 - (void)setAuthorizationHeaderFieldWithUsername:(NSString *)username
                                        password:(NSString *)password
 {
@@ -427,13 +427,13 @@ userAgent = [NSString stringWithFormat:@"%@/%@ (%@; iOS %@; Scale/%0.2f)", [[NSB
     NSString *base64AuthCredentials = [basicAuthCredentials base64EncodedStringWithOptions:(NSDataBase64EncodingOptions)0];
     [self setValue:[NSString stringWithFormat:@"Basic %@", base64AuthCredentials] forHTTPHeaderField:@"Authorization"];
 }
-```
+~~~
 
 ### 设置请求的属性
 
 还有一写 `NSURLRequest` 的属性是通过另一种方式来设置的，AFNetworking 为这些功能提供了接口
 
-```objectivec
+~~~objectivec
 @property (nonatomic, assign) BOOL allowsCellularAccess;
 
 @property (nonatomic, assign) NSURLRequestCachePolicy cachePolicy;
@@ -445,11 +445,11 @@ userAgent = [NSString stringWithFormat:@"%@/%@ (%@; iOS %@; Scale/%0.2f)", [[NSB
 @property (nonatomic, assign) NSURLRequestNetworkServiceType networkServiceType;
 
 @property (nonatomic, assign) NSTimeInterval timeoutInterval;
-```
+~~~
 
 它们都会通过 `AFHTTPRequestSerializerObservedKeyPaths` 的调用而返回。
 
-```objectivec
+~~~objectivec
 static NSArray * AFHTTPRequestSerializerObservedKeyPaths() {
     static NSArray *_AFHTTPRequestSerializerObservedKeyPaths = nil;
     static dispatch_once_t onceToken;
@@ -459,11 +459,11 @@ static NSArray * AFHTTPRequestSerializerObservedKeyPaths() {
 
     return _AFHTTPRequestSerializerObservedKeyPaths;
 }
-```
+~~~
 
 在这些属性被设置时，会触发 KVO，然后将新的属性存储在一个名为 `mutableObservedChangedKeyPaths` 的字典中：
 
-```objectivec
+~~~objectivec
 - (void)observeValueForKeyPath:(NSString *)keyPath
                       ofObject:(__unused id)object
                         change:(NSDictionary *)change
@@ -477,11 +477,11 @@ static NSArray * AFHTTPRequestSerializerObservedKeyPaths() {
         }
     }
 }
-```
+~~~
 
 然后会在生成 `NSURLRequest` 的时候设置这些属性。
 
-```objectivec
+~~~objectivec
 NSMutableURLRequest *mutableRequest = [[NSMutableURLRequest alloc] initWithURL:url];
 mutableRequest.HTTPMethod = method;
 
@@ -490,7 +490,7 @@ for (NSString *keyPath in AFHTTPRequestSerializerObservedKeyPaths()) {
         [mutableRequest setValue:[self valueForKeyPath:keyPath] forKey:keyPath];
     }
 }
-```
+~~~
 
 关于这个方法的的具体实现会在下一节中介绍。
 
@@ -498,7 +498,7 @@ for (NSString *keyPath in AFHTTPRequestSerializerObservedKeyPaths()) {
 
 `AFHTTPRequestSerializer` 会在 `AHHTTPSessionManager` 初始化时一并初始化，这时它会根据当前系统环境预设置一些 HTTP 头部字段 `Accept-Language` `User-Agent`。
 
-```objectivec
+~~~objectivec
 - (instancetype)init {
     self = [super init];
     if (!self) {
@@ -524,13 +524,13 @@ for (NSString *keyPath in AFHTTPRequestSerializerObservedKeyPaths()) {
 
     return self;
 }
-```
+~~~
 
 同时它还对一些属性进行 KVO，确保它们在改变后更新 `NSMutableURLRequest` 中对应的属性。
 
 在初始化之后，如果调用了 `- [AFHTTPSessionManager dataTaskWithHTTPMethod:URLString:parameters:uploadProgress:downloadProgress:success:failure:]`，就会进入 `AFHTTPRequestSerializer` 的这一方法：
 
-```objectivec
+~~~objectivec
 
 - (NSMutableURLRequest *)requestWithMethod:(NSString *)method
                                  URLString:(NSString *)URLString
@@ -557,30 +557,30 @@ for (NSString *keyPath in AFHTTPRequestSerializerObservedKeyPaths()) {
 
 	return mutableRequest;
 }
-```
+~~~
 
 1. 对参数进行检查
 2. 设置 HTTP 方法
 
-	```objectivec
+	~~~objectivec
 	mutableRequest.HTTPMethod = method;
-	```
+	~~~
 
 3. 通过 `mutableObservedChangedKeyPaths` 字典设置 `NSMutableURLRequest` 的属性
 
-	```objectivec
+	~~~objectivec
 	for (NSString *keyPath in AFHTTPRequestSerializerObservedKeyPaths()) {
 	    if ([self.mutableObservedChangedKeyPaths containsObject:keyPath]) {
 	        [mutableRequest setValue:[self valueForKeyPath:keyPath] forKey:keyPath];
 	    }
 	}
-	```
+	~~~
 
 4. 调用 `- [AFHTTPRequestSerializer  requestBySerializingRequest:withParameters:error:]` **设置 HTTP 头部字段和查询参数**。
 
 `- [AFHTTPRequestSerializer  requestBySerializingRequest:withParameters:error:]` 方法主要做了两件事情
 
-```objectivec
+~~~objectivec
 - (NSURLRequest *)requestBySerializingRequest:(NSURLRequest *)request
                                withParameters:(id)parameters
                                         error:(NSError *__autoreleasing *)error
@@ -634,27 +634,27 @@ for (NSString *keyPath in AFHTTPRequestSerializerObservedKeyPaths()) {
 
     return mutableRequest;
 }
-```
+~~~
 
 1. 通过 `HTTPRequestHeaders` 字典设置头部字段
 
-	```objectivec
+	~~~objectivec
 	[self.HTTPRequestHeaders enumerateKeysAndObjectsUsingBlock:^(id field, id value, BOOL * __unused stop) {
 	    if (![request valueForHTTPHeaderField:field]) {
 	        [mutableRequest setValue:value forHTTPHeaderField:field];
 	    }
 	}];
-	```
+	~~~
 
 2. 调用 `AFQueryStringFromParameters` 将参数转换为查询参数
 
-	```objectivec
+	~~~objectivec
 	query = AFQueryStringFromParameters(parameters);
-	```
+	~~~
 
 2. 将 parameters 添加到 URL 或者 HTTP body 中
 
-	```objectivec
+	~~~objectivec
 	if ([self.HTTPMethodsEncodingParametersInURI containsObject:[[request HTTPMethod] uppercaseString]]) {
 	    if (query) {
 	        mutableRequest.URL = [NSURL URLWithString:[[mutableRequest.URL absoluteString] stringByAppendingFormat:mutableRequest.URL.query ? @"&%@" : @"?%@", query]];
@@ -669,7 +669,7 @@ for (NSString *keyPath in AFHTTPRequestSerializerObservedKeyPaths()) {
 	    }
 	    [mutableRequest setHTTPBody:[query dataUsingEncoding:self.stringEncoding]];
 	}
-	```
+	~~~
 
 	+ 如果 HTTP 方法为 `GET` `HEAD` 或者 `DELETE`，也就是在初始化方法中设置的，那么参数会追加到 URL 后面。否则会被放入 HTTP body 中。
 4. 最后这个方法会返回一个 `NSMutableURLRequest`

@@ -18,9 +18,9 @@ permalink: /:title
 
 怎样才能快速的搭建 Prolog 的开发环境呢, 如果你是用的 Mac. 在命令行中输入
 
-```
+~~~
 brew cask install swi-prolog
-```
+~~~
 
 如果没有装 brew 或者 cask, 可以在 google 上轻松找到这两个命令行工具的安装方法. 在这里我也就不在多说了.
 
@@ -40,15 +40,15 @@ Prolog 有三种非常基本结构:
 
 首先我们先写下几个 Prolog 中的 facts, 需要打开一个文件, 后缀是 `.pl`.
 
-```
+~~~
 programmer(linux).
 programmer(bill).
 designer(jonathan).
-```
+~~~
 
 这个文件 `facts.pl` 就是一些 facts 的集合, 注意, 在这里的每一个 fact 都是以 `.` 结尾的. 我们怎么使用呢, 在命令行中切换到 `facts.pl` 的目录下, 然后输入 `swipl`.
 
-```
+~~~
 Welcome to SWI-Prolog (Multi-threaded, 64 bits, Version 6.6.6)
 Copyright (c) 1990-2013 University of Amsterdam, VU Amsterdam
 SWI-Prolog comes with ABSOLUTELY NO WARRANTY. This is free software,
@@ -58,30 +58,30 @@ Please visit http://www.swi-prolog.org for details.
 For help, use ?- help(Topic). or ?- apropos(Word).
 
 ?-
-```
+~~~
 
 然后会出现这些信息, 使用 `consult('fact.pl').` 加载你的 Prolog 代码. 输入: programmer(linux).
 
-```
+~~~
 ?- programmer(linux).
 true
-```
+~~~
 
 Prolog 会返回 `true`. 如果你输入: programmer(jonathan).
 
-```
+~~~
 ?- programmer(jonathan).
 false
-```
+~~~
 
 它就会返回 `false`. 很简单吧.
 
 当然 facts 也可以是向下面这样有多个参数
 
-```
+~~~
 loves(i,u).
 loves(he,u).
-```
+~~~
 
 如果你输入一个不存在过程, 它就会告诉你 `Undefined procedure`.
 
@@ -89,11 +89,11 @@ loves(he,u).
 
 接下来我们介绍一下什么是规则 rules, 规则我们理解起来非常的容易, 在 Prolog 中如何实现一些规则呢, 我们使用 `:-`.
 
-```
+~~~
 sunny(today).
 happy(tom).
 football(tom) :- sunny(today),happy(tom).
-```
+~~~
 
 接下来我们加载我们的代码, 询问 `football(tom)`. Prolog 会返回 `true`, 规则是什么呢, 规则的前半部分也就是 `football(tom)` 是规则的头部(head), 规则的后半部分 `sunny(today),happy(tom)` 是规则的目标(goals). 当规则的 goals 成立时, head 就会成立也就是:
 
@@ -103,11 +103,11 @@ Prolog 使用 `,` 来表示 **和**, 使用 `;` 来表示 **或**. 所以在这�
 
 我们可以在 Rules 中添加变量增强我们的表达能力, 比如这样:
 
-```
+~~~
 father(tom,john).
 father(john,ive).
 grandfather(X,Z):-father(X,Y),father(Y,Z).
-```
+~~~
 
 我相信这对于我们是非常容易理解的, 在这里也不过多说明了.
 
@@ -115,30 +115,30 @@ grandfather(X,Z):-father(X,Y),father(Y,Z).
 
 什么是 queries, 其实我们在上边输入的 `football(tom).`, `programmer(jonathan).` 都是一种查询. 只是查询是否成立, 接下来我们就需要在查询中引入变量(variable)了.
 
-```
+~~~
 programmer(linux).
 programmer(bill).
 designer(jonathan).
-```
+~~~
 
 还是这一段代码, 我们可以通过询问 Prolog:
 
-```
+~~~
 ?- programmer(X).
-```
+~~~
 
 然后就会出现
 
-```
+~~~
 X = linux
-```
+~~~
 
 Prolog 每次只会出现最先符合条件的结果, 若果你想看其他的结果, 可以输入 `;` 也就是或, 来查看是否有其他的输入, 我们输入 `;` 之后, 会出现:
 
 
-```
+~~~
 X = bill
-```
+~~~
 
 
 再次输入之后, 就会返回 `false` 了, 因为没有符合条件的结果了.
@@ -176,17 +176,17 @@ Prolog 中的基本元素都是 term(*不知道该怎么翻译*)构建而来的.
 
 Complex terms 实际上就是一种结构, 而我们之前见到的
 
-```
+~~~
 programmer(linux).
 programmer(bill).
 designer(jonathan).
-```
+~~~
 
 这些都是 complex terms, 而且我们也可以定义出更加复杂的结构
 
-```
+~~~
 father(father(fahter(john))).
-```
+~~~
 
 complex term 拥有的参数的数量叫做 arity, arity 在 complex term 中及其的重要, `progammer(linux)` 中的 `arity = 1`, `love(i,u)` 中的 `arity = 2`.
 
@@ -196,10 +196,10 @@ complex term 拥有的参数的数量叫做 arity, arity 在 complex term 中及
 
 例如:
 
-```
+~~~
 happy/1
 love/2
-```
+~~~
 
 ##总结
 

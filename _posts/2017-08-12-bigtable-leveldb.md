@@ -93,7 +93,7 @@ Bigtable 会在**后台周期性**地进行 *Major Compaction*，将 memtable �
 
 LevelDB 作为一个键值存储的『仓库』，它提供了一组非常简单的增删改查接口：
 
-```cpp
+~~~cpp
 class DB {
  public:
   virtual Status Put(const WriteOptions& options, const Slice& key, const Slice& value) = 0;
@@ -101,7 +101,7 @@ class DB {
   virtual Status Write(const WriteOptions& options, WriteBatch* updates) = 0;
   virtual Status Get(const ReadOptions& options, const Slice& key, std::string* value) = 0;
 }
-```
+~~~
 
 > `Put` 方法在内部最终会调用 `Write` 方法，只是在上层为调用者提供了两个不同的选择。
 
@@ -113,7 +113,7 @@ class DB {
 
 首先来看 `Get` 和 `Put` 两者中的写方法：
 
-```cpp
+~~~cpp
 Status DB::Put(const WriteOptions& opt, const Slice& key, const Slice& value) {
   WriteBatch batch;
   batch.Put(key, value);
@@ -123,7 +123,7 @@ Status DB::Put(const WriteOptions& opt, const Slice& key, const Slice& value) {
 Status DBImpl::Write(const WriteOptions& options, WriteBatch* my_batch) {
     ...
 }
-```
+~~~
 
 正如上面所介绍的，`DB::Put` 方法将传入的参数封装成了一个 `WritaBatch`，然后仍然会执行 `DBImpl::Write` 方法向数据库中写入数据；写入方法 `DBImpl::Write` 其实是一个是非常复杂的过程，包含了很多对上下文状态的判断，我们先来看一个写操作的整体逻辑：
 
@@ -139,7 +139,7 @@ Status DBImpl::Write(const WriteOptions& options, WriteBatch* my_batch) {
 
 在这里，我们并不会提供 LevelDB 对于 `Put` 方法实现的全部代码，只会展示一份精简后的代码，帮助我们大致了解一下整个写操作的流程：
 
-```cpp
+~~~cpp
 Status DBImpl::Write(const WriteOptions& options, WriteBatch* my_batch) {
   Writer w(&mutex_);
   w.batch = my_batch;
@@ -158,13 +158,13 @@ Status DBImpl::Write(const WriteOptions& options, WriteBatch* my_batch) {
   versions_->SetLastSequence(last_sequence);
   return Status::OK();
 }
-```
+~~~
 
 #### 不可变的 memtable
 
 在写操作的实现代码 `DBImpl::Put` 中，写操作的准备过程 `MakeRoomForWrite` 是我们需要注意的一个方法：
 
-```cpp
+~~~cpp
 Status DBImpl::MakeRoomForWrite(bool force) {
   uint64_t new_log_number = versions_->NewFileNumber();
   WritableFile* lfile = NULL;
@@ -182,7 +182,7 @@ Status DBImpl::MakeRoomForWrite(bool force) {
   MaybeScheduleCompaction();
   return Status::OK();
 }
-```
+~~~
 
 当 LevelDB 中的 memtable 已经被数据填满导致内存已经快不够用的时候，我们会开始对 memtable 中的数据进行冻结并创建一个新的 `MemTable` 对象。
 
@@ -202,7 +202,7 @@ Status DBImpl::MakeRoomForWrite(bool force) {
 
 日志在 LevelDB 是以块的形式存储的，每一个块的长度都是 32KB，**固定的块长度**也就决定了日志可能存放在块中的任意位置，LevelDB 中通过引入一位 `RecordType` 来表示当前记录在块中的位置：
 
-```cpp
+~~~cpp
 enum RecordType {
   // Zero is reserved for preallocated files
   kZeroType = 0,
@@ -212,7 +212,7 @@ enum RecordType {
   kMiddleType = 3,
   kLastType = 4
 };
-```
+~~~
 
 日志记录的类型存储在该条记录的头部，其中还存储了 4 字节日志的 CRC 校验、记录的长度等信息：
 
@@ -220,7 +220,7 @@ enum RecordType {
 
 上图中一共包含 4 个块，其中存储着 6 条日志记录，我们可以通过 `RecordType` 对每一条日志记录或者日志记录的一部分进行标记，并在日志需要使用时通过该信息重新构造出这条日志记录。
 
-```cpp
+~~~cpp
 virtual Status Sync() {
   Status s = SyncDirIfManifest();
   if (fflush_unlocked(file_) != 0 ||
@@ -229,7 +229,7 @@ virtual Status Sync() {
   }
   return s;
 }
-```
+~~~
 
 因为向日志中写新记录都是顺序写的，所以它写入的速度非常快，当在内存中写入完成时，也会直接将缓冲区的这部分的内容 `fflush` 到磁盘上，实现对记录的持久化，用于之后的错误恢复等操作。
 
@@ -241,7 +241,7 @@ virtual Status Sync() {
 
 添加和删除的记录的区别就是它们使用了不用的 `ValueType` 标记，插入的数据会将其设置为 `kTypeValue`，删除的操作会标记为 `kTypeDeletion`；但是它们实际上都向 memtable 中插入了一条数据。
 
-```cpp
+~~~cpp
 virtual void Put(const Slice& key, const Slice& value) {
   mem_->Add(sequence_, kTypeValue, key, value);
   sequence_++;
@@ -250,11 +250,11 @@ virtual void Delete(const Slice& key) {
   mem_->Add(sequence_, kTypeDeletion, key, Slice());
   sequence_++;
 }
-```
+~~~
 
 我们可以看到它们都调用了 memtable 的 `Add` 方法，向其内部的数据结构 skiplist 以上图展示的格式插入数据，这条数据中既包含了该记录的键值、序列号以及这条记录的种类，这些字段会在拼接后存入 skiplist；既然我们并没有在 memtable 中对数据进行删除，那么我们是如何保证每次取到的数据都是最新的呢？首先，在 skiplist 中，我们使用了自己定义的一个 `comparator`：
 
-```cpp
+~~~cpp
 int InternalKeyComparator::Compare(const Slice& akey, const Slice& bkey) const {
   int r = user_comparator_->Compare(ExtractUserKey(akey), ExtractUserKey(bkey));
   if (r == 0) {
@@ -268,7 +268,7 @@ int InternalKeyComparator::Compare(const Slice& akey, const Slice& bkey) const {
   }
   return r;
 }
-```
+~~~
 
 > 比较的两个 key 中的数据可能包含的内容都不完全相同，有的会包含键值、序列号等全部信息，但是例如从 `Get` 方法调用过来的 key 中可能就只包含键的长度、键值和序列号了，但是这并不影响这里对数据的提取，因为我们只从每个 key 的头部提取信息，所以无论是完整的 key/value 还是单独的 key，我们都不会取到 key 之外的任何数据。
 
@@ -290,7 +290,7 @@ int InternalKeyComparator::Compare(const Slice& akey, const Slice& bkey) const {
 
 精简后的读操作方法的实现代码是这样的，方法的脉络非常清晰，作者相信这里也不需要过多的解释：
 
-```cpp
+~~~cpp
 Status DBImpl::Get(const ReadOptions& options, const Slice& key, std::string* value) {
   LookupKey lkey(key, versions_->LastSequence());
   if (mem_->Get(lkey, value, NULL)) {
@@ -304,7 +304,7 @@ Status DBImpl::Get(const ReadOptions& options, const Slice& key, std::string* va
   MaybeScheduleCompaction();
   return Status::OK();
 }
-```
+~~~
 
 当 LevelDB 在 memtable 和 imm 中查询到结果时，如果查询到了数据并不一定表示当前的值一定存在，它仍然需要判断 `ValueType` 来确定当前记录是否被删除。
 
@@ -334,7 +334,7 @@ Status DBImpl::Get(const ReadOptions& options, const Slice& key, std::string* va
 
 这种合并分为两种情况，一种是 Minor Compaction，即内存中的数据超过了 memtable 大小的最大限制，改 memtable 被冻结为不可变的 imm，然后执行方法 `CompactMemTable()` 对内存表进行压缩。
 
-```cpp
+~~~cpp
 void DBImpl::CompactMemTable() {
   VersionEdit edit;
   Version* base = versions_->current();
@@ -342,11 +342,11 @@ void DBImpl::CompactMemTable() {
   versions_->LogAndApply(&edit, &mutex_);
   DeleteObsoleteFiles();
 }
-```
+~~~
 
 `CompactMemTable` 会执行 `WriteLevel0Table` 将当前的 imm 转换成一个 Level0 的 SSTable 文件，同时由于 Level0 层级的文件变多，可能会继续触发一个新的 Major Compaction，在这里我们就需要在这里选择需要压缩的合适的层级：
 
-```cpp
+~~~cpp
 Status DBImpl::WriteLevel0Table(MemTable* mem, VersionEdit* edit, Version* base) {
   FileMetaData meta;
   meta.number = versions_->NewFileNumber();
@@ -359,13 +359,13 @@ Status DBImpl::WriteLevel0Table(MemTable* mem, VersionEdit* edit, Version* base)
   edit->AddFile(level, meta.number, meta.file_size, meta.smallest, meta.largest);
   return Status::OK();
 }
-```
+~~~
 
 所有对当前 SSTable 数据的修改由一个统一的 `VersionEdit` 对象记录和管理，我们会在后面介绍这个对象的作用和实现，如果成功写入了就会返回这个文件的元数据 `FileMetaData`，最后调用 `VersionSet` 的方法 `LogAndApply` 将文件中的全部变化如实记录下来，最后做一些数据的清理工作。
 
 当然如果是 Major Compaction 就稍微有一些复杂了，不过整理后的 `BackgroundCompaction` 方法的逻辑非常清晰：
 
-```cpp
+~~~cpp
 void DBImpl::BackgroundCompaction() {
   if (imm_ != NULL) {
     CompactMemTable();
@@ -378,7 +378,7 @@ void DBImpl::BackgroundCompaction() {
   CleanupCompaction(compact);
   DeleteObsoleteFiles();
 }
-```
+~~~
 
 我们从当前的 `VersionSet` 中找到需要压缩的文件信息，将它们打包存入一个 `Compaction` 对象，该对象需要选择两个层级的 SSTable，低层级的表很好选择，只需要选择大小超过限制的或者查询次数太多的 SSTable；当我们选择了低层级的一个 SSTable 后，就在更高的层级选择与该 SSTable 有重叠键的 SSTable 就可以了，通过 `FileMetaData` 中数据的帮助我们可以很快找到待压缩的全部数据。
 
@@ -400,7 +400,7 @@ LevelDB 中的所有状态其实都是被一个 `VersionSet` 结构所存储的�
 
 当 LevelDB 中的 SSTable 发生变动时，它会生成一个 `VersionEdit` 结构，最终执行 `LogAndApply` 方法：
 
-```cpp
+~~~cpp
 Status VersionSet::LogAndApply(VersionEdit* edit, port::Mutex* mu) {
   Version* v = new Version(this);
   Builder builder(this, current_);
@@ -421,7 +421,7 @@ Status VersionSet::LogAndApply(VersionEdit* edit, port::Mutex* mu) {
 
   return Status::OK();
 }
-```
+~~~
 
 该方法的主要工作是使用当前版本和 `VersionEdit` 创建一个新的版本对象，然后将 `Version` 的变更追加到 MANIFEST 日志中，并且改变数据库中全局当前版本信息。
 
@@ -441,7 +441,7 @@ SSTable 中其实存储的不只是数据，其中还保存了一些元数据、
 
 `TableBuilder::Rep` 结构体中就包含了一个文件需要创建的全部信息，包括数据块、索引块等等：
 
-```cpp
+~~~cpp
 struct TableBuilder::Rep {
   WritableFile* file;
   uint64_t offset;
@@ -453,7 +453,7 @@ struct TableBuilder::Rep {
   FilterBlockBuilder* filter_block;
   ...
 }
-```
+~~~
 
 到这里，我们就完成了对整个数据读取过程的解析了；对于读操作，我们可以理解为 LevelDB 在它内部的『多级缓存』中依次查找是否存在对应的键，如果存在就会直接返回，唯一与缓存不同可能就是，在数据『命中』后，它并不会把数据移动到更近的地方，而是会把数据移到更远的地方来减少下一次的访问时间，虽然这么听起来却是不可思议，不过仔细想一下确实是这样。
 

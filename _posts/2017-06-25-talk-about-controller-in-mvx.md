@@ -57,17 +57,17 @@ iOS 中的 Model 层大多为 `NSObject` 的子类，也就是一个简单的对
 
 Controller 层作为整个 MVC 架构模式的中枢，承担着非常重要的职责，不仅要与 Model 以及 View 层进行交互，还有通过 AppDelegate 与诸多的应用生命周期打交道。
 
-```objectivec
+~~~objectivec
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(nullable NSDictionary<UIApplicationLaunchOptionsKey, id> *)launchOptions;
 - (void)applicationWillResignActive:(UIApplication *)application;
 - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler;
-```
+~~~
 
 虽然与应用生命周期沟通的工作并不在单独的 Controller 中，但是 `self.window.rootController` 作为整个应用程序界面的入口，还是需要在 AppDelegate 中进行设置。
 
 除此之外，由于每一个 `UIViewController` 都持有一个视图对象，所以每一个 `UIViewController` 都需要负责这个根视图的加载、布局以及生命周期的管理，包括：
 
-```objectivec
+~~~objectivec
 - (void)loadView;
 
 - (void)viewWillLayoutSubviews;
@@ -76,7 +76,7 @@ Controller 层作为整个 MVC 架构模式的中枢，承担着非常重要的�
 - (void)viewDidLoad;
 - (void)viewWillAppear:(BOOL)animated;
 - (void)viewDidAppear:(BOOL)animated;
-```
+~~~
 
 除了负责应用生命周期和视图生命周期，控制器还要负责展示内容和布局。
 
@@ -88,7 +88,7 @@ Controller 层作为整个 MVC 架构模式的中枢，承担着非常重要的�
 
 我们来看一段 `UIViewController` 中关于视图层的简单代码：
 
-```objectivec
+~~~objectivec
 - (void)viewDidLoad {
     [super viewDidLoad];
     [self setupUI];
@@ -114,7 +114,7 @@ Controller 层作为整个 MVC 架构模式的中枢，承担着非常重要的�
         make.left.mas_equalTo(self.view).offset(32);
     }];
 }
-```
+~~~
 
 在这个欢迎界面以及大多数界面中，由于视图层的代码非常简单，我们很多情况下并不会去写一个单独的 `UIView` 类，而是将全部的视图层代码丢到了 `UIViewController` 中，这种情况下甚至也没有 Model 层，Controller 承担了全部的工作。
 
@@ -124,7 +124,7 @@ Controller 层作为整个 MVC 架构模式的中枢，承担着非常重要的�
 
 当然我们也可以将视图的初始化单独放到一个类中，不过仍然需要处理 `DRKBackgroundView` 视图的布局等问题。
 
-```objectivec
+~~~objectivec
 - (void)setupUI {
     DRKBackgroundView *backgroundView = [[DRKBackgroundView alloc] init];
     [backgroundView.registerButton addTarget:self action:@selector(registerButtonTapped:) forControlEvents:UIControlEventTouchUpInside];
@@ -135,7 +135,7 @@ Controller 层作为整个 MVC 架构模式的中枢，承担着非常重要的�
         make.edges.mas_equalTo(self.view);
     }];
 }
-```
+~~~
 
 `UIViewController` 的这种中心化的设计虽然简单，不过也导致了很多代码没有办法真正解耦，视图层必须依赖于 `UIViewController` 才能展示。
 
@@ -143,7 +143,7 @@ Controller 层作为整个 MVC 架构模式的中枢，承担着非常重要的�
 
 当然，很多人在 Controller 中也会使用惰性初始化的方式生成 Controller 中使用的视图，比如：
 
-```objectivec
+~~~objectivec
 @interface ViewController ()
 
 @property (nonatomic, strong) UIImageView *backgroundView;
@@ -160,11 +160,11 @@ Controller 层作为整个 MVC 架构模式的中枢，承担着非常重要的�
 }
 
 @end
-```
+~~~
 
 这样在 `-viewDidLoad` 方法中就可以直接处理视图的视图层级以及布局工作：
 
-```objectivec
+~~~objectivec
 - (void)viewDidLoad {
     [super viewDidLoad];
 
@@ -174,7 +174,7 @@ Controller 层作为整个 MVC 架构模式的中枢，承担着非常重要的�
         make.edges.mas_equalTo(self.view);
     }];
 }
-```
+~~~
 
 惰性初始化的方法与其他方法其实并没有什么绝对的优劣，两者的选择只是对于代码规范的一种选择，我们所需要做的，只是在同一个项目中将其中一种做法坚持到底。
 
@@ -182,12 +182,12 @@ Controller 层作为整个 MVC 架构模式的中枢，承担着非常重要的�
 
 在 `UIViewController` 中处理用户的行为是经常需要做的事情，这部分代码不能放到视图层或者其他地方的原因是，用户的行为经常需要与 Controller 的上下文有联系，比如，界面的跳转需要依赖于 `UINavigationController` 对象：
 
-```objectivec
+~~~objectivec
 - (void)registerButtonTapped:(UIButton *)button {
     RegisterViewController *registerViewController = [[RegisterViewController alloc] init];
     [self.navigationController pushViewController:registerViewController animated:YES];
 }
-```
+~~~
 
 而有的用户行为需要改变模型层的对象、持久存储数据库中的数据或者发出网络请求，主要因为我们要秉承着 MVC 的设计理念，避免 Model 层和 View 层的直接耦合。
 
@@ -195,23 +195,23 @@ Controller 层作为整个 MVC 架构模式的中枢，承担着非常重要的�
 
 在 iOS 中，我们经常需要处理表视图，而在现有的大部分表视图在加载内容时都会进行分页，使用下拉刷新和上拉加载的方式获取新的条目，而这就需要在 Controller 层保存当前显示的页数：
 
-```objectivec
+~~~objectivec
 @interface TableViewController ()
 
 @property (nonatomic, assign) NSUInteger currentPage;
 
 @end
-```
+~~~
 
 只有保存在了当前页数的状态，才能在下次请求网络数据时传入合适的页数，最后获得正确的资源，当然哪怕当前页数是可以计算出来的，比如通过当前的 Model 对象的数和每页个 Model 数，在这种情况下，我们也需要在当前 Controller 中 Model 数组的值。
 
-```objectivec
+~~~objectivec
 @interface TableViewController ()
 
 @property (nonatomic, strong) NSArray<Model *> *models;
 
 @end
-```
+~~~
 
 在 MVC 的设计中，这种保存当前页面状态的需求是存在的，在很多复杂的页面中，我们也需要维护大量的状态，这也是 Controller 需要承担的重要职责之一。
 
@@ -233,10 +233,10 @@ iOS 中总共有三种界面跳转的方式：
 
 `UINavigationController` 提供的 API 还是非常简单的，我们可以直接使用 `-pushViewController:animated:` 就可以进行跳转。
 
-```objectivec
+~~~objectivec
 RegisterViewController *registerViewController = [[RegisterViewController alloc] init];
 [self.navigationController pushViewController:registerViewController animated:YES];
-```
+~~~
 
 ### 作为数据源以及代理
 
@@ -244,7 +244,7 @@ RegisterViewController *registerViewController = [[RegisterViewController alloc]
 
 这是因为 `UITableView` 作为视图层的对象，需要根据 Model 才能知道自己应该展示什么内容，所以在早期的很多视图层组件都是用了代理的形式，从 Controller 或者其他地方获取需要展示的数据。
 
-```objectivec
+~~~objectivec
 #pragma mark - UITableViewDataSource
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
@@ -257,16 +257,16 @@ RegisterViewController *registerViewController = [[RegisterViewController alloc]
     [cell setupWithModel:model];
     return cell;
 }
-```
+~~~
 
 上面就是使用 `UITableView` 时经常需要的方法。
 
 很多文章中都提供了一种用于减少 Controller 层中代理方法数量的技巧，就是使用一个单独的类作为 `UITableView` 或者其他视图的代理：
 
-```objectivec
+~~~objectivec
 self.tableView.delegate = anotherObject;
 self.tableView.dataSource = anotherObject;
-```
+~~~
 
 然而在笔者看来这种办法并没有什么太大的用处，只是将代理方法挪到了一个其他的地方，如果这个代理方法还依赖于当前 `UIViewController` 实例的上下文，还要向这个对象中传入更多的对象，反而让原有的 MVC 变得更加复杂了。
 
@@ -274,7 +274,7 @@ self.tableView.dataSource = anotherObject;
 
 当用户的行为触发一些事件时，比如下拉刷新、更新 Model 的属性等等，Controller 就需要通过 Model 层提供的接口向服务端发出 HTTP 请求，这一过程其实非常简单，但仍然是 Controller 层的职责，也就是响应用户事件，并且更新 Model 层的数据。
 
-```objectivec
+~~~objectivec
 - (void)registerButtonTapped:(UIButton *)button {
     LoginManager *manager = [LoginManager manager];
     manager.countryCode = _registerPanelView.countryCode;
@@ -286,7 +286,7 @@ self.tableView.dataSource = anotherObject;
         ...
     }];
 }
-```
+~~~
 
 当按钮被点击时 `LoginManager` 就会执行 `-startWithSuccessHandler:failureHandler:` 方法发起请求，并在请求结束后执行回调，更新 Model 的数据。
 
@@ -304,7 +304,7 @@ Controller 层作为 iOS 应用中重要的组成部分，在 MVC 以及类似�
 
 iOS 中的 `UITableView` 和 `UICollectionView` 等需要 `dataSource` 的视图对象十分常见，在一些文章中会提议将数据源的实现单独放到一个对象中。
 
-```objectivec
+~~~objectivec
 void (^configureCell)(PhotoCell*, Photo*) = ^(PhotoCell* cell, Photo* photo) {
    cell.label.text = photo.name;
 };
@@ -312,11 +312,11 @@ photosArrayDataSource = [[ArrayDataSource alloc] initWithItems:photos
                                                 cellIdentifier:PhotoCellIdentifier
                                             configureCellBlock:configureCell];
 self.tableView.dataSource = photosArrayDataSource;
-```
+~~~
 
 在 [Lighter View Controllers](https://www.objc.io/issues/1-view-controllers/lighter-view-controllers/) 一文中就建议可以将数据源协议的实现方法放到 `ArrayDataSource` 对象中：
 
-```objectivec
+~~~objectivec
 @implementation ArrayDataSource
 
 - (id)itemAtIndexPath:(NSIndexPath*)indexPath {
@@ -338,7 +338,7 @@ self.tableView.dataSource = photosArrayDataSource;
 }
 
 @end
-```
+~~~
 
 做出这种建议的理由是：单独的 `ArrayDataSource` 类可以更方便的进行测试，同时，展示一个数组的对象是表视图中非常常见的需求，而 `ArrayDataSource` 能够将这种需求抽象出来并进行重用，也可以达到减轻视图控制器负担的最终目的，但是在笔者看来，上述做法并没有起到**实质性**效果，只是简单的将视图控制器中的一部分代码*移到了*别的位置而已，还会因为增加了额外的类使 Controller 的维护变得更加的复杂。
 
@@ -360,7 +360,7 @@ self.tableView.dataSource = photosArrayDataSource;
 
 控制器中有很多代码和逻辑其实与控制器本身并没有太多的关系，比如：
 
-```objectivec
+~~~objectivec
 @implementation ViewController
 
 - (NSString *)formattedPostCreatedAt {
@@ -370,11 +370,11 @@ self.tableView.dataSource = photosArrayDataSource;
 }
 
 @end
-```
+~~~
 
 在 [谈谈 MVX 中的 Model 层](http://draveness.me/mvx-model.html) 一文中，我们曾经分析过，上述逻辑其实应该属于 Model 层，作为 `Post` 的一个实例方法：
 
-```objectivec
+~~~objectivec
 @implementation Post
 
 - (NSString *)formattedCreatedAt {
@@ -384,7 +384,7 @@ self.tableView.dataSource = photosArrayDataSource;
 }
 
 @end
-```
+~~~
 
 这一条建议是从一些经典的后端 MVC 框架中学习的，Rails 提倡 *Fat Model, Skinny Controller* 就是希望开发者将 Model 相关的业务逻辑都放到 Model 层中，以减轻 Controller 层的负担。
 
@@ -396,7 +396,7 @@ self.tableView.dataSource = photosArrayDataSource;
 
 这种做法在当前模块的视图层比较简单时，笔者觉得没有任何的问题，虽然破坏了经典的 MVC 的架构图，但是也不是什么问题；不过，当视图层的视图对象非常多的时候，大量的配置和布局代码就会在控制器中占据大量的位置，我们可以将整个视图层的代码都移到一个单独的 `UIView` 子类中。
 
-```objectivec
+~~~objectivec
 // RegisterView.h
 @interface RegisterView : UIView
 
@@ -440,11 +440,11 @@ self.tableView.dataSource = photosArrayDataSource;
 }
 
 @end
-```
+~~~
 
 而 Controller 需要持有该视图对象，并将自己持有的根视图替换成该视图对象：
 
-```objectivec
+~~~objectivec
 @interface ViewController ()
 
 @property (nonatomic, strong) RegisterView *view;
@@ -464,7 +464,7 @@ self.tableView.dataSource = photosArrayDataSource;
 }
 
 @end
-```
+~~~
 
 在 `UIViewController` 对象中，我们可以通过覆写 `-loadView` 方法改变其本身持有的视图对象，并使用新的 `@property` 声明以及 `@dynamic` 改变 Controller 持有的根视图，这样我们就把视图层的配置和布局代码从控制器中完全分离了。
 
@@ -476,7 +476,7 @@ self.tableView.dataSource = photosArrayDataSource;
 
 这里给一个简单的例子，
 
-```objectivec
+~~~objectivec
 @implementation ViewController
 
 - (void)viewDidLoad {
@@ -520,7 +520,7 @@ self.tableView.dataSource = photosArrayDataSource;
 - (void)helperMethod {}
 
 @end
-```
+~~~
 
 一个 `UIViewController` 大体由上面这些部分组成：
 
@@ -533,7 +533,7 @@ self.tableView.dataSource = photosArrayDataSource;
 
 在 Objective-C 的工程中，我们使用 `pragma` 预编译指令来对 `UIViewController` 中的；在 Swift 中，我们可以使用 `extension` 加上 `MARK` 来对代码进行分块：
 
-```swift
+~~~swift
 class ViewController: UIViewController {}
 
 // MARK: - UI
@@ -553,7 +553,7 @@ extension ViewController {}
 
 // MARK: - Helper
 extension ViewController {}
-```
+~~~
 
 上述方法是一种在控制器层分割代码块的方法，它们的顺序并不是特别的重要，最重要的还是要在不同的控制器中保持上述行为的一致性，将合理的方法放到合适的代码块中。
 
@@ -561,24 +561,24 @@ extension ViewController {}
 
 很多的 iOS 项目中都会为 `UIView` 添加一个绑定 Model 对象的方法，比如说：
 
-```objectivec
+~~~objectivec
 @implementation UIView (Model)
 
 - (void)setupWithModel:(id)model {}
 
 @end
-```
+~~~
 
 这个方法也可能叫做 `-bindWithModel:` 或者其他名字，其作用就是根据传入的 Model 对象更新当前是视图中的各种状态，比如 `UILabel` 中的文本、`UIImageView` 中的图片等等。
 
 有了上述分类，我们可以再任意的 `UIView` 的子类中覆写该方法：
 
-```objectivec
+~~~objectivec
 - (void)setupWithModel:(Model *)model {
     self.imageView.image = model.image;
     self.label.text = model.name;
 }
-```
+~~~
 
 这种做法其实是将原本 Controller 做的事情放到了 View 中，由视图层来负责如何展示模型对象；虽然它能够减少 Controller 中的代码，但是也导致了 View 和 Model 的耦合。
 

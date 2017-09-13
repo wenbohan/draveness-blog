@@ -28,13 +28,13 @@ tags: iOS
 
 但是在 Swift 中传递单独的 `UIView` 的时候, 由于 UIView 等 Objective-C 对象都是**引用类型**的, 所以在传递的过程中都是传递的引用, 也就是指针. 所以在下一个视图改变 UIView 之后, 原视图也会发生对应的变化. 但是由于, 我不想改变原有的视图, 所以需要对视图进行深拷贝, 就是是调用 `copy()` 方法
 
-```swift
+~~~swift
 let copy = view.copy()
-```
+~~~
 
 在调用 `copy()` 方法时需要实现 `copyWithZone` 方法以及 `NSCopying` 协议. 但是所有的 Objective-C 对象都是默认没有实现这个方法, 所以需要我们手动实现.
 
-```swift
+~~~swift
 func copyWithZone(zone: NSZone) -> AnyObject {
     let copy = CRMainCollectionViewCell(frame: self.frame)
     copy.index = self.index
@@ -44,6 +44,6 @@ func copyWithZone(zone: NSZone) -> AnyObject {
     copy.data = data
     return copy
 }
-```
+~~~
 
 这就是我所实现的 `copyWithZone` 方法, 你可以视情况实现你的 `copyWithZone` 方法.

@@ -47,25 +47,25 @@ permalink: /:title
 
 1. 在视图加载时, 我通过调整`tableView`的`contentInset`使`tableView`在初始化时向下偏移`headerView`的高度, 目的呢, 就是将`cell`开始显示的位置设置到目标的区域.
 
-	```
+	~~~
   	tableView.contentInset = UIEdgeInsetsMake(HEADER_HEIGHT, 0, 0, 0);
-	```
+	~~~
 
 2. 然后呢, 将`headerView`初始化, 并添加到`tableView`上面, 这里呢, 有一点需要注意的就是`headerView.frame.origin.y`是小于`0`的. 这是为什么呢, 是因为我们上一步将`tableView`内容开是显示的`height`设置为`295`, 那么我们需要将`headerView`初始化到`tableView`的"外面"
 
-	```
+	~~~
 	// 使用CGRect的情况下, 使用AutoLayout可以类比一下
 	headerView.frame = CGRectMake (0, -HEADER_HEIGHT, WIDTH_SCREEN, HEADER_HEIGHT);
-	```
+	~~~
 
 3. 这样我们就完成了这个界面的显示, 但是, 当我们向这个`headerView`中添加按钮的时候, 却发现, 这个按钮的`action`没有触发, 因为`headerView`是`tableView`的`subview`并且在它的外部, 所以, 我们需要设置`clipsToBound`属性, 防止`tableView`拦截这个实践.
 
-	```
+	~~~
 	tableView.clipsToBound = NO;
-	```
+	~~~
 4. 接下来我们要实现让界面的一部分停在屏幕上, 只需要调用`UIScrollView`的`delegate`方法, 注意设置适当的条件就可以.
 
-	```
+	~~~
 	- (void)scrollViewDidScroll:(UIScrollView *)scrollView
 	{
 	    static CGFloat headerHeight = 60;
@@ -74,7 +74,7 @@ permalink: /:title
 	    if (scrollView.contentOffset.y <= -HEADER_HEIGHT)
 	        [self.headerView setFrame:CGRectMake(0, scrollView.contentOffset.y, WIDTH_SCREEN, HEADER_HEIGHT)];
 	}
-	```
+	~~~
 
 	
 	
@@ -86,9 +86,9 @@ permalink: /:title
 
 在设置了`tableViewController`之后, 仍然没有起到任何作用.
 
-```
+~~~
 self.automaticallyAdjustsScrollViewInsets = NO;
-```
+~~~
 
 经过仔细寻找其他答案后, 找到了这样一条答案
 
@@ -123,8 +123,8 @@ self.automaticallyAdjustsScrollViewInsets = NO;
 
 后来的后来...我发现了`tableView`的的另一个属性`tableHeaderView`, 只需要设置这个属性, 就可以把视图放在`tableView`的前面...真是蛋都碎了...
 
-```
+~~~
 self.tableView.tableHeaderView = headerView;
-```
+~~~
 	
 ......

@@ -19,7 +19,7 @@ permalink: /:title
 
 当栈中不包含任何元素时, 即栈是**空**的. 如果对一个空栈执行 `POP` 操作, 那么称为 `underflow`. 如果栈中的元素数量超出了所容纳的上限, 那么成为 `overflow`. 在这里我们不考虑栈的 `overflow` 问题.
 
-```
+~~~
 class Stack
 	def initialize
 		@elements = []
@@ -41,7 +41,7 @@ class Stack
 	end
 
 end
-```
+~~~
 
 这三种操作的执行时间都为 $O(1)$.
 
@@ -51,7 +51,7 @@ end
 
 队列中的 `INSERT` 操作成为 `ENQUEUE`, 无参数的 `DELETE` 操作被称为 `DEQUEUE`. 队列有 `head` 和 `tail`. 当一个元素入队时会放到队尾的位置, 就像排在队伍末尾买票的人, 而出队的元素总是队伍最前面等待最久的人.
 
-```
+~~~
 class Queue
 
 	def initialize
@@ -69,7 +69,7 @@ class Queue
 	end
 
 end
-```
+~~~
 
 在这段实现代码中, 我们并没有使用 `@head` 和 `@tail` 来保存队列的头部和尾部属性. 而是使用其他的操作来代替.
 
@@ -86,7 +86,7 @@ end
 * 如果链表是**未排序**的, 则表中的元素可以以任何顺序出现.
 * 如果链表是**循环链表**, 表头元素的 `prev` 指针指向表尾元素, 而表尾元素的 `next` 指针指向表头元素.
 
-```
+~~~
 class LinkList
 	attr_accessor :head
 	
@@ -130,11 +130,11 @@ class Node
 	end
 
 end
-```
+~~~
 
 要搜索一个有 `n` 个对象的链表, 过程 `search` 的最坏情况下的运行时间为 $\Theta(n)$, 因为可能搜索整个链表.
 
-```
+~~~
 def search(key)
 	x = @head
 	while x != nil && x.value != key
@@ -142,22 +142,22 @@ def search(key)
 	end
 	x
 end
-```
+~~~
 
 链表的插入的执行时间为 $O(1)$.
 
-```
+~~~
 def insert(node)
 	node.next = @head
 	@head.prev = node if @head != nil
 	@head = node
 	node.prev = nil
 end
-```
+~~~
 
 我们先使用 `search` 寻找到目标之后, 再将目标元素 `delete`. 它的运行时间为 $O(1)$. 但是要先寻找到指定元素时, 因为要调用 `search` 所以运行时间为 $\Theta(n)$.
 
-```
+~~~
 def delete(node)
 	if node.prev != nil
 		node.prev.next = node.next
@@ -166,7 +166,7 @@ def delete(node)
 	end
 	node.next.prev = node.prev if node.next != nil
 end
-```
+~~~
 
 #树
 

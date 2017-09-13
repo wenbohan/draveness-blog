@@ -21,7 +21,7 @@ The first thing we start an App is set up the project, and I am used to delete t
 
 The common code you add may be this:
 
-```
+~~~
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
@@ -30,13 +30,13 @@ The common code you add may be this:
     [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent];
     return YES;
 }
-```	
+~~~	
 
 Every project without a `storyboard` needs to initialize like this. How should we do then?
 
 What should we do, if we want to set up with a `navigationController`:
 
-```
+~~~
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
@@ -46,11 +46,11 @@ What should we do, if we want to set up with a `navigationController`:
     [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent];
     return YES;
 }
-```
+~~~
 
 It's quiet simple and easy to understand, what about `tabBarController`:
 
-```
+~~~
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
@@ -66,7 +66,7 @@ It's quiet simple and easy to understand, what about `tabBarController`:
     [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent];
     return YES;
 }
-```
+~~~
 
 Just set `tabBarController`'s property `viewControllers` to proper `viewController`.
 
@@ -77,7 +77,7 @@ If you want to switch to another view from one of `tabBarController`, you can no
 So we need to combine them, in my first project, I do this in this way:
 
 
-```
+~~~
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
@@ -94,11 +94,11 @@ So we need to combine them, in my first project, I do this in this way:
     [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent];
     return YES;
 }
-```
+~~~
 
 When I did this, I do not consider about other thing, because the apple developer document use this approach: 
  
-```
+~~~
 UIViewController *firstViewController = [[UIViewController alloc] init];
 UIViewController *secondViewController = [[UIViewController alloc] init];
 UIViewController *thirdViewController = [[UIViewController alloc] init];
@@ -111,7 +111,7 @@ UITabBarController *tabBarController = [[UITabBarController alloc] init];
 tabBarController.viewControllers = controllers;
 
 self.window.rootViewController = tabBarController;
-```
+~~~
 
 I just think this is a silly way. if I imitate this, **Do I need to initialize five navigation controllers each with a view controller?**
 
@@ -123,7 +123,7 @@ The answer is right. I need to do so. Why? After I imitate this approach, my pre
 
 So the verbose but correct approach is this:
 
-```
+~~~
 UIViewController *firstViewController = [[UIViewController alloc] init];
 UIViewController *secondViewController = [[UIViewController alloc] init];
 UIViewController *thirdViewController = [[UIViewController alloc] init];
@@ -140,7 +140,7 @@ UITabBarController *tabBarController = [[UITabBarController alloc] init];
 tabBarController.viewControllers = controllers;
 
 self.window.rootViewController = tabBarController;
-```
+~~~
 
 PS: `navigationBar` is damn difficult to use. Hope this help.
 

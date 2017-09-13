@@ -28,9 +28,9 @@ Shell 有很多种, bash shell, zsh shell 等等, 我平时学习和工作时使
 
 在我们写 shell 脚本的时候需要在文件的 `#!`, 你经常会在 `.sh` 文件中看到的
 
-```
+~~~
 #!/bin/sh
-```
+~~~
 
 > 这种文件会在执行时实际调用 `/bin/sh` 程序来执行, 这也就是 shell 脚本的标准起始行.
 
@@ -40,10 +40,10 @@ Shell 有很多种, bash shell, zsh shell 等等, 我平时学习和工作时使
 
 `echo` 就像是 Objective-C 中的 NSLog, 它会将一系列的参数打印到终端中.
 
-```
+~~~
 $ echo "Hello World"
 Hello World
-```
+~~~
 
 这个命令还是很简单并且常用的. 在这里就不对这个命令进行详细地讲解了.
 
@@ -55,10 +55,10 @@ Hello World
 
 而如果你想查看单独的全局变量时, 必须在变量名前加上 `$` 符号.
 
-```
+~~~
 $ echo $HOME
 /Users/apple
-```
+~~~
 
 这是我在 OS X 系统上输出的结果.
 
@@ -68,7 +68,7 @@ $ echo $HOME
 
 因为使用的是 zsh, 所以我在 zshrc 中添加了如下的代码来简化输入.
 
-```
+~~~
 # Alias
 alias ga='git add .'
 alias gam='git add -A && git commit'
@@ -91,7 +91,7 @@ alias ....=' cd ../../..'
 alias vim='/Applications/MacVim.app/Contents/MacOS/Vim '
 alias v='vim'
 alias v.='vim .'
-```
+~~~
 
 这些重命名能够对于我来说用起来还是很爽的. 每次输入 `g "Commit"`, 然后就会自动完成 `git add` `git commit` `git push` 三个命令.
 

@@ -38,14 +38,14 @@ ReactiveCocoa 在设计上很大程度借鉴了 Reactive Extension 中的概念�
 
 Stream 由两部分组成，分别是 `head` 和 `tail`，两者都是在访问时才会计算，在上图前者是一个数字，而后者会是另一个 Stream 或者 `nil`。
 
-```objectivec
+~~~objectivec
 @interface RACSequence<__covariant ValueType> : RACStream <NSCoding, NSCopying, NSFastEnumeration>
 
 @property (nonatomic, strong, readonly, nullable) ValueType head;
 @property (nonatomic, strong, readonly, nullable) RACSequence<ValueType> *tail;
 
 @end
-```
+~~~
 
 `RACSequence` 头文件的中定义能够帮助我们更好理解递归的序列以及 `head` 和 `tail` 的概念，`head` 是一个值，`tail` 是一个 `RACSequence` 对象。
 
@@ -61,29 +61,29 @@ Stream 由两部分组成，分别是 `head` 和 `tail`，两者都是在访问�
 
 与介绍 `RACSignal` 时一样，这里我们先介绍两个 `RACSequence` 必须覆写的方法，第一个就是 `+return:`
 
-```objectivec
+~~~objectivec
 + (RACSequence *)return:(id)value {
 	return [RACUnarySequence return:value];
 }
-```
+~~~
 
 `+return:` 方法用到了 `RACSequence` 的子类 `RACUnarySequence` 私有类，这个类在外界是不可见的，其实现非常简单，只是将原来的 `value` 包装成了一个简单的 `RACUnarySequence` 对象：
 
-```objectivec
+~~~objectivec
 + (RACUnarySequence *)return:(id)value {
 	RACUnarySequence *sequence = [[self alloc] init];
 	sequence.head = value;
 	return [sequence setNameWithFormat:@"+return: %@", RACDescription(value)];
 }
-```
+~~~
 
 这样在访问 `head` 时可以获取到传入的 `value`；在访问 `tail` 时只需要返回 `nil`：
 
-```objectivec
+~~~objectivec
 - (RACSequence *)tail {
 	return nil;
 }
-```
+~~~
 
 整个 `RACUnarySequence` 也只是对 `value` 简单封装成一个 `RACSequence` 对象而已：
 
@@ -91,16 +91,16 @@ Stream 由两部分组成，分别是 `head` 和 `tail`，两者都是在访问�
 
 相比于 `+return:` 方法的简单实现，`-bind:` 的实现就复杂多了：
 
-```objectivec
+~~~objectivec
 - (RACSequence *)bind:(RACSequenceBindBlock (^)(void))block {
 	RACSequenceBindBlock bindBlock = block();
 	return [[self bind:bindBlock passingThroughValuesFromSequence:nil] setNameWithFormat:@"[%@] -bind:", self.name];
 }
-```
+~~~
 
 首先是对 `-bind:` 方法进行一次转发，将控制权交给 `-bind:passingThroughValuesFromSequence:` 方法中：
 
-```objectivec
+~~~objectivec
 - (RACSequence *)bind:(RACSequenceBindBlock)bindBlock passingThroughValuesFromSequence:(RACSequence *)passthroughSequence {
 	__block RACSequence *valuesSeq = self;
 	__block RACSequence *current = passthroughSequence;
@@ -134,11 +134,11 @@ Stream 由两部分组成，分别是 `head` 和 `tail`，两者都是在访问�
 	sequence.name = self.name;
 	return sequence;
 }
-```
+~~~
 
 这个非常复杂的方法实际作用就是创建了一个私有类 `RACDynamicSequence` 对象，使用的初始化方法也都是私有的 `+sequenceWithLazyDependency:headBlock:tailBlock:`：
 
-```objectivec
+~~~objectivec
 + (RACSequence *)sequenceWithLazyDependency:(id (^)(void))dependencyBlock headBlock:(id (^)(id dependency))headBlock tailBlock:(RACSequence *(^)(id dependency))tailBlock {
 	RACDynamicSequence *seq = [[RACDynamicSequence alloc] init];
 	seq.headBlock = [headBlock copy];
@@ -147,11 +147,11 @@ Stream 由两部分组成，分别是 `head` 和 `tail`，两者都是在访问�
 	seq.hasDependency = YES;
 	return seq;
 }
-```
+~~~
 
 在使用 `RACDynamicSequence` 中的元素时，无论是 `head` 还是 `tail` 都会用到在初始化方法中传入的三个 block：
 
-```objectivec
+~~~objectivec
 - (id)head {
 	@synchronized (self) {
 		id untypedHeadBlock = self.headBlock;
@@ -174,21 +174,21 @@ Stream 由两部分组成，分别是 `head` 和 `tail`，两者都是在访问�
 		return _head;
 	}
 }
-```
+~~~
 
 `head` 的计算依赖于 `self.headBlock` 和 `self.dependencyBlock`；
 
 而 `tail` 的计算也依赖于 `self.headBlock` 和 `self.dependencyBlock`，只是 `tail` 会执行 `tailBlock` 返回另一个 `RACDynamicSequence` 的实例：
 
-```objectivec
+~~~objectivec
 ^ id (id _) {
     return [valuesSeq bind:bindBlock passingThroughValuesFromSequence:current.tail];
 }
-```
+~~~
 
 这里通过一段代码更好的了解 `-bind:` 方法是如何使用的：
 
-```objectivec
+~~~objectivec
 RACSequence *sequence = [RACSequence sequenceWithHeadBlock:^id _Nullable{
     return @1;
 } tailBlock:^RACSequence * _Nonnull{
@@ -207,7 +207,7 @@ RACSequence *bindSequence = [sequence bind:^RACSequenceBindBlock _Nonnull{
 }];
 NSLog(@"sequence:     head = (%@), tail=(%@)", sequence.head, sequence.tail);
 NSLog(@"BindSequence: head = (%@), tail=(%@)", bindSequence.head, bindSequence.tail);
-```
+~~~
 
 在上面的代码中，我们使用 `+sequenceWithHeadBlock:tailBlock:` 这个唯一暴露出来的初始化方法创建了一个如下图所示的 `RACSequence`：
 
@@ -217,11 +217,11 @@ NSLog(@"BindSequence: head = (%@), tail=(%@)", bindSequence.head, bindSequence.t
 
 上述代码在运行之后，会打印出如下内容：
 
-```objectivec
+~~~objectivec
 sequence:     head = (1), tail=(<RACDynamicSequence: 0x60800009eb40>{ name = , head = (unresolved), tail = (unresolved) })
 RACSequenceBindBlock: 1
 BindSequence: head = (2), tail=(<RACDynamicSequence: 0x608000282940>{ name = , head = (unresolved), tail = (unresolved) })
-```
+~~~
 
 无论是 `sequence` 还是 `bindSequence`，其中的 `tail` 部分都是一个 `RACDynamicSequence` 对象，并且其中的 `head` 和 `tail` 部分都是 `unresolved`。
 
@@ -235,10 +235,10 @@ BindSequence: head = (2), tail=(<RACDynamicSequence: 0x608000282940>{ name = , h
 
 `RACSequence` 中定义了两个分别获取 `lazySequence` 和 `eagerSequence` 的属性：
 
-```objectivec
+~~~objectivec
 @property (nonatomic, copy, readonly) RACSequence<ValueType> *eagerSequence;
 @property (nonatomic, copy, readonly) RACSequence<ValueType> *lazySequence;
-```
+~~~
 
 > 笔者一直认为在大多数情况下，在客户端上的惰性求值都是没有太多意义的，如果一个序列的**长度没有达到比较庞大的数量级或者说计算量比较小**，我们完全都可以使用贪婪求值（Eager Evaluation）的方式尽早获得结果；
 >
@@ -246,7 +246,7 @@ BindSequence: head = (2), tail=(<RACDynamicSequence: 0x608000282940>{ name = , h
 
 与上一节相同，在这里使用相同的代码创建一个 `RACSequence` 对象：
 
-```objectivec
+~~~objectivec
 RACSequence *sequence = [RACSequence sequenceWithHeadBlock:^id _Nullable{
     return @1;
 } tailBlock:^RACSequence * _Nonnull{
@@ -260,11 +260,11 @@ RACSequence *sequence = [RACSequence sequenceWithHeadBlock:^id _Nullable{
 NSLog(@"Lazy:  %@", sequence.lazySequence);
 NSLog(@"Eager: %@", sequence.eagerSequence);
 NSLog(@"Lazy:  %@", sequence.lazySequence);
-```
+~~~
 
 然后分别三次打印出当前对象的 `lazySequence` 和 `eagerSequence` 中的值：
 
-```objectivec
+~~~objectivec
 Lazy:  <RACDynamicSequence: 0x608000097160>
 { name = , head = (unresolved), tail = (unresolved) }
 Eager: <RACEagerSequence: 0x600000035de0>
@@ -277,7 +277,7 @@ Lazy:  <RACDynamicSequence: 0x608000097160>
 { name = , head = 1, tail = <RACDynamicSequence: 0x600000097070>
     { name = , head = 2, tail = <RACUnarySequence: 0x600000035f00>
         { name = , head = 3 } } }
-```
+~~~
 
 在第一调用 `sequence.lazySequence` 时，因为元素没有被使用，惰性序列的 `head` 和 `tail` 都为 unresolved；而在 `sequence.eagerSequence` 调用后，访问了序列中的所有元素，在这之后再打印 `sequence.lazySequence` 中的值就都不是 unresolved 的了。
 
@@ -293,17 +293,17 @@ Lazy:  <RACDynamicSequence: 0x608000097160>
 
 `RACStream` 为 `RACSequence` 提供了很多基本的操作，`-map:`、`-filter:`、`-ignore:` 等等，因为这些方法的实现都基于 `-bind:`，而 `-bind:` 方法的执行是惰性的，所以在调用上述方法之后返回的 `RACSequence` 中所有的元素都是 unresolved 的，需要在访问之后才会计算并展开：
 
-```objectivec
+~~~objectivec
 RACSequence *sequence = [@[@1, @2, @3].rac_sequence map:^id _Nullable(NSNumber * _Nullable value) {
     return @(value.integerValue * value.integerValue);
 }];
 NSLog(@"%@", sequence); -> <RACDynamicSequence: 0x60800009ad10>{ name = , head = (unresolved), tail = (unresolved) }
 NSLog(@"%@", sequence.eagerSequence); -> <RACEagerSequence: 0x60800002bfc0>{ name = , array = (1, 4, 9) }
-```
+~~~
 
 除了从 `RACStream` 中继承的一些方法，在 `RACSequence` 类中也有一些自己实现的方法，比如说 `-foldLeftWithStart:reduce:` 方法：
 
-```objectivec
+~~~objectivec
 - (id)foldLeftWithStart:(id)start reduce:(id (^)(id, id))reduce {
 	if (self.head == nil) return start;
 
@@ -313,17 +313,17 @@ NSLog(@"%@", sequence.eagerSequence); -> <RACEagerSequence: 0x60800002bfc0>{ nam
 
 	return start;
 }
-```
+~~~
 
 使用简单的 `for` 循环，将序列中的数据进行『折叠』，最后返回一个结果：
 
-```objectivec
+~~~objectivec
 RACSequence *sequence = @[@1, @2, @3].rac_sequence;
 NSNumber *sum = [sequence foldLeftWithStart:0 reduce:^id _Nullable(NSNumber * _Nullable accumulator, NSNumber * _Nullable value) {
     return @(accumulator.integerValue + value.integerValue);
 }];
 NSLog(@"%@", sum);
-```
+~~~
 
 与上面方法相似的是 `-foldRightWithStart:reduce:` 方法，从右侧开始向左折叠整个序列，虽然过程有一些不同，但是结果还是一样的。
 
@@ -338,7 +338,7 @@ NSLog(@"%@", sum);
 
 在源代码中，你也可以看到方法在创建 `RACSequence` 的 block 中递归调用了当前的方法：
 
-```objectivec
+~~~objectivec
 - (id)foldRightWithStart:(id)start reduce:(id (^)(id, RACSequence *))reduce {
 	if (self.head == nil) return start;
 
@@ -352,7 +352,7 @@ NSLog(@"%@", sum);
 
 	return reduce(self.head, rest);
 }
-```
+~~~
 
 ### RACSequence 与 RACSignal
 
@@ -368,17 +368,17 @@ NSLog(@"%@", sum);
 
 分析其实现之前先看一下如何使用 `-signal` 方法将 `RACSequence` 转换成 `RACSignal` 对象的：
 
-```objectivec
+~~~objectivec
 RACSequence *sequence = @[@1, @2, @3].rac_sequence;
 RACSignal *signal = sequence.signal;
 [signal subscribeNext:^(id  _Nullable x) {
     NSLog(@"%@", x);
 }];
-```
+~~~
 
 其实过程非常简单，原序列 `@[@1, @2, @3]` 中的元素会按照次序发送，可以理解为依次调用 `-sendNext:`，它可以等价于下面的代码：
 
-```objectivec
+~~~objectivec
 RACSignal *signal = [RACSignal createSignal:^RACDisposable * _Nullable(id<RACSubscriber>  _Nonnull subscriber) {
     [subscriber sendNext:@1];
     [subscriber sendNext:@2];
@@ -389,11 +389,11 @@ RACSignal *signal = [RACSignal createSignal:^RACDisposable * _Nullable(id<RACSub
 [signal subscribeNext:^(id  _Nullable x) {
     NSLog(@"%@", x);
 }];
-```
+~~~
 
 `-signal` 方法的实现依赖于另一个实例方法 `-signalWithScheduler:`，它会在一个 `RACScheduler` 对象上发送序列中的所有元素：
 
-```objectivec
+~~~objectivec
 - (RACSignal *)signal {
 	return [[self signalWithScheduler:[RACScheduler scheduler]] setNameWithFormat:@"[%@] -signal", self.name];
 }
@@ -413,7 +413,7 @@ RACSignal *signal = [RACSignal createSignal:^RACDisposable * _Nullable(id<RACSub
 		}];
 	}] setNameWithFormat:@"[%@] -signalWithScheduler: %@", self.name, scheduler];
 }
-```
+~~~
 
 `RACScheduler` 并不是这篇文章准备介绍的内容，这里的代码其实相当于递归调用了 `reschedule` block，不断向 `subscriber` 发送 `-sendNext:`，直到 `RACSequence` 为空为止。
 
@@ -425,7 +425,7 @@ RACSignal *signal = [RACSignal createSignal:^RACDisposable * _Nullable(id<RACSub
 
 通过一段代码来看转换过程是如何进行的：
 
-```objectivec
+~~~objectivec
 RACSignal *signal = [RACSignal createSignal:^RACDisposable * _Nullable(id<RACSubscriber>  _Nonnull subscriber) {
     [subscriber sendNext:@1];
     [subscriber sendNext:@2];
@@ -434,17 +434,17 @@ RACSignal *signal = [RACSignal createSignal:^RACDisposable * _Nullable(id<RACSub
     return nil;
 }];
 NSLog(@"%@", signal.toArray.rac_sequence);
-```
+~~~
 
 运行上面的代码，会得到一个如下的 `RACArraySequence` 对象：
 
-```objectivec
+~~~objectivec
 <RACArraySequence: 0x608000024e80>{ name = , array = (
     1,
     2,
     3
 ) }
-```
+~~~
 
 在这里不想过多介绍其实现原理，我们只需要知道这里使用了 `RACStream` 提供的操作『收集』了信号发送过程中的发送的所有对象 `@1`、`@2`、`@3` 就可以了。
 

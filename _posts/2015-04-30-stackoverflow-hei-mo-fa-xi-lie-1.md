@@ -9,11 +9,11 @@ tags: iOS
 
 ## 原子(atomic)和非原子(nonatomic)的区别是什么?
 
-```objectivec
+~~~objectivec
 @property(nonatomic, retain) UITextField *userName;
 @property(atomic, retain) UITextField *userName;
 @property(retain) UITextField *userName;
-```
+~~~
 
 这三行代码中的后两行是相同的, 因为 `atomic` 是默认的行为. 在现在的 LLVM 的版本中, 使用 `atomic` 和 `nonatomic` 声明的属性在自动生成 `getter/setter` 方法时有所不同.
 
@@ -35,12 +35,12 @@ tags: iOS
 
 提问的人首先提了一个非常取巧也非常聪明的办法, 它直接使用了 `stringWithContentsOfURL:` 这个方法来访问 Google, 然后查看是否有 response 来判断网络的状态.
 
-```objectivec
+~~~objectivec
 - (BOOL) connectedToInternet {
   NSString *URLString = [NSString stringWithContentsOfURL:[NSURL URLWithString:@"http://www.google.com"]];
   return ( URLString != NULL ) ? YES : NO;
 }
-```
+~~~
 
 但是这段代码在天朝还是行不通啊, 我们并没有 Google 这个网站, 当然可以把 Google 改成随便什么别的网站来解决这个问题, 但是我们还是需要一种更加"靠谱"的解决方案.
 
@@ -48,7 +48,7 @@ tags: iOS
 
 在实现文件的中添加如下代码, 然后填写你想要测试连通性的 host:
 
-```objectivec
+~~~objectivec
 // Checks if we have an internet connection or not
     - (void)testInternetConnection {   
     // Allocate a reachability object
@@ -72,7 +72,7 @@ tags: iOS
     // Start the notifier, which will cause the reachability object to retain itself!
     [reach startNotifier];
 }
-```
+~~~
 
 链接: [How to check for an active Internet Connection on iPhone SDK?](http://stackoverflow.com/questions/1083701/how-to-check-for-an-active-internet-connection-on-iphone-sdk)
 
@@ -82,27 +82,27 @@ tags: iOS
 
 在 iOS8 以前, 我们需要使用 `rangeOfString:` 方法来判断是否含有子字符串:
 
-```objectivec
+~~~objectivec
 NSString *string = @"hello bla bla";
 if ([string rangeOfString:@"bla"].location == NSNotFound) {
    NSLog(@"string does not contain bla");
 } else {
    NSLog(@"string contains bla!");
 }
-```
+~~~
 
 其中最关键的地方是 `rangeOfString:` 会返回一个 `NSRange` 的结构体, `{NSNotFound, 0}`, 所以我们要获取结构体中的 `location` 来判断是否存在该字符串, 详见[文档](https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Classes/NSString_Class/index.html#//apple_ref/occ/instm/NSString/rangeOfString:).
 
 而在 iOS8 之后, 苹果~~大发慈悲地~~为我们提供了更加友善的解决办法, 也就是 `containString:` 方法直接解决了这个问题.
 
-```objectivec
+~~~objectivec
 NSString *string = @"hello bla blah";
 if ([string containsString:@"bla"]) {
    NSLog(@"string contains bla!");
 } else {
    NSLog(@"string does not contain bla");
 }
-```
+~~~
 
 链接: [How do I check if a string contains another string in Objective-C?](http://stackoverflow.com/questions/2753956/how-do-i-check-if-a-string-contains-another-string-in-objective-c)
 
@@ -115,7 +115,7 @@ if ([string containsString:@"bla"]) {
 
 在这里我们要使用通知来解决这个问题, 首先我们要在 `viewWillAppear:` 和 `viewWillDisapear:` 中分别注册和移除通知.
 
-```objectivec
+~~~objectivec
 - (void)viewWillAppear:(BOOL)animated {
    [super viewWillAppear:animated];
    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow) name:UIKeyboardWillShowNotification object:nil];
@@ -127,22 +127,22 @@ if ([string containsString:@"bla"]) {
    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillShowNotification object:nil];
    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillHideNotification object:nil];
 }
-```
+~~~
 
 然后我们需要实现一个 `UITextField` 的代理方法 `textFieldDidBeginEditing:` 当 `UITextField` 开始编辑键盘准备响应的时候, 让 `UITextField` 向上弹出.
 
-```objectivec
+~~~objectivec
 - (void)textFieldDidBeginEditing:(UITextField *)sender {
    //move the main view, so that the keyboard does not hide it.
    if  (self.view.frame.origin.y >= 0) {
        [self setViewMovedUp:YES];
    }
 }
-```
+~~~
 
 接下来实现当键盘弹出或隐藏发出通知所响应的两个方法, `keyboardWillShow` 和 `keyboardWillHide`.
 
-```objectivec
+~~~objectivec
 - (void)keyboardWillShow {
    // Animate the current view out of the way
    if (self.view.frame.origin.y >= 0) {
@@ -159,11 +159,11 @@ if ([string containsString:@"bla"]) {
        [self setViewMovedUp:NO];
    }
 }
-```
+~~~
 
 在最后, 就来实现使 `UITextField` 移动的方法 `setViewMovedUp:` 了.
 
-```objectivec
+~~~objectivec
 #define kOFFSET_FOR_KEYBOARD 80.0
 
 - (void)setViewMovedUp:(BOOL)movedUp {
@@ -185,7 +185,7 @@ if ([string containsString:@"bla"]) {
 
    [UIView commitAnimations];
 }
-```
+~~~
 
 这种重要的问题在苹果的[官方文档](https://developer.apple.com/library/ios/documentation/StringsTextFonts/Conceptual/TextAndWebiPhoneOS/KeyboardManagement/KeyboardManagement.html#//apple_ref/doc/uid/TP40009542-CH5-SW7)中也对应的实现方法.
 
@@ -195,8 +195,8 @@ if ([string containsString:@"bla"]) {
 
 ## 如何在 `UITableView` 中禁止选择的高亮?
 
-```objectivec
+~~~objectivec
 tableView.allowsSelection = NO;
-```
+~~~
 
 链接: [How can I disable the UITableView selection highlighting?](http://stackoverflow.com/questions/190908/how-can-i-disable-the-uitableview-selection-highlighting)

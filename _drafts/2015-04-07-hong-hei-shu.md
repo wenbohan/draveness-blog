@@ -24,7 +24,7 @@ permalink: /:title
 
 ![](/content/images/2015/04/rotate.png)
 
-```
+~~~
 struct tree_t {
     struct node_t *root;
 };
@@ -77,7 +77,7 @@ void right_rotate(tree_t *tree, node_t *x) {
     y->right = x;
     x->parent = y;
 }
-```
+~~~
 
 `left_rotate` 和 `right_rotate` 的都能在时间复杂度 $O(1)$ 内完成, 在这个操作中只有指针改变, 其他所有属性都保持不变.
 
@@ -85,7 +85,7 @@ void right_rotate(tree_t *tree, node_t *x) {
 
 我们可以在 $O(\lg n)$ 时间内完成向一棵含有 $n$ 个结点的红黑树中插入一个新结点. 我们在 `tree-insert` 的基础上进行修改, 实现了 `red_black_insert`, 同时我们调用一个辅助函数 `red_black_insert_fixup` 来对结点进行着色和旋转.
 
-```
+~~~
 void red_black_insert(tree_t *tree, node_t *z) {
 	node_t *t = NULL;
 	node_t *x = tree.root;
@@ -115,11 +115,11 @@ void red_black_insert(tree_t *tree, node_t *z) {
 
 	red_black_insert_fixup(tree, z);
 }
-```
+~~~
 
 因为将 z 着色为红色可能违反红黑书的性质, 所以我们需要 `red_black_insert_fixup` 来保持红黑性质.
 
-```
+~~~
 void red_black_insert_fixup(tree_t *tree, node_t *z) {
 	while (z->parent->colot == RED) {
 		if (z->parent == z->parent->parent->left) {
@@ -156,7 +156,7 @@ void red_black_insert_fixup(tree_t *tree, node_t *z) {
 	}
 	tree->root->color = BLACK;
 }
-```
+~~~
 
 该过程总共有三种情况:
 
@@ -168,12 +168,12 @@ void red_black_insert_fixup(tree_t *tree, node_t *z) {
 
 `z` 的 uncle 结点是红色的, `y` 为 `z` 的 uncle 结点.
 
-```
+~~~
 z->parent->color = BLACK;
 y->color = BLACK;
 z->parent->parent->color = RED;
 z = z->parent->parent;
-```
+~~~
 
 然后, 再次进入循环, `z` 变成了 `z->parent->parent`.
 
@@ -181,10 +181,10 @@ z = z->parent->parent;
 
 `z` 的 uncle 结点是黑色的, 并且 `z` 是一个 right child.
 
-```
+~~~
 z = z->parent;
 left_rotate(tree, z);
-```
+~~~
 
 向左旋转 `z` 的父结点.
 
@@ -192,11 +192,11 @@ left_rotate(tree, z);
 
 `z` 的 uncle 结点是黑色的, 并且 `z` 是一个 left child.
 
-```
+~~~
 z->parent->color = BLACK;
 z->parent->parent->color = RED;
 right_rotate(tree, z->parent->parent);
-```
+~~~
 
 ##删除
 
@@ -204,7 +204,7 @@ right_rotate(tree, z->parent->parent);
 
 从一棵红黑树中删除结点的过程是基于 `tree_delete` 过程, 我们需要设计一个 `transplant` 过程, 并将它应用到红黑树上.
 
-```
+~~~
 void red_black_transplant(tree_t *tree, node_t *u, node_t *v) {
 	if (u->parent == NULL) {
 		tree->root = v;
@@ -215,11 +215,11 @@ void red_black_transplant(tree_t *tree, node_t *u, node_t *v) {
 	}
 	v->parent = u->parent;
 }
-```
+~~~
 
 这个过程非常的简单, 我们接下来实现 `red_black_delete` 函数.
 
-```
+~~~
 void red_black_delete(tree_t *tree, node_t *z) {
 	node_t *x;
 	node_t *y = z;
@@ -251,7 +251,7 @@ void red_black_delete(tree_t *tree, node_t *z) {
 		red_black_delete_fixup(tree, x);
 	}
 }
-```
+~~~
 
 `red_black_delete` 函数与 `tree_delete` 拥有相同的结构. 如果结点 y 是黑色的, 就会产生三个问题.
 
@@ -261,7 +261,7 @@ void red_black_delete(tree_t *tree, node_t *z) {
 
 现在我们来看一下过程 `red_black_delete_fixup` 过程是如何修复这些问题的.
 
-```
+~~~
 void red_black_delete_fixup(tree_t *t, node_t *x) {
 	node_t *w;
 	while (x != tree->root && x->color == BLACK) {
@@ -314,7 +314,7 @@ void red_black_delete_fixup(tree_t *t, node_t *x) {
 	}
 	x->color = BLACK;
 }
-```
+~~~
 
 下图中给出了代码中的 4 种情况.
 
@@ -324,44 +324,44 @@ void red_black_delete_fixup(tree_t *t, node_t *x) {
 
 `x` 的兄弟结点 `w` 是红色的.
 
-```
+~~~
 w->color = BLACK;
 x->parent->color = RED;
 left_rotate(tree, x->parent);
 w = x->parent->right;
-```
+~~~
 
 ###情况2
 
 `x` 的兄弟结点 `w` 是黑色的, 而且 `w` 的两个子节点都是黑色的.
 
-```
+~~~
 w->color = RED;
 x = x->parent;
-```
+~~~
 
 ###情况3
 
 `x` 的兄弟结点 `w` 是黑色的, `w` 的左子结点是红色的, 右子结点是黑色的.
 
-```
+~~~
 w->left->color = BLACK;
 w->color = RED;
 right_rotate(tree, w);
 w = x->parent->right;
-```
+~~~
 
 ###情况4
 
 `x` 的兄弟结点 `w` 是黑色的, `w` 右子结点是红色的.
 
-```
+~~~
 w->color = x->parent->color;
 x->parent->color = BLACK;
 w->right->color = BLACK;
 left_rotate(tree, x->parent);
 x = tree->root;
-```
+~~~
 
 ###分析
 

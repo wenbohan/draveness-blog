@@ -156,7 +156,7 @@ ASDK 中到底使用了哪些方法来对视图进行渲染呢？本文主要会
 
 当我们运行某一个使用 ASDK 的工程时，`-[ASDisplayNode _loadViewOrLayerIsLayerBacked:]` 总是 ASDK 中最先被调用的方法，而这个方法执行的原因往往就是 `ASDisplayNode` 对应的 `UIView` 和 `CALayer` 被引用了：
 
-```objectivec
+~~~objectivec
 - (CALayer *)layer {
 	if (!_layer) {
 		ASDisplayNodeAssertMainThread();
@@ -175,11 +175,11 @@ ASDK 中到底使用了哪些方法来对视图进行渲染呢？本文主要会
 	}
 	return _view;
 }
-```
+~~~
 
 这里涉及到一个 ASDK 中比较重要的概念，如果 `ASDisplayNode` 是 `layerBacked` 的，它不会渲染对应的 `UIView` 以此来提升性能：
 
-```objectivec
+~~~objectivec
 - (void)_loadViewOrLayerIsLayerBacked:(BOOL)isLayerBacked {
 	if (isLayerBacked) {
 		_layer = [self _layerToLoad];
@@ -193,7 +193,7 @@ ASDK 中到底使用了哪些方法来对视图进行渲染呢？本文主要会
 
 	self.asyncLayer.asyncDelegate = self;
 }
-```
+~~~
 
 因为 `UIView` 和 `CALayer` 虽然都可以用于展示内容，不过由于 `UIView` 可以用于处理用户的交互，所以如果不需要使用 `UIView` 的特性，直接使用 `CALayer` 进行渲染，能够节省大量的渲染时间。
 
@@ -207,12 +207,12 @@ ASDK 中到底使用了哪些方法来对视图进行渲染呢？本文主要会
 
 `-[ASDisplayNode asyncLayer]` 只是对当前 `node` 持有的 `layer` 进行封装，确保会返回一个 `_ASDisplayLayer` 的实例：
 
-```objectivec
+~~~objectivec
 - (_ASDisplayLayer *)asyncLayer {
 	ASDN::MutexLocker l(_propertyLock);
 	return [_layer isKindOfClass:[_ASDisplayLayer class]] ? (_ASDisplayLayer *)_layer : nil;
 }
-```
+~~~
 
 最重要的是 `-[ASDisplayNode _loadViewOrLayerIsLayerBacked:]` 方法会将当前节点设置为 `asyncLayer` 的代理，在后面会使用 `ASDisplayNode` 为 `CALayer` 渲染内容。
 
@@ -224,11 +224,11 @@ ASDK 中到底使用了哪些方法来对视图进行渲染呢？本文主要会
 
 `_ASDisplayView` 和 `_ASDisplayLayer` 都是私有类，它们之间的对应关系其实和 `UIView` 与 `CALayer` 完全相同。
 
-```objectivec
+~~~objectivec
 + (Class)layerClass {
 	return [_ASDisplayLayer class];
 }
-```
+~~~
 
 `_ASDisplayView` 覆写了很多跟视图层级改变有关的方法：
 
@@ -239,20 +239,20 @@ ASDK 中到底使用了哪些方法来对视图进行渲染呢？本文主要会
 
 它们用于在视图的层级改变时，通知对应 `ASDisplayNode` 作出相应的反应，比如 `-[_ASDisplayView willMoveToWindow:]` 方法会在视图被加入层级时调用：
 
-```objectivec
+~~~objectivec
 - (void)willMoveToWindow:(UIWindow *)newWindow {
 	BOOL visible = (newWindow != nil);
 	if (visible && !_node.inHierarchy) {
 		[_node __enterHierarchy];
 	}
 }
-```
+~~~
 
 #### setNeedsDisplay
 
 当前视图如果不在视图层级中，就会通过 `_node` 的实例方法 `-[ASDisplayNode __enterHierarchy]` 加入视图层级：
 
-```objectivec
+~~~objectivec
 - (void)__enterHierarchy {
 	if (!_flags.isInHierarchy && !_flags.visibilityNotificationsDisabled && ![self __selfOrParentHasVisibilityNotificationsDisabled]) {
 		_flags.isEnteringHierarchy = YES;
@@ -269,13 +269,13 @@ ASDK 中到底使用了哪些方法来对视图进行渲染呢？本文主要会
 	}
 }
 
-```
+~~~
 
 > `_flags` 是 `ASDisplayNodeFlags` 结构体，用于标记当前 `ASDisplayNode` 的一些 BOOL 值，比如，异步显示、栅格化子视图等等，你不需要知道都有什么，根据这些值的字面意思理解就已经足够了。
 
 上述方法的前半部分只是对 `_flags` 的标记，如果需要将当前视图的子视图栅格化，也就是**将它的全部子视图与当前视图压缩成一个图层**，就会向这些视图递归地调用 `-[ASDisplayNode willEnterHierarchy]` 方法通知目前的状态：
 
-```objectivec
+~~~objectivec
 - (void)_recursiveWillEnterHierarchy {
   _flags.isEnteringHierarchy = YES;
   [self willEnterHierarchy];
@@ -285,21 +285,21 @@ ASDK 中到底使用了哪些方法来对视图进行渲染呢？本文主要会
 	[subnode _recursiveWillEnterHierarchy];
   }
 }
-```
+~~~
 
 而 `-[ASDisplayNode willEnterHierarchy]` 会修改当前节点的 `interfaceState` 到 `ASInterfaceStateInHierarchy`，表示当前节点不包含在 `cell` 或者其它，但是在 `window` 中。
 
-```objectivec
+~~~objectivec
 - (void)willEnterHierarchy {
   if (![self supportsRangeManagedInterfaceState]) {
 	self.interfaceState = ASInterfaceStateInHierarchy;
   }
 }
-```
+~~~
 
 当前结点需要被显示在屏幕上时，如果其内容 `contents` 为空，就会调用 `-[CALayer setNeedsDisplay]` 方法将 `CALayer` 标记为脏的，通知系统需要在下一个绘制循环中重绘视图：
 
-```objectivec
+~~~objectivec
 - (void)__enterHierarchy {
 	 if (!_flags.isInHierarchy && !_flags.visibilityNotificationsDisabled && ![self __selfOrParentHasVisibilityNotificationsDisabled]) {
 
@@ -320,7 +320,7 @@ ASDK 中到底使用了哪些方法来对视图进行渲染呢？本文主要会
 		}
 	}
 }
-```
+~~~
 
 在将 `CALayer` 标记为 dirty 之后，在绘制循环中就会执行 `-[CALayer display]` 方法，对它要展示的内容进行绘制；如果当前视图需要一些占位图，那么就会在这里的代码中，为当前 `node` 对应的 `layer` 添加合适颜色的占位层。
 
@@ -330,7 +330,7 @@ ASDK 中到底使用了哪些方法来对视图进行渲染呢？本文主要会
 
 在上一节中调用 `-[CALayer setNeedsDisplay]` 方法将当前节点标记为 dirty 之后，在下一个绘制循环时就会对所有需要重绘的 `CALayer` 执行 `-[CALayer display]`，这也是这一小节需要分析的方法的入口：
 
-```objectivec
+~~~objectivec
 - (void)display {
   [self _hackResetNeedsDisplay];
 
@@ -339,11 +339,11 @@ ASDK 中到底使用了哪些方法来对视图进行渲染呢？本文主要会
 
   [self display:self.displaysAsynchronously];
 }
-```
+~~~
 
 这一方法的调用栈比较复杂，在具体分析之前，笔者会先给出这个方法的调用栈，给读者一个关于该方法实现的简要印象：
 
-```objectivec
+~~~objectivec
 -[_ASDisplayLayer display]
 	-[_ASDisplayLayer display:] // 将绘制工作交给 ASDisplayNode 处理
 		-[ASDisplayNode(AsyncDisplay) displayAsyncLayer:asynchronously:]
@@ -356,23 +356,23 @@ ASDK 中到底使用了哪些方法来对视图进行渲染呢？本文主要会
 			-[_ASAsyncTransaction addOperationWithBlock:priority:queue:completion:]
 				ASAsyncTransactionQueue::GroupImpl::schedule(NSInteger priority, dispatch_queue_t queue, dispatch_block_t block)
 					void dispatch_async(dispatch_queue_t queue, dispatch_block_t block);
-```
+~~~
 
 `-[_ASDisplayLayer display]` 在调用栈中其实会创建一个 `displayBlock`，它其实是一个使用 Core Graphics 进行图像绘制的过程，整个绘制过程是通过事务的形式进行管理的；而 `displayBlock` 会被 GCD 分发到后台的并发进程来处理。
 
 调用栈中的第二个方法 `-[_ASDisplayLayer display]` 会将异步绘制的工作交给自己的 `asyncDelegate`，也就是[第一部分](#uiview-和-calayer-的加载)中设置的 `ASDisplayNode`：
 
-```objectivec
+~~~objectivec
 - (void)display:(BOOL)asynchronously {
   [_asyncDelegate displayAsyncLayer:self asynchronously:asynchronously];
 }
-```
+~~~
 
 #### ASDisplayNode(AsyncDisplay)
 
 这里省略了一部分 `-[ASDisplayNode(AsyncDisplay) displayAsyncLayer:asynchronously:]` 方法的实现：
 
-```objectivec
+~~~objectivec
 - (void)displayAsyncLayer:(_ASDisplayLayer *)asyncLayer asynchronously:(BOOL)asynchronously {
   ASDisplayNodeAssertMainThread();
 
@@ -400,7 +400,7 @@ ASDK 中到底使用了哪些方法来对视图进行渲染呢？本文主要会
 	completionBlock(contents, NO);
   }
 }
-```
+~~~
 
 省略后的代码脉络非常清晰，`-[ASDisplayNode(AsyncDisplay) _displayBlockWithAsynchronous:isCancelledBlock:rasterizing:]` 返回一个用于 `displayBlock`，然后构造一个 `completionBlock`，在绘制结束时执行，在主线程中设置当前 `layer` 的内容。
 
@@ -424,7 +424,7 @@ ASDK 中到底使用了哪些方法来对视图进行渲染呢？本文主要会
 
 如果当前的视图需要栅格化子视图，就会进入启用下面的构造方式创建一个 block，它会递归地将子视图绘制在父视图上：
 
-```objectivec
+~~~objectivec
 - (asyncdisplaykit_async_transaction_operation_block_t)_displayBlockWithAsynchronous:(BOOL)asynchronous isCancelledBlock:(asdisplaynode_iscancelled_block_t)isCancelledBlock rasterizing:(BOOL)rasterizing {
   asyncdisplaykit_async_transaction_operation_block_t displayBlock = nil;
   ASDisplayNodeFlags flags = _flags;
@@ -457,7 +457,7 @@ ASDK 中到底使用了哪些方法来对视图进行渲染呢？本文主要会
 
   return [displayBlock copy];
 }
-```
+~~~
 
 在压缩视图层级的过程中就会调用 `-[ASDisplayNode(AsyncDisplay) _recursivelyRasterizeSelfAndSublayersWithIsCancelledBlock:displayBlocks:]` 方法，获取子视图的所有 `displayBlock`，在得到 `UIGraphicsBeginImageContextWithOptions` 需要的参数之后，创建一个新的 context，执行了所有的 `displayBlock` 将子视图的绘制到当前图层之后，使用 `UIGraphicsGetImageFromCurrentImageContext` 取出图层的内容并返回。
 
@@ -467,7 +467,7 @@ ASDK 中到底使用了哪些方法来对视图进行渲染呢？本文主要会
 
 `displayBlock` 的第二种绘制策略更多地适用于图片节点 `ASImageNode` 的绘制：
 
-```objectivec
+~~~objectivec
 - (asyncdisplaykit_async_transaction_operation_block_t)_displayBlockWithAsynchronous:(BOOL)asynchronous isCancelledBlock:(asdisplaynode_iscancelled_block_t)isCancelledBlock rasterizing:(BOOL)rasterizing {
   asyncdisplaykit_async_transaction_operation_block_t displayBlock = nil;
   ASDisplayNodeFlags flags = _flags;
@@ -492,7 +492,7 @@ ASDK 中到底使用了哪些方法来对视图进行渲染呢？本文主要会
 
   return [displayBlock copy];
 }
-```
+~~~
 
 通过 `- displayWithParameters:isCancelled:` 的执行返回一个图片，不过这里的绘制也离不开 Core Graphics 的一些 C 函数，你会在 `-[ASImageNode displayWithParameters:isCancelled:]` 中看到对于 CG 的运用，它会使用 `drawParameters` 来修改并绘制自己持有的 `image` 对象。
 
@@ -500,7 +500,7 @@ ASDK 中到底使用了哪些方法来对视图进行渲染呢？本文主要会
 
 文字的绘制一般都会在 `- drawRect:withParameters:isCancelled:isRasterizing:` 进行，这个方法只是提供了一个合适的用于绘制的上下文，该方法不止可以绘制文字，只是在这里绘制文字比较常见：
 
-```objectivec
+~~~objectivec
 - (asyncdisplaykit_async_transaction_operation_block_t)_displayBlockWithAsynchronous:(BOOL)asynchronous isCancelledBlock:(asdisplaynode_iscancelled_block_t)isCancelledBlock rasterizing:(BOOL)rasterizing {
   asyncdisplaykit_async_transaction_operation_block_t displayBlock = nil;
   ASDisplayNodeFlags flags = _flags;
@@ -532,7 +532,7 @@ ASDK 中到底使用了哪些方法来对视图进行渲染呢？本文主要会
 
   return [displayBlock copy];
 }
-```
+~~~
 
 上述代码跟第一部分比较像，区别是这里不会栅格化子视图；代码根据情况会决定是否重新开一个新的上下文，然后通过 `- drawRect:withParameters:isCancelled:isRasterizing:` 方法实现绘制。
 
@@ -546,7 +546,7 @@ ASDK 提供了一个私有的管理事务的机制，由三部分组成 `_ASAsyn
 
 从上面的小节中，我们已经获取到了用于绘制的 `displayBlock`，然后就需要将 block 添加到绘制事务中：
 
-```objectivec
+~~~objectivec
 - (void)displayAsyncLayer:(_ASDisplayLayer *)asyncLayer asynchronously:(BOOL)asynchronously {
   ...
 
@@ -558,11 +558,11 @@ ASDK 提供了一个私有的管理事务的机制，由三部分组成 `_ASAsyn
 	...
   }
 }
-```
+~~~
 
 前两行代码是获取 `_ASAsyncTransaction` 实例的过程，这个实例会包含在一个 `layer` 的哈希表中，最后调用的实例方法 `-[_ASAsyncTransaction addOperationWithBlock:priority:queue:completion:]` 会把用于绘制的 `displayBlock` 添加到后台并行队列中：
 
-```objectivec
+~~~objectivec
 + (dispatch_queue_t)displayQueue {
   static dispatch_queue_t displayQueue = NULL;
   static dispatch_once_t onceToken;
@@ -573,11 +573,11 @@ ASDK 提供了一个私有的管理事务的机制，由三部分组成 `_ASAsyn
 
   return displayQueue;
 }
-```
+~~~
 
 这个队列是一个并行队列，并且优先级是 `DISPATCH_QUEUE_PRIORITY_HIGH`，**确保 UI 的渲染会在其它异步操作执行之前进行**，而 `-[_ASAsyncTransaction addOperationWithBlock:priority:queue:completion:]` 中会初始化 `ASDisplayNodeAsyncTransactionOperation` 的实例，然后传入 `completionBlock`，在绘制结束时回调：
 
-```objectivec
+~~~objectivec
 - (void)addOperationWithBlock:(asyncdisplaykit_async_transaction_operation_block_t)block priority:(NSInteger)priority queue:(dispatch_queue_t)queue completion:(asyncdisplaykit_async_transaction_operation_completion_block_t)completion {
   ASDisplayNodeAssertMainThread();
 
@@ -591,11 +591,11 @@ ASDK 提供了一个私有的管理事务的机制，由三部分组成 `_ASAsyn
 	}
   });
 }
-```
+~~~
 
 `schedule` 方法是一个 C++ 方法，它会向 `ASAsyncTransactionQueue::Group` 中派发一个 block，这个 block 中会执行 `displayBlock`，然后将结果传给 `operation.value`：
 
-```objectivec
+~~~objectivec
 void ASAsyncTransactionQueue::GroupImpl::schedule(NSInteger priority, dispatch_queue_t queue, dispatch_block_t block) {
   ASAsyncTransactionQueue &q = _queue;
   ASDN::MutexLocker locker(q._mutex);
@@ -638,7 +638,7 @@ void ASAsyncTransactionQueue::GroupImpl::schedule(NSInteger priority, dispatch_q
 	});
   }
 }
-```
+~~~
 
 `ASAsyncTransactionQueue::GroupImpl` 其实现其实就是对 GCD 的封装，同时添加一些最大并发数、线程锁的功能。通过 `dispatch_async` 将 block 分发到 `queue` 中，立刻执行 block，将数据传回 `ASDisplayNodeAsyncTransactionOperation` 实例。
 
@@ -646,7 +646,7 @@ void ASAsyncTransactionQueue::GroupImpl::schedule(NSInteger priority, dispatch_q
 
 在 `_ASAsyncTransactionGroup` 调用 `mainTransactionGroup` 类方法获取单例时，会通过 `+[_ASAsyncTransactionGroup registerTransactionGroupAsMainRunloopObserver]` 向 Runloop 中注册回调：
 
-```objectivec
+~~~objectivec
 + (void)registerTransactionGroupAsMainRunloopObserver:(_ASAsyncTransactionGroup *)transactionGroup {
   static CFRunLoopObserverRef observer;
   CFRunLoopRef runLoop = CFRunLoopGetCurrent();
@@ -657,30 +657,30 @@ void ASAsyncTransactionQueue::GroupImpl::schedule(NSInteger priority, dispatch_q
   CFRunLoopAddObserver(runLoop, observer, kCFRunLoopCommonModes);
   CFRelease(observer);
 }
-```
+~~~
 
 上述代码会在即将退出 Runloop 或者 Runloop 开始休眠时执行回调 `_transactionGroupRunLoopObserverCallback`，而这个回调方法就是这一条主线的入口：
 
-```objectivec
+~~~objectivec
 static void _transactionGroupRunLoopObserverCallback(CFRunLoopObserverRef observer, CFRunLoopActivity activity, void *info) {
   ASDisplayNodeCAssertMainThread();
   _ASAsyncTransactionGroup *group = (__bridge _ASAsyncTransactionGroup *)info;
   [group commit];
 }
-```
+~~~
 
 上一节中只是会将绘制代码提交到后台的并发进程中，而这里才会将结果提交，也就是在每次 Runloop 循环结束时开始绘制内容，而 `-[_operationCompletionBlock commit]` 方法的调用栈能够帮助我们理解内容是如何提交的，又是如何传回 `node` 持有的 `layer` 的：
 
-```objectivec
+~~~objectivec
 -[_ASAsyncTransactionGroup commit]
 	-[_ASAsyncTransaction commit]
 		ASAsyncTransactionQueue::GroupImpl::notify(dispatch_queue_t, dispatch_block_t)
 			_notifyList.push_back(GroupNotify)
-```
+~~~
 
 `-[_ASAsyncTransactionGroup commit]` 方法的调用完成了对绘制事务的提交，而在 `-[_ASAsyncTransaction commit]` 中会调用 `notify` 方法，在上一节中的 `displayBlock` 执行结束后调用这里传入的 block 执行 `-[_ASAsyncTransaction completeTransaction]` 方法：
 
-```objectivec
+~~~objectivec
 - (void)commit {
   ASDisplayNodeAssertMainThread();
   __atomic_store_n(&_state, ASAsyncTransactionStateCommitted, __ATOMIC_SEQ_CST);
@@ -690,11 +690,11 @@ static void _transactionGroupRunLoopObserverCallback(CFRunLoopObserverRef observ
 	[self completeTransaction];
   });
 }
-```
+~~~
 
 我们按照时间顺序来分析在上面的 block 执行之前，方法是如何调用的，以及 block 是如何被执行的；这就不得不回到派发绘制事务的部分了，在 `ASAsyncTransactionQueue::GroupImpl::schedule` 方法中，使用了 `dispatch_async` 将派发 block：
 
-```objectivec
+~~~objectivec
 void ASAsyncTransactionQueue::GroupImpl::schedule(NSInteger priority, dispatch_queue_t queue, dispatch_block_t block) {
   ...
   if (entry._threadCount < maxThreads) {
@@ -716,11 +716,11 @@ void ASAsyncTransactionQueue::GroupImpl::schedule(NSInteger priority, dispatch_q
 	});
   }
 }
-```
+~~~
 
 在 `displayBlock` 执行之后，会调用的 `group` 的 `leave` 方法：
 
-```objectivec
+~~~objectivec
 void ASAsyncTransactionQueue::GroupImpl::leave() {
   if (_pendingOperations == 0) {
 	std::list<GroupNotify> notifyList;
@@ -731,11 +731,11 @@ void ASAsyncTransactionQueue::GroupImpl::leave() {
 	}
   }
 }
-```
+~~~
 
 这里终于执行了在 `- commit` 中加入的 block，也就是 `-[_ASAsyncTransaction completeTransaction]` 方法：
 
-```objectivec
+~~~objectivec
 - (void)completeTransaction {
   if (__atomic_load_n(&_state, __ATOMIC_SEQ_CST) != ASAsyncTransactionStateComplete) {
 	BOOL isCanceled = (__atomic_load_n(&_state, __ATOMIC_SEQ_CST) == ASAsyncTransactionStateCanceled);
@@ -746,22 +746,22 @@ void ASAsyncTransactionQueue::GroupImpl::leave() {
 	__atomic_store_n(&_state, ASAsyncTransactionStateComplete, __ATOMIC_SEQ_CST);
   }
 }
-```
+~~~
 
 最后的最后，`-[ASDisplayNodeAsyncTransactionOperation callAndReleaseCompletionBlock:]` 方法执行了回调将 `displayBlock` 执行的结果传回了 CALayer:
 
-```objectivec
+~~~objectivec
 - (void)callAndReleaseCompletionBlock:(BOOL)canceled; {
   if (_operationCompletionBlock) {
 	_operationCompletionBlock(self.value, canceled);
 	self.operationCompletionBlock = nil;
   }
 }
-```
+~~~
 
 也就是在  `-[ASDisplayNode(AsyncDisplay) displayAsyncLayer:asynchronously:]` 方法中构建的 `completionBlock`：
 
-```objectivec
+~~~objectivec
 asyncdisplaykit_async_transaction_operation_completion_block_t completionBlock = ^(id<NSObject> value, BOOL canceled){
   ASDisplayNodeCAssertMainThread();
   if (!canceled && !isCancelledBlock()) {
@@ -776,7 +776,7 @@ asyncdisplaykit_async_transaction_operation_completion_block_t completionBlock =
 	[self didDisplayAsyncLayer:self.asyncLayer];
   }
 };
-```
+~~~
 
 这一部分进行的大量的数据传递都是通过 block 进行的，从 Runloop 中对事务的提交，以及通过 `notify` 方法加入的 block，都是为了最后将绘制的结果传回 `CALayer` 对象，而到这里可以说整个 ASDK 对于视图内容的绘制过程就结束了。
 

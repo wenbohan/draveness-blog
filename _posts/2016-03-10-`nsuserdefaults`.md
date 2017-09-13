@@ -28,33 +28,33 @@ tags: iOS
 
 假如我们要为我们的 App 添加一个 `isLatestVersion` 的 `BOOL` 值, 而它的默认值是 `YES`.
 
-```objectivec
+~~~objectivec
 static NSString *isLatestVersion = @"isLatestVersion";
-```
+~~~
 
 当我们使用 `boolForKey:` 获取 `isLatestVersion` 的值时:
 
-```objectivec
+~~~objectivec
 [[NSUserDefaults standUserDefaults] boolForKey:isLatestVersion];
-```
+~~~
 
 如果我们在之前没有设置它的值, 它的值总是 `NO`.
 
 但是当我们用 `objectForKey:` 去获取它的值时:
 
-```objectivec
+~~~objectivec
 [[NSUserDefaults standUserDefaults] objectForKey:isLatestVersion];
-```
+~~~
 
 它返回的值是 `nil`. 哪怕在我们先通过 `boolForKey:` 获取 `isLatestVersion` 之后, 再调用  `objectForKey:` 返回的值依然是 `nil`. `boolForKey:` 也没有改变它的行为.
 
 也就是说当我们没有设置一个 `BOOL` 类型的 `NSUserDefaults` 值时, 它的默认值都是 `nil`, 这样我们就可以通过下面的代码将一个 `BOOL` 类型的默认值设置为 `YES` 了.
 
-```objectivec
+~~~objectivec
 if ([[NSUserDefaults standUserDefaults] objectForKey:isLatestVersion] == nil) {
     [[NSUserDefaults standUserDefaults] setBool:YES forKey:isLatestVersion];
 }
-```
+~~~
 
 <iframe src="http://ghbtns.com/github-btn.html?user=draveness&type=follow&size=large" height="30" width="240" frameborder="0" scrolling="0" style="width:240px; height: 30px;" allowTransparency="true"></iframe>
 

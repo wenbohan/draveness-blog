@@ -30,7 +30,7 @@ tags: iOS Runtime
 
 这是 `main.m` 文件中的代码：
 
-```objectivec
+~~~objectivec
 #import <Foundation/Foundation.h>
 
 @interface XXObject : NSObject @end
@@ -47,7 +47,7 @@ int main(int argc, const char * argv[]) {
     @autoreleasepool { }
     return 0;
 }
-```
+~~~
 
 主函数中的代码为空，如果我们运行这个程序：
 
@@ -57,14 +57,14 @@ int main(int argc, const char * argv[]) {
 
 如果，我们在自动释放池中加入以下代码：
 
-```objectivec
+~~~objectivec
 int main(int argc, const char * argv[]) {
     @autoreleasepool {
         __unused XXObject *object = [[XXObject alloc] init];
     }
     return 0;
 }
-```
+~~~
 
 再运行程序：
 
@@ -79,7 +79,7 @@ int main(int argc, const char * argv[]) {
 ![objc-initialize-breakpoint](http://7xrlu3.com1.z0.glb.clouddn.com/2016-04-30-objc-initialize-breakpoint.png)
 
 
-```objectivec
+~~~objectivec
 0 +[XXObject initialize]
 1 _class_initialize
 2 lookUpImpOrForward
@@ -87,7 +87,7 @@ int main(int argc, const char * argv[]) {
 4 objc_msgSend
 5 main
 6 start
-```
+~~~
 
 直接来看调用栈中的 `lookUpImpOrForward` 方法，`lookUpImpOrForward` 方法**只会在向对象发送消息，并且在类的缓存中没有找到消息的选择子时**才会调用，具体可以看这篇文章，[从源代码看 ObjC 中消息的发送](https://github.com/Draveness/iOS-Source-Code-Analyze/blob/master/objc/从源代码看%20ObjC%20中消息的发送.md)。
 
@@ -99,11 +99,11 @@ int main(int argc, const char * argv[]) {
 
 其中，使用 `if (initialize  &&  !cls->isInitialized())` 来判断当前类是否初始化过：
 
-```objectivec
+~~~objectivec
 bool isInitialized() {
    return getMeta()->data()->flags & RW_INITIALIZED;
 }
-```
+~~~
 
 > 当前类是否初始化过的信息就保存在[元类](http://www.cocoawithlove.com/2010/01/what-is-meta-class-in-objective-c.html)的 `class_rw_t` 结构体中的 `flags` 中。
 
@@ -117,7 +117,7 @@ bool isInitialized() {
 
 在 `initialize` 的调用栈中，直接调用其方法的是下面的这个 C 语言函数：
 
-```objectivec
+~~~objectivec
 void _class_initialize(Class cls)
 {
     Class supercls;
@@ -171,7 +171,7 @@ void _class_initialize(Class cls)
         _objc_fatal("thread-safe class init in objc runtime is buggy!");
     }
 }
-```
+~~~
 
 方法的主要作用自然是向未初始化的类发送 `+initialize` 消息，不过会强制父类先发送 `+initialize`。
 
@@ -194,9 +194,9 @@ void _class_initialize(Class cls)
 
 3. 成功设置标志位、向当前类发送 `+initialize` 消息
 
-    ```objectivec
+    ~~~objectivec
     ((void(*)(Class, SEL))objc_msgSend)(cls, SEL_initialize);
-    ```
+    ~~~
 
 4. 完成初始化，如果父类已经初始化完成，设置 `RW_INITIALIZED` 标志位。否则，在父类初始化完成之后再设置标志位
 
@@ -236,17 +236,17 @@ void _class_initialize(Class cls)
 
 这个数据结构中的信息会被两个方法改变：
 
-```objectivec
+~~~objectivec
 if (!supercls  ||  supercls->isInitialized()) {
   _finishInitializing(cls, supercls);
 } else {
   _finishInitializingAfter(cls, supercls);
 }
-```
+~~~
 
 分别是 `_finishInitializing` 以及 `_finishInitializingAfter`，先来看一下后者是怎么实现的，也就是**在父类没有完成初始化的时候**调用的方法：
 
-```objectivec
+~~~objectivec
 static void _finishInitializingAfter(Class cls, Class supercls)
 {
     PendingInitialize *pending;
@@ -255,17 +255,17 @@ static void _finishInitializingAfter(Class cls, Class supercls)
     pending->next = (PendingInitialize *)NXMapGet(pendingInitializeMap, supercls);
     NXMapInsert(pendingInitializeMap, supercls, pending);
 }
-```
+~~~
 
 因为当前类的父类没有初始化，所以会将子类加入一个数据结构 `PendingInitialize` 中，这个数据结构其实就类似于一个保存子类的链表。这个链表会以父类为键存储到 `pendingInitializeMap` 中。
 
-```objective
+~~~objective
 NXMapInsert(pendingInitializeMap, supercls, pending);
-```
+~~~
 
 而在**父类已经调用了初始化方法**的情况下，对应方法 `_finishInitializing` 的实现就稍微有些复杂了：
 
-```objectivec
+~~~objectivec
 static void _finishInitializing(Class cls, Class supercls)
 {
     PendingInitialize *pending;
@@ -285,7 +285,7 @@ static void _finishInitializing(Class cls, Class supercls)
         pending = next;
     }
 }
-```
+~~~
 
 首先，由于父类已经完成了初始化，在这里直接将当前类标记成已经初始化，然后**递归地将被当前类 block 的子类标记为已初始化**，再把这些当类移除 `pendingInitializeMap`。
 

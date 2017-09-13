@@ -19,7 +19,7 @@ iOS 中的 run loop 等待一些事件的发生并且响应这些实践. 这个�
 
 可以用下面的代码来表示
 
-```objectivec
+~~~objectivec
 int UIApplicationMain(...) {
     while (!shouldQuitApplication) {
         Event *someEvent = // wait for next event;
@@ -28,15 +28,15 @@ int UIApplicationMain(...) {
         [myPool release];
     }
 }
-```
+~~~
 
 在 iOS 中有三种事件的类型.
 
-```objectivec
+~~~objectivec
 UIEventTypeTouches,
 UIEventTypeMotion,
 UIEventTypeRemoteControl,
-```
+~~~
 
 所以在每一次触摸, 运动和远程控制的事件结束之后, 自动释放池都会被排干.
 
@@ -77,7 +77,7 @@ UIEventTypeRemoteControl,
 
 判断 iPhone 上面晃动手势的最简单办法是, 你需要有一些 UIView 来作为第一响应者来接收晃动实践. 这里有一写使用 UIView 获取晃动事件的代码.
 
-```objectivec
+~~~objectivec
 @implementation ShakingView
 
 - (void)motionEnded:(UIEventSubtype)motion withEvent:(UIEvent *)event {
@@ -94,14 +94,14 @@ UIEventTypeRemoteControl,
 }
 
 @end
-```
+~~~
 
 你可以通过子类化任意一个 `UIView` 并覆写这些方法完成对晃动手势的监听.
 
 在视图控制器中, 你需要设置这个视图变成第一响应者:
 
 
-```objectivec
+~~~objectivec
 - (void) viewWillAppear:(BOOL)animated {
     [shakeView becomeFirstResponder];
     [super viewWillAppear:animated];
@@ -110,7 +110,7 @@ UIEventTypeRemoteControl,
     [shakeView resignFirstResponder];
     [super viewWillDisappear:animated];
 }
-```
+~~~
 
 如果有其他的视图变成了第一响应者, 那么在其他视图响应结束后, 恢复当前视图的第一响应者身份.
 

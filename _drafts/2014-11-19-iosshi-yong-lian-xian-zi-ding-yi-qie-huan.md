@@ -9,7 +9,7 @@ permalink: /:title
 
 通过添加`UIStoryboardSegure`的子类, 覆盖其`perform`方法, 来创建自定义切换.
 
-```
+~~~
 - (void)perform {
     UIViewController *sourceVC = (UIViewController *)self.sourceViewController;
     UIViewController *destinationVC = (UIViewController *)self.destinationViewController;
@@ -37,4 +37,4 @@ permalink: /:title
                      }];
 }
 
-```
+~~~

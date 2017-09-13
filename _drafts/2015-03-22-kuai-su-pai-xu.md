@@ -19,7 +19,7 @@ permalink: /:title
 	
 ##快速排序的实现
 
-```
+~~~
 void quicksort(int A[], int p, int r) {
 	if (p < r - 1) {
 		int q = partition(A, p, r);
@@ -27,7 +27,7 @@ void quicksort(int A[], int p, int r) {
 		quicksort(A, q + 1, r);
 	}
 }
-```
+~~~
 
 为了排序一个数组, 我们需要调用 `quicksort(A, 0, A.length - 1)
 
@@ -35,7 +35,7 @@ void quicksort(int A[], int p, int r) {
 
 快速排序最关键的部分就是数组的划分, 也就是过程 `partition`, 它实现了对数组的重新排序.
 
-```
+~~~
 #define EXCHANGE(a, b) tmp = a; a = b; b = tmp;
 
 int partition(int A[], int p, int r) {
@@ -51,7 +51,7 @@ int partition(int A[], int p, int r) {
 	EXCHANGE(A[r], A[i + 1]);
 	return i + 1;
 }
-```
+~~~
 	
 每一轮迭代开始时, 对于任意数组下标 `k`, 有:
 
@@ -91,7 +91,7 @@ int partition(int A[], int p, int r) {
 
 因为快速排序的时间复杂度取决于数组的划分, 有时, 我们希望引入随机性来改善算法的性能. 在这里我们可以采用一种随机抽样的方式选择数组的主元, 达到随机的目的.
 
-```
+~~~
 int randomized_partition(int A[], int p, int r) {
 	int i = i = rand() % (r - p) + p;
 	EXCHANGE(A[r], A[i])	;
@@ -105,7 +105,7 @@ int randomized_quicksort(int A[], int p, int r) {
 		randomized_quicksort(A, q + 1, r);
 	}
 }
-```
+~~~
 	
 我们只需要在调用 `partition` 之前随机选择一个 pivot 然后与 `A[r]` 交换即可.
 
@@ -113,7 +113,7 @@ int randomized_quicksort(int A[], int p, int r) {
 
 我们在之前使用的 `partition` 并不是快速排序算法最初的版本, 下面给出的是快速排序最初的版本.
 
-```
+~~~
 int hoare_partition(int A[], int p, int r) {
 	int x = A[p],
 		 i = p - 1,
@@ -136,11 +136,11 @@ int hoare_quicksort(int A[], int p, int r) {
 		hoare_quicksort(A, q + 1, r);
 	}
 }
-```
+~~~
 	
 ###针对相同元素的快速排序
 
-```
+~~~
 typedef struct {
     int q;
     int t;
@@ -171,7 +171,7 @@ pivot_t partition(int A[], int p, int r) {
     pivot_t result = {q, t};
     return result;
 }
-```
+~~~
 
 `partition` 过程在这一版本中, 返回 `q` 和 `t`, 使得 
 

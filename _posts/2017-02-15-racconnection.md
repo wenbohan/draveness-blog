@@ -23,7 +23,7 @@ ReactiveCocoa 中的信号信号在默认情况下都是冷的，每次有新的
 
 `RACMulticastConnection` 有一个非常简单的初始化方法 `-initWithSourceSignal:subject:`，不过这个初始化方法是私有的：
 
-```objectivec
+~~~objectivec
 - (instancetype)initWithSourceSignal:(RACSignal *)source subject:(RACSubject *)subject {
 	self = [super init];
 
@@ -33,7 +33,7 @@ ReactiveCocoa 中的信号信号在默认情况下都是冷的，每次有新的
 
 	return self;
 }
-```
+~~~
 
 在 `RACMulticastConnection` 的头文件的注释中，对它的初始化有这样的说明：
 
@@ -41,7 +41,7 @@ ReactiveCocoa 中的信号信号在默认情况下都是冷的，每次有新的
 
 我们不应该直接使用 `-initWithSourceSignal:subject:` 来初始化一个对象，我们应该通过 `RACSignal` 的实例方法初始化 `RACMulticastConnection` 实例。
 
-```objectivec
+~~~objectivec
 - (RACMulticastConnection *)publish {
 	RACSubject *subject = [RACSubject subject];
 	RACMulticastConnection *connection = [self multicast:subject];
@@ -52,7 +52,7 @@ ReactiveCocoa 中的信号信号在默认情况下都是冷的，每次有新的
 	RACMulticastConnection *connection = [[RACMulticastConnection alloc] initWithSourceSignal:self subject:subject];
 	return connection;
 }
-```
+~~~
 
 这两个方法 `-publish` 和 `-multicast:` 都是对初始化方法的封装，并且都会返回一个 `RACMulticastConnection` 对象，传入的 `sourceSignal` 就是当前信号，`subject` 就是用于对外广播的 `RACSubject` 对象。
 
@@ -60,7 +60,7 @@ ReactiveCocoa 中的信号信号在默认情况下都是冷的，每次有新的
 
 网络请求在客户端其实是一个非常昂贵的操作，也算是多级缓存中最慢的一级，在使用 ReactiveCocoa 处理业务需求中经常会遇到下面的情况：
 
-```objectivec
+~~~objectivec
 RACSignal *requestSignal = [RACSignal createSignal:^RACDisposable * _Nullable(id<RACSubscriber>  _Nonnull subscriber) {
     NSLog(@"Send Request");
     NSURL *url = [NSURL URLWithString:@"http://localhost:3000"];
@@ -86,7 +86,7 @@ RACSignal *requestSignal = [RACSignal createSignal:^RACDisposable * _Nullable(id
     NSNumber *productId = [x objectForKey:@"id"];
     NSLog(@"productId: %@", productId);
 }];
-```
+~~~
 
 通过订阅发出网络请求的信号经常会被多次订阅，以满足不同 UI 组件更新的需求，但是以上代码却有非常严重的问题。
 
@@ -96,7 +96,7 @@ RACSignal *requestSignal = [RACSignal createSignal:^RACDisposable * _Nullable(id
 
 为了解决上述问题，我们使用了 `-publish` 方法获得一个多播对象 `RACMulticastConnection`，更改后的代码如下：
 
-```objectivec
+~~~objectivec
 RACMulticastConnection *connection = [[RACSignal createSignal:^RACDisposable * _Nullable(id<RACSubscriber>  _Nonnull subscriber) {
     NSLog(@"Send Request");
     ...
@@ -111,7 +111,7 @@ RACMulticastConnection *connection = [[RACSignal createSignal:^RACDisposable * _
 }];
 
 [connection connect];
-```
+~~~
 
 在这个例子中，我们使用 `-publish` 方法生成实例，订阅者不再订阅源信号，而是订阅 `RACMulticastConnection` 中的 `RACSubject` 热信号，最后通过 `-connect` 方法触发源信号中的任务。
 
@@ -123,7 +123,7 @@ RACMulticastConnection *connection = [[RACSignal createSignal:^RACDisposable * _
 
 我们再来看一下 `-publish` 和 `-multicast:` 这两个方法的实现：
 
-```objectivec
+~~~objectivec
 - (RACMulticastConnection *)publish {
 	RACSubject *subject = [RACSubject subject];
 	RACMulticastConnection *connection = [self multicast:subject];
@@ -134,7 +134,7 @@ RACMulticastConnection *connection = [[RACSignal createSignal:^RACDisposable * _
 	RACMulticastConnection *connection = [[RACMulticastConnection alloc] initWithSourceSignal:self subject:subject];
 	return connection;
 }
-```
+~~~
 
 当 `-publish` 方法调用时相当于向 `-multicast:` 传入了 `RACSubject`。
 
@@ -156,12 +156,12 @@ RACMulticastConnection *connection = [[RACSignal createSignal:^RACDisposable * _
 
 只有在调用 `-connect` 方法之后，`RACSubject` 才会**订阅**源信号 `sourceSignal`。
 
-```objectivec
+~~~objectivec
 - (RACDisposable *)connect {
 	self.serialDisposable.disposable = [self.sourceSignal subscribe:_signal];
 	return self.serialDisposable;
 }
-```
+~~~
 
 这时源信号的 `didSubscribe` 代码块才会执行，向 `RACSubject` 推送消息，消息向下继续传递到 `RACSubject` 所有的订阅者中。
 
@@ -173,7 +173,7 @@ RACMulticastConnection *connection = [[RACSignal createSignal:^RACDisposable * _
 
 在 `RACMulticastConnection` 中还有另一个用于连接 `RACSignal` 和 `RACSubject` 信号的 `-autoconnect` 方法：
 
-```objectivec
+~~~objectivec
 - (RACSignal *)autoconnect {
 	__block volatile int32_t subscriberCount = 0;
 	return [RACSignal
@@ -190,7 +190,7 @@ RACMulticastConnection *connection = [[RACSignal createSignal:^RACDisposable * _
 			}];
 		}];
 }
-```
+~~~
 
 它保证了在 `-autoconnect` 方法返回的对象被第一次订阅时，就会建立源信号与热信号之间的连接。
 
@@ -200,7 +200,7 @@ RACMulticastConnection *connection = [[RACSignal createSignal:^RACDisposable * _
 
 如何才能保存 `didSubscribe` 执行过程中发送的消息，并在 `-connect` 调用之后也可以收到消息？这时，我们就要使用 `-multicast:` 方法和 `RACReplaySubject` 来完成这个需求了。
 
-```objectivec
+~~~objectivec
 RACSignal *sourceSignal = [RACSignal createSignal:...];
 RACMulticastConnection *connection = [sourceSignal multicast:[RACReplaySubject subject]];
 [connection.signal subscribeNext:^(id  _Nullable x) {
@@ -211,11 +211,11 @@ RACMulticastConnection *connection = [sourceSignal multicast:[RACReplaySubject s
     NSNumber *productId = [x objectForKey:@"id"];
     NSLog(@"productId: %@", productId);
 }];
-```
+~~~
 
 除了使用上述的代码，也有一个更简单的方式创建包含 `RACReplaySubject` 对象的 `RACMulticastConnection`：
 
-```objectivec
+~~~objectivec
 RACSignal *signal = [[RACSignal createSignal:...] replay];
 [signal subscribeNext:^(id  _Nullable x) {
     NSLog(@"product: %@", x);
@@ -224,26 +224,26 @@ RACSignal *signal = [[RACSignal createSignal:...] replay];
     NSNumber *productId = [x objectForKey:@"id"];
     NSLog(@"productId: %@", productId);
 }];
-```
+~~~
 
 `-replay` 方法和 `-publish` 差不多，只是内部封装的热信号不同，并在方法调用时就连接原信号：
 
-```objectivec
+~~~objectivec
 - (RACSignal *)replay {
 	RACReplaySubject *subject = [RACReplaySubject subject];
 	RACMulticastConnection *connection = [self multicast:subject];
 	[connection connect];
 	return connection.signal;
 }
-```
+~~~
 
 除了 `-replay` 方法，`RACSignal` 中还定义了与 `RACMulticastConnection` 中相关的其它 `-replay` 方法：
 
-```objectivec
+~~~objectivec
 - (RACSignal<ValueType> *)replay;
 - (RACSignal<ValueType> *)replayLast;
 - (RACSignal<ValueType> *)replayLazily;
-```
+~~~
 
 三个方法都会在 `RACMulticastConnection` 初始化时传入一个 `RACReplaySubject` 对象，不过却有一点细微的差别：
 
@@ -251,18 +251,18 @@ RACSignal *signal = [[RACSignal createSignal:...] replay];
 
 相比于 `-replay` 方法，`-replayLast` 方法生成的 `RACMulticastConnection` 中热信号的容量为 `1`：
 
-```objectivec
+~~~objectivec
 - (RACSignal *)replayLast {
 	RACReplaySubject *subject = [RACReplaySubject replaySubjectWithCapacity:1];
 	RACMulticastConnection *connection = [self multicast:subject];
 	[connection connect];
 	return connection.signal;
 }
-```
+~~~
 
 而 `replayLazily` 会在返回的信号被**第一次订阅**时，才会执行 `-connect` 方法：
 
-```objectivec
+~~~objectivec
 - (RACSignal *)replayLazily {
 	RACMulticastConnection *connection = [self multicast:[RACReplaySubject subject]];
 	return [RACSignal
@@ -271,7 +271,7 @@ RACSignal *signal = [[RACSignal createSignal:...] replay];
 			return connection.signal;
 		}];
 }
-```
+~~~
 
 ## 总结
 

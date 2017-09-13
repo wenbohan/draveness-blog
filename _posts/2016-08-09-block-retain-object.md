@@ -22,7 +22,7 @@ Block 是 Objective-C 中笔者最喜欢的特性，它为 Objective-C 这门语
 
 在 `FBRetainCycleDetector` 中存在这样一个类 `FBObjectiveCBlock`，这个类的 `- allRetainedObjects` 方法就会返回所有 block 持有的强引用，这也是文章需要关注的重点。
 
-```objectivec
+~~~objectivec
 - (NSSet *)allRetainedObjects {
 	NSMutableArray *results = [[[super allRetainedObjects] allObjects] mutableCopy];
 
@@ -40,7 +40,7 @@ Block 是 Objective-C 中笔者最喜欢的特性，它为 Objective-C 这门语
 
 	return [NSSet setWithArray:results];
 }
-```
+~~~
 
 这部分代码中的大部分都不重要，只是在开头调用父类方法，在最后将获取的对象包装成一个系列 `FBObjectiveCGraphElement`，最后返回一个数组，也就是当前对象 block 持有的全部强引用了。
 
@@ -48,7 +48,7 @@ Block 是 Objective-C 中笔者最喜欢的特性，它为 Objective-C 这门语
 
 对 block 稍微有了解的人都知道，block 其实是一个结构体，其结构大概是这样的：
 
-```objectivec
+~~~objectivec
 struct BlockLiteral {
 	void *isa;
 	int flags;
@@ -64,11 +64,11 @@ struct BlockDescriptor {
 	void (*dispose_helper)(void *src);
 	const char *signature;
 };
-```
+~~~
 
 在 `BlockLiteral` 结构体中有一个 `isa` 指针，而对 `isa`了解的人也都知道，这里的 `isa` 其实指向了一个类，每一个 block 指向的类可能是 `__NSGlobalBlock__`、`__NSMallocBlock__` 或者 `__NSStackBlock__`，但是这些 block，它们继承自一个共同的父类，也就是 `NSBlock`，我们可以使用下面的代码来获取这个类：
 
-```objectivec
+~~~objectivec
 static Class _BlockClass() {
 	static dispatch_once_t onceToken;
 	static Class blockClass;
@@ -82,7 +82,7 @@ static Class _BlockClass() {
 	});
 	return blockClass;
 }
-```
+~~~
 
 Objective-C 中的三种 block `__NSMallocBlock__`、`__NSStackBlock__` 和 `__NSGlobalBlock__` 会在下面的情况下出现：
 
@@ -97,14 +97,14 @@ Objective-C 中的三种 block `__NSMallocBlock__`、`__NSStackBlock__` 和 `__N
 
 然后可以通过这种办法来判断当前对象是不是 block：
 
-```objectivec
+~~~objectivec
 BOOL FBObjectIsBlock(void *object) {
 	Class blockClass = _BlockClass();
 
 	Class candidate = object_getClass((__bridge id)object);
 	return [candidate isSubclassOfClass:blockClass];
 }
-```
+~~~
 
 ## Block 如何持有对象
 
@@ -112,7 +112,7 @@ BOOL FBObjectIsBlock(void *object) {
 
 重新回到文章开头提到的 `- allRetainedObjects` 方法：
 
-```objectivec
+~~~objectivec
 - (NSSet *)allRetainedObjects {
 	NSMutableArray *results = [[[super allRetainedObjects] allObjects] mutableCopy];
 
@@ -130,11 +130,11 @@ BOOL FBObjectIsBlock(void *object) {
 
 	return [NSSet setWithArray:results];
 }
-```
+~~~
 
 通过函数的符号我们也能够猜测出，上述方法中通过 `FBGetBlockStrongReferences` 获取 block 持有的所有强引用：
 
-```objectivec
+~~~objectivec
 NSArray *FBGetBlockStrongReferences(void *block) {
 	if (!FBObjectIsBlock(block)) {
 		return nil;
@@ -158,7 +158,7 @@ NSArray *FBGetBlockStrongReferences(void *block) {
 
 	return [results autorelease];
 }
-```
+~~~
 
 而 `FBGetBlockStrongReferences` 是对另一个私有函数 `_GetBlockStrongLayout` 的封装，也是实现最有意思的部分。
 
@@ -170,7 +170,7 @@ NSArray *FBGetBlockStrongReferences(void *block) {
 
 在文章的上面曾经出现过 block 的结构体，不知道各位读者是否还有印象：
 
-```objectivec
+~~~objectivec
 struct BlockLiteral {
 	void *isa;
 	int flags;
@@ -179,11 +179,11 @@ struct BlockLiteral {
 	struct BlockDescriptor *descriptor;
 	// imported variables
 };
-```
+~~~
 
 在每个 block 结构体的下面就会存放当前 block 持有的所有对象，无论强弱。我们可以做一个小实验来验证这个观点，我们在程序中声明这样一个 block：
 
-```objectivec
+~~~objectivec
 NSObject *firstObject = [NSObject new];
 __attribute__((objc_precise_lifetime)) NSObject *object = [NSObject new];
 __weak NSObject *secondObject = object;
@@ -194,7 +194,7 @@ __unused void (^block)() = ^{
 	__unused NSObject *second = secondObject;
 	__unused NSObject *third = thirdObject;
 };
-```
+~~~
 
 然后在代码中打一个断点：
 
@@ -217,7 +217,7 @@ __unused void (^block)() = ^{
 
 第二个需要介绍的是 `dispose_helper`，这是 `BlockDescriptor` 结构体中的一个指针：
 
-```objectivec
+~~~objectivec
 struct BlockDescriptor {
 	unsigned long int reserved;                // NULL
 	unsigned long int size;
@@ -226,7 +226,7 @@ struct BlockDescriptor {
 	void (*dispose_helper)(void *src);         // IFF (1<<25)
 	const char *signature;                     // IFF (1<<30)
 };
-```
+~~~
 
 上面的结构体中有两个函数指针，`copy_helper` 用于 block 的拷贝，`dispose_helper` 用于 block 的 `dispose` 也就是 block 在析构的时候会调用这个函数指针，销毁自己持有的对象，而这个原理也是区别强弱引用的关键，因为在 `dispose_helper` 会对强引用发送 `release` 消息，对弱引用不会做任何的处理。
 
@@ -234,7 +234,7 @@ struct BlockDescriptor {
 
 最后就是用于从 `dispose_helper` 接收消息的类 `FBBlockStrongRelationDetector` 了；它的实例在接受 `release` 消息时，并不会真正的释放，只会将标记 `_strong` 为 YES：
 
-```objectivec
+~~~objectivec
 - (oneway void)release {
 	_strong = YES;
 }
@@ -242,21 +242,21 @@ struct BlockDescriptor {
 - (oneway void)trueRelease {
 	[super release];
 }
-```
+~~~
 
 只有真正执行 `trueRelease` 的时候才会向对象发送 `release` 消息。
 
 因为这个文件覆写了 `release` 方法，所以要在非 ARC 下编译：
 
-```objectivec
+~~~objectivec
 #if __has_feature(objc_arc)
 #error This file must be compiled with MRR. Use -fno-objc-arc flag.
 #endif
-```
+~~~
 
 如果 block 持有了另一个 block 对象，`FBBlockStrongRelationDetector` 也可以将自身 fake 成为一个假的 block 防止在接收到关于 block 释放的消息时发生 crash：
 
-```objectivec
+~~~objectivec
 struct _block_byref_block;
 @interface FBBlockStrongRelationDetector : NSObject {
 	// __block fakery
@@ -267,11 +267,11 @@ struct _block_byref_block;
 	void (*byref_dispose)(struct _block_byref_block *);
 	void *captured[16];
 }
-```
+~~~
 
 该类的实例在初始化时，会设置 `forwarding`、`byref_keep` 和 `byref_dispose`，后两个方法的实现都是空的，只是为了防止 crash：
 
-```objectivec
+~~~objectivec
 + (id)alloc {
 	FBBlockStrongRelationDetector *obj = [super alloc];
 
@@ -285,13 +285,13 @@ struct _block_byref_block;
 
 static void byref_keep_nop(struct _block_byref_block *dst, struct _block_byref_block *src) {}
 static void byref_dispose_nop(struct _block_byref_block *param) {}
-```
+~~~
 
 ### 获取 block 强引用的对象
 
 到现在为止，获取 block 强引用对象所需要的知识都介绍完了，接下来可以对私有方法 `_GetBlockStrongLayout` 进行分析了：
 
-```objectivec
+~~~objectivec
 static NSIndexSet *_GetBlockStrongLayout(void *block) {
 	struct BlockLiteral *blockLiteral = block;
 
@@ -302,12 +302,12 @@ static NSIndexSet *_GetBlockStrongLayout(void *block) {
 
 	...
 }
-```
+~~~
 
 + 如果 block 有 Cpp 的构造器/析构器，说明它**持有的对象很有可能没有按照指针大小对齐**，我们很难检测到所有的对象
 + 如果 block 没有 `dispose` 函数，说明它无法 `retain` 对象，也就是说我们也没有办法测试其强引用了哪些对象
 
-```objectivec
+~~~objectivec
 static NSIndexSet *_GetBlockStrongLayout(void *block) {
 	...
 	void (*dispose_helper)(void *src) = blockLiteral->descriptor->dispose_helper;
@@ -327,14 +327,14 @@ static NSIndexSet *_GetBlockStrongLayout(void *block) {
 	}
 	...
 }
-```
+~~~
 
 1. 从 `BlockDescriptor` 取出 `dispose_helper` 以及 `size`（block 持有的所有对象的大小）
 2. 通过 `(blockLiteral->descriptor->size + ptrSize - 1) / ptrSize` 向上取整，获取 block 持有的指针的数量
 3. 初始化两个包含 `elements` 个 `FBBlockStrongRelationDetector` 实例的数组，其中第一个数组用于传入 `dispose_helper`，第二个数组用于检测 `_strong` 是否被标记为 `YES`
 4. 在自动释放池中执行 `dispose_helper(obj)`，释放 block 持有的对象
 
-```objectivec
+~~~objectivec
 static NSIndexSet *_GetBlockStrongLayout(void *block) {
 	...
 	NSMutableIndexSet *layout = [NSMutableIndexSet indexSet];
@@ -350,13 +350,13 @@ static NSIndexSet *_GetBlockStrongLayout(void *block) {
 
 	return layout;
 }
-```
+~~~
 
 因为 `dispose_helper` 只会调用 `release` 方法，但是这并不会导致我们的 `FBBlockStrongRelationDetector` 实例被释放掉，反而会标记 `_string` 属性，在这里我们只需要判断这个属性的真假，将对应索引加入数组，最后再调用 `trueRelease` 真正的释放对象。
 
 我们可以执行下面的代码，分析其工作过程：
 
-```objectivec
+~~~objectivec
 NSObject *firstObject = [NSObject new];
 __attribute__((objc_precise_lifetime)) NSObject *object = [NSObject new];
 __weak NSObject *secondObject = object;
@@ -371,7 +371,7 @@ __unused void (^block)() = ^{
 FBRetainCycleDetector *detector = [FBRetainCycleDetector new];
 [detector addCandidate:block];
 [detector findRetainCycles];
-```
+~~~
 
 在 `dispose_helper` 调用之前：
 

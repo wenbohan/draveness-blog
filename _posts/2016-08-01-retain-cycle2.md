@@ -19,7 +19,7 @@ tags: iOS
 
 我们会以 `XXObject` 为例演示 `- allRetainedObjects` 方法的调用过程：
 
-```objectivec
+~~~objectivec
 #import <Foundation/Foundation.h>
 
 @interface XXObject : NSObject
@@ -32,30 +32,30 @@ tags: iOS
 @property (nonatomic, strong) id sixth;
 
 @end
-```
+~~~
 
 使用 `FBRetainCycleDetector` 的代码如下：
 
-```objectivec
+~~~objectivec
 XXObject *object = [[XXObject alloc] init];
 
 FBRetainCycleDetector *detector = [FBRetainCycleDetector new];
 [detector addCandidate:object];
 __unused NSSet *cycles = [detector findRetainCycles];
-```
+~~~
 
 在 `FBObjectiveCObject` 中，`- allRetainedObjects` 方法只是调用了 `- _unfilteredRetainedObjects`，然后进行了过滤，文章主要会对 `- _unfilteredRetainedObjects` 的实现进行分析：
 
-```objectivec
+~~~objectivec
 - (NSSet *)allRetainedObjects {
 	NSArray *unfiltered = [self _unfilteredRetainedObjects];
 	return [self filterObjects:unfiltered];
 }
-```
+~~~
 
 方法 `- _unfilteredRetainedObjects` 的实现代码还是比较多的，这里会将代码分成几个部分，首先是最重要的部分：如何得到对象持有的强引用：
 
-```objectivec
+~~~objectivec
 - (NSArray *)_unfilteredRetainedObjects
 	NSArray *strongIvars = FBGetObjectStrongReferences(self.object, self.configuration.layoutCache);
 
@@ -78,11 +78,11 @@ __unused NSSet *cycles = [detector findRetainCycles];
 
 	...
 }
-```
+~~~
 
 获取强引用是通过 `FBGetObjectStrongReferences` 这一函数：
 
-```objectivec
+~~~objectivec
 NSArray<id<FBObjectReference>> *FBGetObjectStrongReferences(id obj,
 															NSMutableDictionary<Class, NSArray<id<FBObjectReference>> *> *layoutCache) {
 	NSMutableArray<id<FBObjectReference>> *array = [NSMutableArray new];
@@ -111,11 +111,11 @@ NSArray<id<FBObjectReference>> *FBGetObjectStrongReferences(id obj,
 
 	return [array copy];
 }
-```
+~~~
 
 上面代码的核心部分是执行 `FBGetStrongReferencesForClass` 返回 `currentClass` 中的强引用，只是在这里我们递归地查找了所有父类的指针，并且加入了缓存以加速查找强引用的过程，接下来就是从对象的结构中获取强引用的过程了：
 
-```objectivec
+~~~objectivec
 static NSArray<id<FBObjectReference>> *FBGetStrongReferencesForClass(Class aCls) {
 	NSArray<id<FBObjectReference>> *ivars = [FBGetClassReferences(aCls) filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(id evaluatedObject, NSDictionary *bindings) {
 		if ([evaluatedObject isKindOfClass:[FBIvarReference class]]) {
@@ -142,7 +142,7 @@ static NSArray<id<FBObjectReference>> *FBGetStrongReferencesForClass(Class aCls)
 
 	return filteredIvars;
 }
-```
+~~~
 
 该方法的实现大约有三个部分：
 
@@ -156,7 +156,7 @@ static NSArray<id<FBObjectReference>> *FBGetStrongReferencesForClass(Class aCls)
 
 > 这里省略对结构体属性的处理，因为太过复杂，并且涉及大量的C++ 代码，有兴趣的读者可以查看 `FBGetReferencesForObjectsInStructEncoding` 方法的实现。
 
-```objectivec
+~~~objectivec
 NSArray<id<FBObjectReference>> *FBGetClassReferences(Class aCls) {
 	NSMutableArray<id<FBObjectReference>> *result = [NSMutableArray new];
 
@@ -172,11 +172,11 @@ NSArray<id<FBObjectReference>> *FBGetClassReferences(Class aCls) {
 
 	return [result copy];
 }
-```
+~~~
 
 上述实现还是非常直接的，遍历 `ivars` 数组，使用 `FBIvarReference` 将其包装起来然后加入 `result` 中，其中的类 `FBIvarReference` 仅仅起到了一个包装的作用，将 Ivar 中保存的各种属性全部保存起来：
 
-```objectivec
+~~~objectivec
 typedef NS_ENUM(NSUInteger, FBType) {
   FBObjectType,
   FBBlockType,
@@ -195,11 +195,11 @@ typedef NS_ENUM(NSUInteger, FBType) {
 - (nonnull instancetype)initWithIvar:(nonnull Ivar)ivar;
 
 @end
-```
+~~~
 
 包括属性的名称、类型、偏移量以及索引，类型是通过[类型编码](https://developer.apple.com/library/mac/documentation/Cocoa/Conceptual/ObjCRuntimeGuide/Articles/ocrtTypeEncodings.html)来获取的，在 `FBIvarReference` 的实例初始化时，会通过私有方法 `- _convertEncodingToType:` 将类型编码转换为枚举类型：
 
-```objectivec
+~~~objectivec
 - (FBType)_convertEncodingToType:(const char *)typeEncoding {
 	if (typeEncoding[0] == '{') return FBStructType;
 
@@ -210,7 +210,7 @@ typedef NS_ENUM(NSUInteger, FBType) {
 
 	return FBUnknownType;
 }
-```
+~~~
 
 当代码即将从 `FBGetClassReferences` 方法中返回时，使用 lldb 打印 `result` 中的所有元素：
 
@@ -218,7 +218,7 @@ typedef NS_ENUM(NSUInteger, FBType) {
 
 上述方法成功地从 `XXObject` 类中获得了正确的属性数组，不过这些数组中不止包含了强引用，还有被 `weak` 标记的弱引用：
 
-```objectivec
+~~~objectivec
 <__NSArrayM 0x7fdac0f31860>(
 	[_first,  index: 1],
 	[_second, index: 2],
@@ -227,7 +227,7 @@ typedef NS_ENUM(NSUInteger, FBType) {
 	[_fifth,  index: 5],
 	[_sixth,  index: 6]
 )
-```
+~~~
 
 ### 获取 Ivar Layout
 
@@ -239,14 +239,14 @@ typedef NS_ENUM(NSUInteger, FBType) {
 
 在 ObjC 运行时中的 `class_getIvarLayout` 可以获取某一个类的 Ivar Layout，而 `XXObject` 的 Ivar Layout 是什么样的呢？
 
-```c
+~~~c
 (lldb) po fullLayout
 "\x01\x12\x11"
-```
+~~~
 
 Ivar Layout 就是一系列的字符，每两个一组，比如 `\xmn`，每一组 Ivar Layout 中第一位表示有 `m` 个非强属性，第二位表示接下来有 `n` 个强属性；如果没有明白，我们以 `XXObject` 为例演示一下：
 
-```objectivec
+~~~objectivec
 @interface XXObject : NSObject
 
 @property (nonatomic, strong) id first;
@@ -257,7 +257,7 @@ Ivar Layout 就是一系列的字符，每两个一组，比如 `\xmn`，每一�
 @property (nonatomic, strong) id sixth;
 
 @end
-```
+~~~
 
 + 第一组的 `\x01` 表示有 0 个非强属性，然后有 1 个强属性 `first`
 + 第二组的 `\x12` 表示有 1 个非强属性 `second`，然后有 2 个强属性 `third` `forth`
@@ -265,7 +265,7 @@ Ivar Layout 就是一系列的字符，每两个一组，比如 `\xmn`，每一�
 
 在对 Ivar Layout 有一定了解之后，我们可以继续对 `FBGetStrongReferencesForClass` 分析了，下面要做的就是使用 Ivar Layout 提供的信息过滤其中的所有非强引用，而这就需要两个方法的帮助，首先需要 `FBGetMinimumIvarIndex` 方法获取变量索引的最小值：
 
-```objectivec
+~~~objectivec
 static NSUInteger FBGetMinimumIvarIndex(__unsafe_unretained Class aCls) {
 	NSUInteger minimumIndex = 1;
 	unsigned int count;
@@ -281,11 +281,11 @@ static NSUInteger FBGetMinimumIvarIndex(__unsafe_unretained Class aCls) {
 
 	return minimumIndex;
 }
-```
+~~~
 
 然后执行 `FBGetLayoutAsIndexesForDescription(minimumIndex, fullLayout)` 获取所有强引用的 `NSRange`：
 
-```objectivec
+~~~objectivec
 static NSIndexSet *FBGetLayoutAsIndexesForDescription(NSUInteger minimumIndex, const uint8_t *layoutDescription) {
 	NSMutableIndexSet *interestingIndexes = [NSMutableIndexSet new];
 	NSUInteger currentIndex = minimumIndex;
@@ -303,7 +303,7 @@ static NSIndexSet *FBGetLayoutAsIndexesForDescription(NSUInteger minimumIndex, c
 
 	return interestingIndexes;
 }
-```
+~~~
 
 因为高位表示非强引用的数量，所以我们要加上 `upperNibble`，然后 `NSMakeRange(currentIndex, lowerNibble)` 就是强引用的范围；略过 `lowerNibble` 长度的索引，移动 `layoutDescription` 指针，直到所有的 `NSRange` 都加入到了 `interestingIndexes` 这一集合中，就可以返回了。
 
@@ -311,13 +311,13 @@ static NSIndexSet *FBGetLayoutAsIndexesForDescription(NSUInteger minimumIndex, c
 
 在上一阶段由于已经获取了强引用的范围，在这里我们直接使用 `NSPredicate` 谓词来进行过滤就可以了：
 
-```objectivec
+~~~objectivec
 NSArray<id<FBObjectReference>> *filteredIvars =
 [ivars filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(id<FBObjectReference> evaluatedObject,
 																		 NSDictionary *bindings) {
 	return [parsedLayout containsIndex:[evaluatedObject indexInIvarLayout]];
 }]];
-```
+~~~
 
 ![filtered-ivars](http://img.draveness.me/2016-08-01-filtered-ivars.png)
 
@@ -325,7 +325,7 @@ NSArray<id<FBObjectReference>> *filteredIvars =
 
 接下来，我们回到文章开始的 `- _unfilteredRetainedObjects` 方法：
 
-```objectivec
+~~~objectivec
 - (NSSet *)allRetainedObjects {
 	NSArray *strongIvars = FBGetObjectStrongReferences(self.object, self.configuration.layoutCache);
 
@@ -348,11 +348,11 @@ NSArray<id<FBObjectReference>> *filteredIvars =
 
 	...
 }
-```
+~~~
 
 `FBGetObjectStrongReferences` 只是返回 `id<FBObjectReference>` 对象，还需要 `FBWrapObjectGraphElementWithContext` 把它进行包装成 `FBObjectiveCGraphElement`：
 
-```objectivec
+~~~objectivec
 FBObjectiveCGraphElement *FBWrapObjectGraphElementWithContext(id object,
 															  FBObjectGraphConfiguration *configuration,
 															  NSArray<NSString *> *namePath) {
@@ -373,13 +373,13 @@ FBObjectiveCGraphElement *FBWrapObjectGraphElementWithContext(id object,
 		}
 	}
 }
-```
+~~~
 
 最后会把封装好的实例添加到 `retainedObjects` 数组中。
 
 `- _unfilteredRetainedObjects` 同时也要处理集合类，比如数组或者字典，但是如果是无缝桥接的 CF 集合，或者是元类，虽然它们可能遵循 `NSFastEnumeration` 协议，但是在这里并不会对它们进行处理：
 
-```objectivec
+~~~objectivec
 - (NSArray *)_unfilteredRetainedObjects {
 	...
 
@@ -393,11 +393,11 @@ FBObjectiveCGraphElement *FBWrapObjectGraphElementWithContext(id object,
 
 	...
 }
-```
+~~~
 
 在遍历内容时，Mutable 的集合类中的元素可能会改变，所以会重试多次以确保集合类中的所有元素都被获取到了：
 
-```objectivec
+~~~objectivec
 - (NSArray *)_unfilteredRetainedObjects {
 	...
 
@@ -423,13 +423,13 @@ FBObjectiveCGraphElement *FBWrapObjectGraphElementWithContext(id object,
 
 	return retainedObjects;
 }
-```
+~~~
 
 这里将遍历集合中的元素的代码放入了 `@try` 中，如果在遍历时插入了其它元素，就会抛出异常，然后 `continue` 重新遍历集合，最后返回所有持有的对象。
 
 最后的过滤部分会使用 `FBObjectGraphConfiguration` 中的 `filterBlocks` 将不需要加入集合中的元素过滤掉：
 
-```objectivec
+~~~objectivec
 - (NSSet *)filterObjects:(NSArray *)objects {
 	NSMutableSet *filtered = [NSMutableSet new];
 
@@ -450,7 +450,7 @@ FBObjectiveCGraphElement *FBWrapObjectGraphElementWithContext(id object,
 
 	return NO;
 }
-```
+~~~
 
 ## 总结
 

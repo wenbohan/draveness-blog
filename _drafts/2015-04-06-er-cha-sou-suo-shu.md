@@ -18,7 +18,7 @@ permalink: /:title
 
 我们先来实现一下树的数据结构:
 
-```
+~~~
 class Tree
 	attr_accessor :root, :left, :right, :parent, :key
 	def initialize
@@ -28,13 +28,13 @@ class Tree
 		@key = nil
 	end
 end
-```
+~~~
 
 ##Traverse
 
 二叉搜索树性质允许我们通过一个简单的递归算法来按序输出二叉搜索树中的所有关键字, 这种算法称为**中序遍历**, 这样的命名是因为输出的 root 的关键字位于其 left child 和 right child 之间. 类似地, 我们有**先序遍历**和**后序遍历**.
 
-```
+~~~
 def inorder_tree_walk(tree)
 	if tree != nil
 		inorder_tree_walk(tree.left)
@@ -55,7 +55,7 @@ def postorder_tree_walk(tree)
 		postorder_tree_walk(tree.right)
 		puts tree.key
 end
-```
+~~~
 
 遍历一棵 $n$ 个结点的二叉搜索树, 需要耗费 $\Theta(n)$ 的时间, 因为在第一次调用之后, 每个结点还要调用自己两次, 分别是 left 和 right child.
 
@@ -67,7 +67,7 @@ end
 
 查找操作非常的简单, 我们接下来用 Ruby 实现查找操作.
 
-```
+~~~
 def tree_search(tree, key)
 	if tree == nil or key == tree.key
 		return tree
@@ -78,7 +78,7 @@ def tree_search(tree, key)
 		return tree_search(tree.right, key)
 	end
 end
-```
+~~~
 
 这个过程从 root 开始查找, 并沿着树中的一条简单的路径向下进行. 不断与 tree.key 比较, 选择最合适的路径.
 
@@ -88,7 +88,7 @@ end
 
 二叉搜索树的最大关键字和最小关键字的查找十分的简单, 我们这里直接给出 Ruby 的实现代码.
 
-```
+~~~
 def tree_minimum(tree)
 	if tree.left != nil
 		tree_minimum(tree.left)
@@ -104,7 +104,7 @@ def tree_maximum(tree)
 		tree
 	end
 end
-```
+~~~
 
 这两个过程在一棵高度为 $h$ 的树上均能在 $O(h)$ 时间内执行玩, 所遇到的结点均形成了一条从 root 向下的简单路径.
 
@@ -112,7 +112,7 @@ end
 
 给定一棵二叉搜索树中的一个结点, 有时候需要按照中序遍历的次序查找它的后继:
 
-```
+~~~
 def tree_successor(tree)
 	return tree_successor if tree.right != nil
 	parent = tree.parent
@@ -122,7 +122,7 @@ def tree_successor(tree)
 	end
 	parent
 end
-```
+~~~
 
 我们把 `tree_successor` 的伪代码分成两个部分
 
@@ -131,7 +131,7 @@ end
 
 同理, 查找树的 predecessor 的代码如下:
 
-```
+~~~
 def tree_predecessor(tree)
 	return tree_predecessor if tree.left != nil
 	parent = tree.parent
@@ -141,7 +141,7 @@ def tree_predecessor(tree)
 	end
 	parent
 end
-```
+~~~
 
 ##Insert and Delete
 
@@ -151,7 +151,7 @@ end
 
 要将一个新的值 $v$ 插入到一棵二叉搜索树 $T$ 中, 需要调用一下过程 `tree-insert`. 
 
-```
+~~~
 def tree_insert(tree,z)
 	y = nil
 	x = tree
@@ -172,7 +172,7 @@ def tree_insert(tree,z)
 		y.right = z
 	end
 end
-```
+~~~
 
 该过程在高度为 $h$ 的二叉搜索树上的运行时间为 $O(h)$.
 
@@ -191,7 +191,7 @@ end
 为了在二叉搜索树内移动子树, 定义了一个子过程 `tranplant`, 它用另一棵子树替换一棵子树并成为其双亲的子节点.
 
 
-```
+~~~
 def transplant(tree, u, v)
 	if u.parent == nil
 		tree.root = v
@@ -204,11 +204,11 @@ def transplant(tree, u, v)
 		v.parent = u.parent
 	end
 end
-```
+~~~
 
 利用线程的 `transplant` 过程, 下面是从二叉树中删除结点 $z$ 的删除过程.
 
-```
+~~~
 def tree_delete(tree,z)
 	if z.left = nil
 		transplant(tree, z, z.right)
@@ -226,6 +226,6 @@ def tree_delete(tree,z)
 		y.left.parent = y
 	end
 end
-```
+~~~
 
 在一棵高度为 $h$ 的树上, 事项动态集合操作 `INSERT` 和 `DELETE` 的运行时间均为 $O(h)$.

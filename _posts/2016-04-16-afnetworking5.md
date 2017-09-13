@@ -20,13 +20,13 @@ Blog: [Draveness](http://draveness.me)
 
 使用 `AFSecurityPolicy` 时，总共有三种验证服务器是否被信任的方式：
 
-```objectivec
+~~~objectivec
 typedef NS_ENUM(NSUInteger, AFSSLPinningMode) {
     AFSSLPinningModeNone,
     AFSSLPinningModePublicKey,
     AFSSLPinningModeCertificate,
 };
-```
+~~~
 
 + `AFSSLPinningModeNone` 是默认的认证方式，只会在系统的信任的证书列表中对服务端返回的证书进行验证
 + `AFSSLPinningModeCertificate` 需要客户端预先保存服务端的证书
@@ -36,7 +36,7 @@ typedef NS_ENUM(NSUInteger, AFSSLPinningMode) {
 
 在使用 `AFSecurityPolicy` 验证服务端是否受到信任之前，要对其进行初始化，使用初始化方法时，主要目的是设置**验证服务器是否受信任的方式**。
 
-```objectivec
+~~~objectivec
 + (instancetype)policyWithPinningMode:(AFSSLPinningMode)pinningMode {
     return [self policyWithPinningMode:pinningMode withPinnedCertificates:[self defaultPinnedCertificates]];
 }
@@ -49,11 +49,11 @@ typedef NS_ENUM(NSUInteger, AFSSLPinningMode) {
 
     return securityPolicy;
 }
-```
+~~~
 
 这里没有什么地方值得解释的。不过在调用 `pinnedCertificate` 的 setter 方法时，会从全部的证书中**取出公钥**保存到 `pinnedPublicKeys` 属性中。
 
-```objectivec
+~~~objectivec
 - (void)setPinnedCertificates:(NSSet *)pinnedCertificates {
     _pinnedCertificates = pinnedCertificates;
 
@@ -71,7 +71,7 @@ typedef NS_ENUM(NSUInteger, AFSSLPinningMode) {
         self.pinnedPublicKeys = nil;
     }
 }
-```
+~~~
 
 在这里调用了 `AFPublicKeyForCertificate` 对证书进行操作，返回一个公钥。
 
@@ -79,7 +79,7 @@ typedef NS_ENUM(NSUInteger, AFSSLPinningMode) {
 
 对 `serverTrust` 的操作的函数基本上都是 C 的 API，都定义在 `Security` 模块中，先来分析一下在上一节中 `AFPublicKeyForCertificate` 的实现
 
-```objectivec
+~~~objectivec
 static id AFPublicKeyForCertificate(NSData *certificate) {
     id allowedPublicKey = nil;
     SecCertificateRef allowedCertificate;
@@ -120,7 +120,7 @@ _out:
 
     return allowedPublicKey;
 }
-```
+~~~
 
 1. 初始化一坨临时变量
 
@@ -190,7 +190,7 @@ _out:
 
 对它的操作还有 `AFCertificateTrustChainForServerTrust` 和 `AFPublicKeyTrustChainForServerTrust` 但是它们几乎调用了相同的 API。
 
-```objectivec
+~~~objectivec
 static NSArray * AFCertificateTrustChainForServerTrust(SecTrustRef serverTrust) {
     CFIndex certificateCount = SecTrustGetCertificateCount(serverTrust);
     NSMutableArray *trustChain = [NSMutableArray arrayWithCapacity:(NSUInteger)certificateCount];
@@ -202,7 +202,7 @@ static NSArray * AFCertificateTrustChainForServerTrust(SecTrustRef serverTrust) 
 
     return [NSArray arrayWithArray:trustChain];
 }
-```
+~~~
 
 + `SecTrustGetCertificateAtIndex` 获取 `SecTrustRef` 中的证书
 + `SecCertificateCopyData` 从证书中或者 DER 表示的数据
@@ -211,7 +211,7 @@ static NSArray * AFCertificateTrustChainForServerTrust(SecTrustRef serverTrust) 
 
 验证服务端是否守信是通过 `- [AFSecurityPolicy evaluateServerTrust:forDomain:]` 方法进行的。
 
-```objectivec
+~~~objectivec
 - (BOOL)evaluateServerTrust:(SecTrustRef)serverTrust
                   forDomain:(NSString *)domain
 {
@@ -226,7 +226,7 @@ static NSArray * AFCertificateTrustChainForServerTrust(SecTrustRef serverTrust) 
 
     return NO;
 }
-```
+~~~
 
 1. 不能隐式地信任自己签发的证书
 
@@ -326,7 +326,7 @@ static NSArray * AFCertificateTrustChainForServerTrust(SecTrustRef serverTrust) 
 
 在代理协议 `- URLSession:didReceiveChallenge:completionHandler:` 或者 `- URLSession:task:didReceiveChallenge:completionHandler:` 代理方法被调用时会运行这段代码
 
-```objectivec
+~~~objectivec
 if ([challenge.protectionSpace.authenticationMethod isEqualToString:NSURLAuthenticationMethodServerTrust]) {
     if ([self.securityPolicy evaluateServerTrust:challenge.protectionSpace.serverTrust forDomain:challenge.protectionSpace.host]) {
         disposition = NSURLSessionAuthChallengeUseCredential;
@@ -337,7 +337,7 @@ if ([challenge.protectionSpace.authenticationMethod isEqualToString:NSURLAuthent
 } else {
     disposition = NSURLSessionAuthChallengePerformDefaultHandling;
 }
-```
+~~~
 
 `NSURLAuthenticationChallenge` 表示一个认证的挑战，提供了关于这次认证的全部信息。它有一个非常重要的属性 `protectionSpace`，这里保存了需要认证的保护空间, 每一个 `NSURLProtectionSpace` 对象都保存了主机地址，端口和认证方法等重要信息。
 

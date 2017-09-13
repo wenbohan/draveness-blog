@@ -32,7 +32,7 @@ tags: iOS
 
 DKNightVersion 为大多数常用的 `color` 比如说: `backgroundColor` `tintColor` 都添加了以 `night` 开头的夜间模式下的颜色, `nightBackgroundColor` `nightTintColor`.
 
-```objectivec
+~~~objectivec
 - (UIColor *)nightBackgroundColor {
     return objc_getAssociatedObject(self, &nightBackgroundColorKey) ? :self.backgroundColor);
 }
@@ -40,7 +40,7 @@ DKNightVersion 为大多数常用的 `color` 比如说: `backgroundColor` `tintC
 - (void)setNightBackgroundColor:(UIColor *)nightBackgroundColor {
     objc_setAssociatedObject(self, &nightBackgroundColorKey, nightBackgroundColor, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
-```
+~~~
 
 我们创建这个属性以保存夜间模式下的颜色, 这样当应用的主题切换到夜间模式时, 将 `nightColor` 属性存储的颜色赋值给对应的 `color`, 但是这会有一个问题. 当应用重新切换回正常模式时, 我们失去了原有正常模式的 `color`.
 
@@ -48,7 +48,7 @@ DKNightVersion 为大多数常用的 `color` 比如说: `backgroundColor` `tintC
 
 为了解决这一问题, 我们为 UIKit 控件添加了另一个属性 `normalColor` 来保存正常模式下的颜色.
 
-```objectivec
+~~~objectivec
 - (UIColor *)normalBackgroundColor {
     return objc_getAssociatedObject(self, &normalBackgroundColorKey);
 }
@@ -56,16 +56,16 @@ DKNightVersion 为大多数常用的 `color` 比如说: `backgroundColor` `tintC
 - (void)setNormalBackgroundColor:(UIColor *)normalBackgroundColor {
     objc_setAssociatedObject(self, &normalBackgroundColorKey, normalBackgroundColor, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
-```
+~~~
 
 但是保存这个颜色的时机是非常重要的, 在最开始的时候, 我的选择是直接覆写 `setter` 方法, 在保存颜色之前存储 `normalColor`.
 
-```objectivec
+~~~objectivec
 - (void)setBackgroundColor:(UIColor *)backgroundColor {
     self.normalBackgroundColor = backgroundColor;
     _backgroundColor = backgroundColor;
 }
-```
+~~~
 
 然而这种看似可以运行的 `setter` 其实会导致视图不会被着色, 设置 `color` 包括正常的颜色都不会有任何的反应, 反而视图的背景颜色一片漆黑.
 
@@ -77,14 +77,14 @@ DKNightVersion 为大多数常用的 `color` 比如说: `backgroundColor` `tintC
 
 这是要与 `setter` 调剂的钩子方法:
 
-```objectivec
+~~~objectivec
 - (void)hook_setBackgroundColor:(UIColor*)backgroundColor {
     if ([DKNightVersionManager currentThemeVersion] == DKThemeVersionNormal) {
         [self setNormalBackgroundColor:backgroundColor];
     }
     [self hook_setBackgroundColor:backgroundColor];
 }
-```
+~~~
 
 如果当前是 `normal` 模式, 就会存储 `color`, 如果不是就会直接赋值, 如果你看不懂为什么这里好像会造成无限递归, 请看[这里](http://nshipster.com/method-swizzling/), 详细的解释了方法调剂是如何使用的.
 
@@ -96,7 +96,7 @@ DKNightVersion 为大多数常用的 `color` 比如说: `backgroundColor` `tintC
 
 当调用 `DKNightVersionManager` 的类方法 `nightFalling` 或者 `dawnComing` 时, 我们首先会获取全局的 `UIWindow`, 然后通过递归调用 `changeColor` 方法, 使能够响应 `changeColor` 方法的视图改变颜色.
 
-```objectivec
+~~~objectivec
 - (void)changeColor:(id <DKNightVersionChangeColorProtocol>)object {
     if ([object respondsToSelector:@selector(changeColor)]) {
         [object changeColor];
@@ -116,18 +116,18 @@ DKNightVersion 为大多数常用的 `color` 比如说: `backgroundColor` `tintC
         }
     }
 }
-```
+~~~
 
 因为我在这个类中并没有引入 `category`, 编译器不知道 `id` 类型具有这两个方法. 所以我声明了一个协议, 使 `changeColor` 中的方法来满足两个方法 `changeColor` 和 `subViews`. 不让编译器提示错误.
 
-```objectivec
+~~~objectivec
 @protocol DKNightVersionChangeColorProtocol <NSObject>
 
 - (void)changeColor;
 - (NSArray *)subviews;
 
 @end
-```
+~~~
 
 然后让所有的 UIKit 控件遵循这个协议就可以了, 当然我们也可以不显式的遵循这个协议, 只要它能够响应这两个方法也是可以的.
 
@@ -137,7 +137,7 @@ DKNightVersion 为大多数常用的 `color` 比如说: `backgroundColor` `tintC
 
 但是因为我们对每种 `color` 只在父类中实现一次, 这样使得子类能够继承父类的实现, 但是同样**不想让 UIKit 系子类继承父类的默认颜色**.
 
-```objectivec
+~~~objectivec
 - (UIColor *)defaultNightBackgroundColor {
     BOOL notUIKitSubclass = [self isKindOfClass:[UIView class]] && ![NSStringFromClass(self.class) hasPrefix:@"UI"];
     if ([self isMemberOfClass:[UIView class]] || notUIKitSubclass) {
@@ -147,13 +147,13 @@ DKNightVersion 为大多数常用的 `color` 比如说: `backgroundColor` `tintC
         return resultColor;
     }
 }
-```
+~~~
 
 通过使用 `isMemberOfClass:` 方法来判断**实例是不是当前类的实例, 而不是该类子类的实例.** 然后才会返回默认的颜色. 但是非 UIKit 中的子类是可以继承这个特性的, 所以使用这段代码来判断该实例是否是非 UIKit 的子类:
 
-```objectivec
+~~~objectivec
 [self isKindOfClass:[UIView class]] && ![NSStringFromClass(self.class) hasPrefix:@"UI"]
-```
+~~~
 
 我们通过 `NSStringFromClass(self.class) hasPrefix:@"UI"` 巧妙地达到这一目的.
 

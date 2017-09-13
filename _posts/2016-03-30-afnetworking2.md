@@ -27,7 +27,7 @@ Blog: [Draveness](http://draveness.me)
 
 在使用 `AFURLSessionManager` 时，第一件要做的事情一定是初始化：
 
-```objectivec
+~~~objectivec
 - (instancetype)initWithSessionConfiguration:(NSURLSessionConfiguration *)configuration {
     self = [super init];
     if (!self) {
@@ -60,7 +60,7 @@ Blog: [Draveness](http://draveness.me)
 
     return self;
 }
-```
+~~~
 
 在初始化方法中，需要完成初始化一些自己持有的实例：
 
@@ -73,7 +73,7 @@ Blog: [Draveness](http://draveness.me)
 
 接下来，在获得了 `AFURLSessionManager` 的实例之后，我们可以通过以下方法创建 `NSURLSessionDataTask` 的实例：
 
-```objectivec
+~~~objectivec
 - (NSURLSessionDataTask *)dataTaskWithRequest:(NSURLRequest *)request
                                uploadProgress:(nullable void (^)(NSProgress *uploadProgress)) uploadProgressBlock
                              downloadProgress:(nullable void (^)(NSProgress *downloadProgress)) downloadProgressBlock
@@ -93,13 +93,13 @@ Blog: [Draveness](http://draveness.me)
 
 ...
 
-```
+~~~
 
 这里省略了一些返回 `NSURLSessionTask` 的方法，因为这些接口的形式都是差不多的。
 
 我们将以 `- [AFURLSessionManager dataTaskWithRequest:uploadProgress:downloadProgress:completionHandler:]` 方法的实现为例，分析它是如何实例化并返回一个 `NSURLSessionTask` 的实例的：
 
-```objectivec
+~~~objectivec
 - (NSURLSessionDataTask *)dataTaskWithRequest:(NSURLRequest *)request
                                uploadProgress:(nullable void (^)(NSProgress *uploadProgress)) uploadProgressBlock
                              downloadProgress:(nullable void (^)(NSProgress *downloadProgress)) downloadProgressBlock
@@ -114,7 +114,7 @@ Blog: [Draveness](http://draveness.me)
 
     return dataTask;
 }
-```
+~~~
 
 > `url_session_manager_create_task_safely` 的调用是因为苹果框架中的一个 bug [#2093](https://github.com/AFNetworking/AFNetworking/issues/2093)，如果有兴趣可以看一下，在这里就不说明了
 
@@ -122,7 +122,7 @@ Blog: [Draveness](http://draveness.me)
 2. 调用 `- [AFURLSessionManager addDelegateForDataTask:uploadProgress:downloadProgress:completionHandler:]` 方法返回一个 `AFURLSessionManagerTaskDelegate` 对象
 3. 将 `completionHandler` `uploadProgressBlock` 和 `downloadProgressBlock` 传入该对象并在相应事件发生时进行回调
 
-```objectivec
+~~~objectivec
 - (void)addDelegateForDataTask:(NSURLSessionDataTask *)dataTask
                 uploadProgress:(nullable void (^)(NSProgress *uploadProgress)) uploadProgressBlock
               downloadProgress:(nullable void (^)(NSProgress *downloadProgress)) downloadProgressBlock
@@ -138,11 +138,11 @@ Blog: [Draveness](http://draveness.me)
     delegate.uploadProgressBlock = uploadProgressBlock;
     delegate.downloadProgressBlock = downloadProgressBlock;
 }
-```
+~~~
 
 在这个方法中同时调用了另一个方法 `- [AFURLSessionManager setDelegate:forTask:]` 来设置代理：
 
-```objectivec
+~~~objectivec
 - (void)setDelegate:(AFURLSessionManagerTaskDelegate *)delegate
             forTask:(NSURLSessionTask *)task
 {
@@ -155,7 +155,7 @@ Blog: [Draveness](http://draveness.me)
     [self addNotificationObserverForTask:task];
     [self.lock unlock];
 }
-```
+~~~
 
 正如上面所提到的，`AFNRUSessionManager` 就是通过字典 `mutableTaskDelegatesKeyedByTaskIdentifier` 来存储并管理每一个 `NSURLSessionTask`，它以 `taskIdentifier` 为键存储 task。
 
@@ -174,25 +174,25 @@ Blog: [Draveness](http://draveness.me)
 
 它在初始化方法 `- [AFURLSessionManager initWithSessionConfiguration:]` 将 `NSURLSession` 的代理指向 `self`，然后**实现这些方法**，提供更简洁的 block 的接口：
 
-```objectivec
+~~~objectivec
 - (void)setSessionDidBecomeInvalidBlock:(nullable void (^)(NSURLSession *session, NSError *error))block;
 - (void)setSessionDidReceiveAuthenticationChallengeBlock:(nullable NSURLSessionAuthChallengeDisposition (^)(NSURLSession *session, NSURLAuthenticationChallenge *challenge, NSURLCredential * _Nullable __autoreleasing * _Nullable credential))block;
 ...
-```
+~~~
 
 它为所有的代理协议都提供了对应的 block 接口，方法实现的思路都是相似的，我们以 `- [AFNRLSessionManager setSessionDidBecomeInvalidBlock:]` 为例。
 
 首先调用 setter 方法，将 block 存入 `sessionDidBecomeInvalid` 属性中：
 
-```objectivec
+~~~objectivec
 - (void)setSessionDidBecomeInvalidBlock:(void (^)(NSURLSession *session, NSError *error))block {
     self.sessionDidBecomeInvalid = block;
 }
-```
+~~~
 
 当代理方法调用时，如果存在对应的 block，会执行对应的 block：
 
-```objectivec
+~~~objectivec
 - (void)URLSession:(NSURLSession *)session
 didBecomeInvalidWithError:(NSError *)error
 {
@@ -202,7 +202,7 @@ didBecomeInvalidWithError:(NSError *)error
 
     [[NSNotificationCenter defaultCenter] postNotificationName:AFURLSessionDidInvalidateNotification object:session];
 }
-```
+~~~
 
 其他相似的接口实现也都差不多，这里直接跳过了。
 
@@ -212,7 +212,7 @@ didBecomeInvalidWithError:(NSError *)error
 
 <a id="setupProgressForTask"></a>我们首先分析一下 `AFURLSessionManagerTaskDelegate` 是如何对进度进行跟踪的：
 
-```objectivec
+~~~objectivec
 - (void)setupProgressForTask:(NSURLSessionTask *)task {
 
 	#1：设置在上传进度或者下载进度状态改变时的回调
@@ -220,11 +220,11 @@ didBecomeInvalidWithError:(NSError *)error
 	#2：KVO
 
 }
-```
+~~~
 
 该方法的实现有两个部分，一部分是对代理持有的两个属性 `uploadProgress` 和 `downloadProgress` 设置回调
 
-```objectivec
+~~~objectivec
 __weak __typeof__(task) weakTask = task;
 
 self.uploadProgress.totalUnitCount = task.countOfBytesExpectedToSend;
@@ -244,7 +244,7 @@ if ([self.uploadProgress respondsToSelector:@selector(setResumingHandler:)]) {
        [strongTask resume];
    }];
 }
-```
+~~~
 
 这里只有对 `uploadProgress` 设置回调的代码，设置 `downloadProgress` 与这里完全相同
 
@@ -252,7 +252,7 @@ if ([self.uploadProgress respondsToSelector:@selector(setResumingHandler:)]) {
 
 第二部分是对 task 和 `NSProgress` 属性进行键值观测：
 
-```objectivec
+~~~objectivec
 [task addObserver:self
       forKeyPath:NSStringFromSelector(@selector(countOfBytesReceived))
          options:NSKeyValueObservingOptionNew
@@ -279,11 +279,11 @@ if ([self.uploadProgress respondsToSelector:@selector(setResumingHandler:)]) {
                      forKeyPath:NSStringFromSelector(@selector(fractionCompleted))
                         options:NSKeyValueObservingOptionNew
                         context:NULL];
-```
+~~~
 
 在 `observeValueForKeypath:ofObject:change:context:` 方法中改变进度，并调用 block
 
-```objectivec
+~~~objectivec
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSString *,id> *)change context:(void *)context {
     if ([object isKindOfClass:[NSURLSessionTask class]]) {
         if ([keyPath isEqualToString:NSStringFromSelector(@selector(countOfBytesReceived))]) {
@@ -307,7 +307,7 @@ if ([self.uploadProgress respondsToSelector:@selector(setResumingHandler:)]) {
         }
     }
 }
-```
+~~~
 
 对象的某些属性改变时更新 `NSProgress` 对象或使用 block 传递 `NSProgress` 对象 `self.uploadProgressBlock(object)`。
 
@@ -318,7 +318,7 @@ if ([self.uploadProgress respondsToSelector:@selector(setResumingHandler:)]) {
 1. 调用传入的 `completionHander` block
 2. 发出 `AFNetworkingTaskDidCompleteNotification` 通知
 
-```objectivec
+~~~objectivec
 - (void)URLSession:(__unused NSURLSession *)session
               task:(NSURLSessionTask *)task
 didCompleteWithError:(NSError *)error
@@ -331,11 +331,11 @@ didCompleteWithError:(NSError *)error
 		#3：调用 `completionHandler`
     }
 }
-```
+~~~
 
 这是整个代理方法的骨架，先看一下最简单的第一部分代码：
 
-```objectivec
+~~~objectivec
 __block NSMutableDictionary *userInfo = [NSMutableDictionary dictionary];
 userInfo[AFNetworkingTaskDidCompleteResponseSerializerKey] = manager.responseSerializer;
 
@@ -352,11 +352,11 @@ if (self.downloadFileURL) {
 } else if (data) {
    userInfo[AFNetworkingTaskDidCompleteResponseDataKey] = data;
 }
-```
+~~~
 
 这部分代码从 `mutableData` 中取出了数据，设置了 `userInfo`。
 
-```objectivec
+~~~objectivec
 userInfo[AFNetworkingTaskDidCompleteErrorKey] = error;
 
 dispatch_group_async(manager.completionGroup ?: url_session_manager_completion_group(), manager.completionQueue ?: dispatch_get_main_queue(), ^{
@@ -368,13 +368,13 @@ dispatch_group_async(manager.completionGroup ?: url_session_manager_completion_g
         [[NSNotificationCenter defaultCenter] postNotificationName:AFNetworkingTaskDidCompleteNotification object:task userInfo:userInfo];
     });
 });
-```
+~~~
 
 如果当前 `manager` 持有 `completionGroup` 或者 `completionQueue` 就使用它们。否则会创建一个 `dispatch_group_t` 并在主线程中调用 `completionHandler` 并发送通知(在主线程中)。
 
 如果在执行当前 task 时没有遇到错误，那么先**对数据进行序列化**，然后同样调用 block 并发送通知。
 
-```objectivec
+~~~objectivec
 dispatch_async(url_session_manager_processing_queue(), ^{
     NSError *serializationError = nil;
     responseObject = [manager.responseSerializer responseObjectForResponse:task.response data:data error:&serializationError];
@@ -401,13 +401,13 @@ dispatch_async(url_session_manager_processing_queue(), ^{
         });
     });
 });
-```
+~~~
 
 ### 代理方法 `URLSession:dataTask:didReceiveData:` 和 `- URLSession:downloadTask:didFinishDownloadingToURL:`
 
 这两个代理方法分别会在收到数据或者完成下载对应文件时调用，作用分别是为 `mutableData` 追加数据和处理下载的文件：
 
-```objectivec
+~~~objectivec
 - (void)URLSession:(__unused NSURLSession *)session
           dataTask:(__unused NSURLSessionDataTask *)dataTask
     didReceiveData:(NSData *)data
@@ -433,13 +433,13 @@ didFinishDownloadingToURL:(NSURL *)location
         }
     }
 }
-```
+~~~
 
 ## <a id="_AFURLSessionTaskSwizzling"></a>使用 `_AFURLSessionTaskSwizzling` 调剂方法
 
 `_AFURLSessionTaskSwizzling` 的唯一功能就是修改 `NSURLSessionTask` 的 `resume` 和 `suspend` 方法，使用下面的方法替换原有的实现
 
-```objectivec
+~~~objectivec
 - (void)af_resume {
     NSAssert([self respondsToSelector:@selector(state)], @"Does not respond to state");
     NSURLSessionTaskState state = [self state];
@@ -459,7 +459,7 @@ didFinishDownloadingToURL:(NSURL *)location
         [[NSNotificationCenter defaultCenter] postNotificationName:AFNSURLSessionTaskDidSuspendNotification object:self];
     }
 }
-```
+~~~
 
 这样做的目的是为了在方法 `resume` 或者 `suspend` 被调用时发出通知。
 
@@ -467,7 +467,7 @@ didFinishDownloadingToURL:(NSURL *)location
 
 > `load` 方法只会在整个文件被引入时调用一次
 
-```objectivec
+~~~objectivec
 + (void)load {
     if (NSClassFromString(@"NSURLSessionTask")) {
         NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration ephemeralSessionConfiguration];
@@ -494,7 +494,7 @@ didFinishDownloadingToURL:(NSURL *)location
         [session finishTasksAndInvalidate];
     }
 }
-```
+~~~
 
 1. 首先用 `NSClassFromString(@"NSURLSessionTask")` 判断当前部署的 iOS 版本是否含有类 `NSURLSessionTask`
 2. 因为 iOS7 和 iOS8 上对于 `NSURLSessionTask` 的实现不同，所以会通过 `- [NSURLSession dataTaskWithURL:]` 方法返回一个 `NSURLSessionTask` 实例
@@ -517,7 +517,7 @@ didFinishDownloadingToURL:(NSURL *)location
 
 在 API 调用上，后两者都调用了 `- [AFSecurityPolicy evaluateServerTrust:forDomain:]` 方法来判断**当前服务器是否被信任**，我们会在接下来的文章中具体介绍这个方法的实现的作用。
 
-```objectivec
+~~~objectivec
 - (void)URLSession:(NSURLSession *)session
               task:(NSURLSessionTask *)task
 didReceiveChallenge:(NSURLAuthenticationChallenge *)challenge
@@ -545,7 +545,7 @@ didReceiveChallenge:(NSURLAuthenticationChallenge *)challenge
         completionHandler(disposition, credential);
     }
 }
-```
+~~~
 
 如果没有传入 `taskDidReceiveAuthenticationChallenge` block，只有在上述方法返回 `YES` 时，才会获得认证凭证 `credential`。
 

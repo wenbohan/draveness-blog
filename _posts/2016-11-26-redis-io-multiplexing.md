@@ -64,7 +64,7 @@ I/O 多路复用模块封装了底层的 `select`、`epoll`、`avport` 以及 `k
 
 同时，因为各个函数所需要的参数不同，我们在每一个子模块内部通过一个 `aeApiState` 来存储需要的上下文信息：
 
-```c
+~~~c
 // select
 typedef struct aeApiState {
     fd_set rfds, wfds;
@@ -76,7 +76,7 @@ typedef struct aeApiState {
     int epfd;
     struct epoll_event *events;
 } aeApiState;
-```
+~~~
 
 这些上下文信息会存储在 `eventLoop` 的 `void *state` 中，不会暴露到上层，只在当前子模块中使用。
 
@@ -86,7 +86,7 @@ typedef struct aeApiState {
 
 在介绍 I/O 多路复用模块如何对 `select` 函数封装之前，先来看一下 `select` 函数使用的大致流程：
 
-```c
+~~~c
 int fd = /* file descriptor */
 
 fd_set rfds;
@@ -99,7 +99,7 @@ for ( ; ; ) {
         /* file descriptor `fd` becomes readable */
     }
 }
-```
+~~~
 
 1. 初始化一个可读的 `fd_set` 集合，保存需要监控可读性的 FD；
 2. 使用 `FD_SET` 将 `fd` 加入 `rfds`；
@@ -108,7 +108,7 @@ for ( ; ; ) {
 
 而在 Redis 的 `ae_select` 文件中代码的组织顺序也是差不多的，首先在 `aeApiCreate` 函数中初始化 `rfds` 和 `wfds`：
 
-```c
+~~~c
 static int aeApiCreate(aeEventLoop *eventLoop) {
     aeApiState *state = zmalloc(sizeof(aeApiState));
     if (!state) return -1;
@@ -117,22 +117,22 @@ static int aeApiCreate(aeEventLoop *eventLoop) {
     eventLoop->apidata = state;
     return 0;
 }
-```
+~~~
 
 而 `aeApiAddEvent` 和 `aeApiDelEvent` 会通过 `FD_SET` 和 `FD_CLR` 修改 `fd_set` 中对应 FD 的标志位：
 
-```c
+~~~c
 static int aeApiAddEvent(aeEventLoop *eventLoop, int fd, int mask) {
     aeApiState *state = eventLoop->apidata;
     if (mask & AE_READABLE) FD_SET(fd,&state->rfds);
     if (mask & AE_WRITABLE) FD_SET(fd,&state->wfds);
     return 0;
 }
-```
+~~~
 
 整个 `ae_select` 子模块中最重要的函数就是 `aeApiPoll`，它是实际调用 `select` 函数的部分，其作用就是在 I/O 多路复用函数返回时，将对应的 FD 加入 `aeEventLoop` 的 `fired` 数组中，并返回事件的个数：
 
-```c
+~~~c
 static int aeApiPoll(aeEventLoop *eventLoop, struct timeval *tvp) {
     aeApiState *state = eventLoop->apidata;
     int retval, j, numevents = 0;
@@ -159,13 +159,13 @@ static int aeApiPoll(aeEventLoop *eventLoop, struct timeval *tvp) {
     }
     return numevents;
 }
-```
+~~~
 
 ### 封装 epoll 函数
 
 Redis 对 `epoll` 的封装其实也是类似的，使用 `epoll_create` 创建 `epoll` 中使用的 `epfd`：
 
-```c
+~~~c
 static int aeApiCreate(aeEventLoop *eventLoop) {
     aeApiState *state = zmalloc(sizeof(aeApiState));
 
@@ -184,11 +184,11 @@ static int aeApiCreate(aeEventLoop *eventLoop) {
     eventLoop->apidata = state;
     return 0;
 }
-```
+~~~
 
 在 `aeApiAddEvent` 中使用 `epoll_ctl` 向 `epfd` 中添加需要监控的 FD 以及监听的事件：
 
-```c
+~~~c
 static int aeApiAddEvent(aeEventLoop *eventLoop, int fd, int mask) {
     aeApiState *state = eventLoop->apidata;
     struct epoll_event ee = {0}; /* avoid valgrind warning */
@@ -205,11 +205,11 @@ static int aeApiAddEvent(aeEventLoop *eventLoop, int fd, int mask) {
     if (epoll_ctl(state->epfd,op,fd,&ee) == -1) return -1;
     return 0;
 }
-```
+~~~
 
 由于 `epoll` 相比 `select` 机制略有不同，在 `epoll_wait` 函数返回时并不需要遍历所有的 FD 查看读写情况；在 `epoll_wait` 函数返回时会提供一个 `epoll_event` 数组：
 
-```c
+~~~c
 typedef union epoll_data {
     void    *ptr;
     int      fd; /* 文件描述符 */
@@ -221,13 +221,13 @@ struct epoll_event {
     uint32_t     events; /* Epoll 事件 */
     epoll_data_t data;
 };
-```
+~~~
 
 > 其中保存了发生的 `epoll` 事件（`EPOLLIN`、`EPOLLOUT`、`EPOLLERR` 和 `EPOLLHUP`）以及发生该事件的 FD。
 
 `aeApiPoll` 函数只需要将 `epoll_event` 数组中存储的信息加入 `eventLoop` 的 `fired` 数组中，将信息传递给上层模块：
 
-```c
+~~~c
 static int aeApiPoll(aeEventLoop *eventLoop, struct timeval *tvp) {
     aeApiState *state = eventLoop->apidata;
     int retval, numevents = 0;
@@ -252,13 +252,13 @@ static int aeApiPoll(aeEventLoop *eventLoop, struct timeval *tvp) {
     }
     return numevents;
 }
-```
+~~~
 
 ### 子模块的选择
 
 因为 Redis 需要在多个平台上运行，同时为了最大化执行的效率与性能，所以会根据编译平台的不同选择不同的 I/O 多路复用函数作为子模块，提供给上层统一的接口；在 Redis 中，我们通过宏定义的使用，合理的选择不同的子模块：
 
-```c
+~~~c
 #ifdef HAVE_EVPORT
 #include "ae_evport.c"
 #else
@@ -272,7 +272,7 @@ static int aeApiPoll(aeEventLoop *eventLoop, struct timeval *tvp) {
         #endif
     #endif
 #endif
-```
+~~~
 
 因为 `select` 函数是作为 POSIX 标准中的系统调用，在不同版本的操作系统上都会实现，所以将其作为保底方案：
 

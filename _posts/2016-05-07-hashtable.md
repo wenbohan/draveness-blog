@@ -27,7 +27,7 @@ tags: iOS Runtime
 
 `NXHashTable` 的实现位于 `hashtable2.mm` 文件，我们先来看一下 `NXHashTable` 的结构以及重要的接口：
 
-```objectivec
+~~~objectivec
 typedef struct {
     const NXHashTablePrototype *prototype;
     unsigned count;
@@ -35,18 +35,18 @@ typedef struct {
     void *buckets;
     const void *info;
 } NXHashTable;
-```
+~~~
 
 对于结构体中的 `NXHashTablePrototype` 属性暂且不说，其中的 `buckets` 是真正用来**存储数据的数组**。
 
-```objectivec
+~~~objectivec
 NXHashTable *NXCreateHashTableFromZone (NXHashTablePrototype prototype, unsigned capacity, const void *info, void *z);
 unsigned NXCountHashTable (NXHashTable *table);
 int NXHashMember (NXHashTable *table, const void *data);
 void *NXHashGet (NXHashTable *table, const void *data);
 void *NXHashInsert (NXHashTable *table, const void *data);
 void *NXHashRemove (NXHashTable *table, const void *data);
-```
+~~~
 
 我们会以上面的这些方法作为切入点，分析 `NXHashTable` 的实现。
 
@@ -54,7 +54,7 @@ void *NXHashRemove (NXHashTable *table, const void *data);
 
 `NXHashTable` 使用 `NXCreateHashTableFromZone` 方法初始化：
 
-```objectivec
+~~~objectivec
 NXHashTable *NXCreateHashTableFromZone (NXHashTablePrototype prototype, unsigned capacity, const void *info, void *z) {
     NXHashTable			*table;
     NXHashTablePrototype	 *proto;
@@ -79,11 +79,11 @@ NXHashTable *NXCreateHashTableFromZone (NXHashTablePrototype prototype, unsigned
     table->buckets = ALLOCBUCKETS(z, table->nbBuckets);
     return table;
 }
-```
+~~~
 
 在这个方法中，绝大多数代码都是用来初始化 `table->prototype` 的，我们先把这部分全部忽略，分析一下简略版本的实现。
 
-```objectivec
+~~~objectivec
 NXHashTable *NXCreateHashTableFromZone (NXHashTablePrototype prototype, unsigned capacity, const void *info, void *z) {
     NXHashTable			*table;
     NXHashTablePrototype	 *proto;
@@ -98,25 +98,25 @@ NXHashTable *NXCreateHashTableFromZone (NXHashTablePrototype prototype, unsigned
     table->buckets = ALLOCBUCKETS(z, table->nbBuckets);
     return table;
 }
-```
+~~~
 
 其中 `ALLOCTABLE`、`GOOD_CAPACITY` 以及 `ALLOCBUCKETS` 都是用来辅助初始化的宏：
 
-```objectivec
+~~~objectivec
 #define	 ALLOCTABLE(z) ((NXHashTable *) malloc_zone_malloc ((malloc_zone_t *)z,sizeof (NXHashTable)))
 #define GOOD_CAPACITY(c) (exp2m1u (log2u (c)+1))
 #define ALLOCBUCKETS(z,nb) ((HashBucket *) malloc_zone_calloc ((malloc_zone_t *)z, nb, sizeof (HashBucket)))
-```
+~~~
 
 `ALLOCTABLE` 和 `ALLOCBUCKETS` 只是调用了 `malloc_zone_calloc` 来初始化相应的结构体，而 `GOOD_CAPACITY` 有一些特殊，我们来举个例子说明：
 
-```
+~~~
 c   binary  result
 1   1       1
 2   10      3(0b11)
 6   110     7(0b111)
 100 1100100 127(0b111 1111)
-```
+~~~
 
 `c` 表示传入参数，`binary` 表示二进制下的参数，而 `result` 就是 `GOOD_CAPACITY` 返回的结果。
 
@@ -128,22 +128,22 @@ c   binary  result
 
 在继续分析其它方法之前，我们需要先知道 `NXHashTablePrototype` 是什么：
 
-```objectivec
+~~~objectivec
 typedef struct {
     uintptr_t (*hash)(const void *info, const void *data);
     int (*isEqual)(const void *info, const void *data1, const void *data2);
     void (*free)(const void *info, void *data);
     int style; /* reserved for future expansion; currently 0 */
 } NXHashTablePrototype;
-```
+~~~
 
 `NXHashTablePrototype` 中存储了 `hash`、`isEqual` 和 `free` 的函数指针（用于获取数据的哈希、判断两个数据是否相等以及释放数据）。
 
 在 `hashtable2.mm` 文件中有一个宏 `ISEQUAL` 就是用了 `NXHashTablePrototype` 中的 `isEqual` 来判断两个数据是否相等：
 
-```objectivec
+~~~objectivec
 #define ISEQUAL(table, data1, data2) ((data1 == data2) || (*table->prototype->isEqual)(table->info, data1, data2))
-```
+~~~
 
 可以说，`NXHashTablePrototype` 中存储了一些**构建哈希表必要的函数指针**。
 
@@ -153,21 +153,21 @@ typedef struct {
 
 在这里另一个需要注意的数据结构就是 `HashBucket`：
 
-```c
+~~~c
 typedef struct	{
     unsigned count;
     oneOrMany elements;
 } HashBucket;
-```
+~~~
 
 `oneOrMany` 是一个 `union` 结构体：
 
-```c
+~~~c
 typedef union {
     const void *one;
     const void **many;
 } oneOrMany;
-```
+~~~
 
 > 这么设计的主要原因是**提升性能**。
 
@@ -177,17 +177,17 @@ typedef union {
 
 `NXCountHashTable` 方法应该是我们要介绍的方法中的最简单的一个，它会直接返回 `NXHashTable` 结构体中的 `count`。
 
-```objectivec
+~~~objectivec
 unsigned NXCountHashTable (NXHashTable *table) {
     return table->count;
 }
-```
+~~~
 
 ### NXHashMember
 
 `NXHashMember` 的函数签名虽然会返回 `int`，其实它是一个布尔值，会判断当前的 `NXHashTable` 中是否包含传入的数据：
 
-```objectivec
+~~~objectivec
 int NXHashMember (NXHashTable *table, const void *data) {
     HashBucket	*bucket = BUCKETOF(table, data);
     unsigned	j = bucket->count;
@@ -204,17 +204,17 @@ int NXHashMember (NXHashTable *table, const void *data) {
     };
     return 0;
 }
-```
+~~~
 
 使用 `BUCKETOF` 对 `data` 进行 hash，将结果与哈希表的 `buckets` 数取模，返回 `buckets` 数组中对应的 `NXHashBucket`。
 
-```objectivec
+~~~objectivec
 #define BUCKETOF(table, data) (((HashBucket *)table->buckets)+((*table->prototype->hash)(table->info, data) % table->nbBuckets))
-```
+~~~
 
 在获取了 `bucket` 之后，根据其中元素个数的不同，选择不同的分支：
 
-```objectivec
+~~~objectivec
 if (! j) return 0;
 if (j == 1) {
     return ISEQUAL(table, data, bucket->elements.one);
@@ -224,7 +224,7 @@ while (j--) {
     if (ISEQUAL(table, data, *pairs)) return 1;
     pairs ++;
 };
-```
+~~~
 
 + `count == 0`，直接返回
 + `count == 1`，使用 `ISEQUAL` 比较查找的数据与 `bucket->elements.one`
@@ -242,7 +242,7 @@ while (j--) {
 
 它的实现跟上面的 `NXHashMember` 区别并不大，这里就不过多介绍了：
 
-```objectivec
+~~~objectivec
 void *NXHashGet (NXHashTable *table, const void *data) {
     HashBucket	*bucket = BUCKETOF(table, data);
     unsigned	j = bucket->count;
@@ -260,13 +260,13 @@ void *NXHashGet (NXHashTable *table, const void *data) {
     };
     return NULL;
 }
-```
+~~~
 
 ### NXHashInsert
 
 `NXHashInsert` 是 `NXHashTable` 中比较重要的方法，其作用就是向表中插入数据：
 
-```objectivec
+~~~objectivec
 void *NXHashInsert (NXHashTable *table, const void *data) {
     HashBucket *bucket = BUCKETOF(table, data);
     unsigned j = bucket->count;
@@ -313,7 +313,7 @@ void *NXHashInsert (NXHashTable *table, const void *data) {
     if (table->count > table->nbBuckets) _NXHashRehash (table);
     return NULL;
 }
-```
+~~~
 
 虽然这里的实现比上面的两个方法复杂得多，但是脉络仍然很清晰，我们将插入的过程分为三种情况：
 
@@ -323,14 +323,14 @@ void *NXHashInsert (NXHashTable *table, const void *data) {
 
 如果对应的 `bucket` 为空：
 
-```objectivec
+~~~objectivec
 if (! j) {
     bucket->count++;
     bucket->elements.one = data;
     table->count++;
     return NULL;
 };
-```
+~~~
 
 将数据直接填入 `bucket`，增加 `bucket` 中元素的数目，以及 `table` 中存储的元素的数目：
 
@@ -338,7 +338,7 @@ if (! j) {
 
 如果原来的 `buckets` 中有一个元素，它会替换或者使用 `many` 替换原来的 `one`：
 
-```objectivec
+~~~objectivec
 if (j == 1) {
     if (ISEQUAL(table, data, bucket->elements.one)) {
         const void	*old = bucket->elements.one;
@@ -356,7 +356,7 @@ if (j == 1) {
 
     return NULL;
 };
-```
+~~~
 
 当前数据 `data` 如果与 `bucket` 中存储的数据相同，就会更新这个数据，否则就会使用 `ALLOCPAIRS` 初始化一个新的数组，然后将 `data` 和原来的数据传入。
 
@@ -364,7 +364,7 @@ if (j == 1) {
 
 但是如果原来的 `bucket` 中存储的元素大于 1，那么会在链表的头部追加一个新的元素：
 
-```objectivec
+~~~objectivec
 while (j--) {
     if (ISEQUAL(table, data, *pairs)) {
         const void	*old = *pairs;
@@ -380,7 +380,7 @@ FREEPAIRS (bucket->elements.many);
 bucket->count++;
 bucket->elements.many = newt;
 table->count++;
-```
+~~~
 
 上面的代码使用 `bcopy` 将原链表中元素拷贝到新的数组 `newt` 中。
 
@@ -388,9 +388,9 @@ table->count++;
 
 在每次添加完一个元素之后，都会进行下面的判断：
 
-```objectivec
+~~~objectivec
 if (table->count > table->nbBuckets) _NXHashRehash (table);
-```
+~~~
 
 > 上面的这行代码会保证**哈希表中的元素数据小于等于表中的 bucket 数量**。
 
@@ -400,21 +400,21 @@ if (table->count > table->nbBuckets) _NXHashRehash (table);
 
 如果哈希表在添加元素后，其中的数据多于 `buckets` 数量，就会对 `NXHashTable` 进行 `_NXHashRehash` 操作。
 
-```objectivec
+~~~objectivec
 static void _NXHashRehash (NXHashTable *table) {
     _NXHashRehashToCapacity (table, MORE_CAPACITY(table->nbBuckets));
 }
-```
+~~~
 
 它调用 `_NXHashRehashToCapacity` 方法来扩大 `NXHashTable` 的容量（`HashBucket` 的个数）。
 
-```c
+~~~c
 #define MORE_CAPACITY(b) (b*2+1)
-```
+~~~
 
 而 `MORE_CAPACITY` 会将当前哈希表的容量翻倍，并将新的容量传入 `_NXHashRehashToCapacity` 中：
 
-```objectivec
+~~~objectivec
 void _NXHashRehashToCapacity (NXHashTable *table, unsigned newCapacity) {
     NXHashTable	*old;
     NXHashState	state;
@@ -434,7 +434,7 @@ void _NXHashRehashToCapacity (NXHashTable *table, unsigned newCapacity) {
     free (old->buckets);
     free (old);
 }
-```
+~~~
 
 1. 创建一个 `NXHashTable` 的指针指向原哈希表
 2. 改变哈希表的 `nbBuckets`，并重新初始化哈希表的 `buckets` 数组
@@ -445,27 +445,27 @@ void _NXHashRehashToCapacity (NXHashTable *table, unsigned newCapacity) {
 
 在将元素重新插入到哈希表中涉及了一个非常奇怪的结构体 `NXHashState`，这个结构体主要作用是遍历 `NXHashTable` 中的元素。
 
-```objectivec
+~~~objectivec
 typedef struct {
     int i;
     int j;
 } NXHashState;
-```
+~~~
 
 我们可以使用如下的代码对哈希表中的元素进行遍历：
 
-```objectivec
+~~~objectivec
  unsigned count = 0;
  MyData	 *data;
  NXHashState state = NXInitHashState(table);
  while (NXNextHashState(table, &state, &data)) {
     count++;
  }
-```
+~~~
 
 代码片段中调用了两个方法，分别是 `NXInitHashState` 以及 `NXNextHashState`：
 
-```objectivec
+~~~objectivec
 NXHashState NXInitHashState (NXHashTable *table) {
     NXHashState	state;
 
@@ -473,7 +473,7 @@ NXHashState NXInitHashState (NXHashTable *table) {
     state.j = 0;
     return state;
 };
-```
+~~~
 
 `NXInitHashState` 会将 `NXHashState` 指向哈希表的最末端：
 
@@ -483,7 +483,7 @@ NXHashState NXInitHashState (NXHashTable *table) {
 
 而每次调用 `NXNextHashState` 都会向『前』移动一次：
 
-```objectivec
+~~~objectivec
 int NXNextHashState (NXHashTable *table, NXHashState *state, void **data) {
     HashBucket		*buckets = (HashBucket *) table->buckets;
 
@@ -497,7 +497,7 @@ int NXNextHashState (NXHashTable *table, NXHashState *state, void **data) {
                       ? buckets->elements.one : buckets->elements.many[state->j]);
     return YES;
 };
-```
+~~~
 
 下面的 gif 为我们展示了每一次调用 `NXNextHashState` 方法之后当前的 `NXHashState`：
 
@@ -507,7 +507,7 @@ int NXNextHashState (NXHashTable *table, NXHashState *state, void **data) {
 
 这里的 `NXHashRemove`在某种意义上是 `NXHashInsert` 的逆操作：
 
-```objectivec
+~~~objectivec
 void *NXHashRemove (NXHashTable *table, const void *data) {
     HashBucket	*bucket = BUCKETOF(table, data);
     unsigned	j = bucket->count;
@@ -553,7 +553,7 @@ void *NXHashRemove (NXHashTable *table, const void *data) {
     };
     return NULL;
 }
-```
+~~~
 
 它的实现也分为三种情况，不过在这里就不多说了。
 
@@ -561,7 +561,7 @@ void *NXHashRemove (NXHashTable *table, const void *data) {
 
 在已经熟悉了 `NXHashTable` 的具体实现之后，我们要分析插入**不同数据量级**的情况下，所需要的时间，这里是主程序的代码，分别测试了在 `100, 1000, 10000, 100000, 1000000, 2000000, 3000000, 5000000, 10000000` 数据下 `NXHashTable` 的性能表现：
 
-```objectivec
+~~~objectivec
 #import <Foundation/Foundation.h>
 #import "hashtable2.h"
 
@@ -596,7 +596,7 @@ int main(int argc, const char * argv[]) {
     }
     return 0;
 }
-```
+~~~
 
 代码中初始化了一个 `capacities` 存储需要测量的数据量级，然后调用 `NXHashInsert` 方法将相当数量级的数据添加到哈希表中：
 
@@ -619,9 +619,9 @@ int main(int argc, const char * argv[]) {
 
 如何避免哈希表的 Rehash 呢，重新回顾一下创建哈希表的函数：
 
-```objectivec
+~~~objectivec
 NXHashTable *NXCreateHashTable (NXHashTablePrototype prototype, unsigned capacity, const void *info);
-```
+~~~
 
 这个函数的签名中包含一个 `capacity` 的参数，我们在上面的代码中传入了 0，也就是最开始的 `buckets` 数为 0，但是它的数目并不是固定的，它会随着哈希表中数据的增多，逐渐变大。
 
@@ -629,9 +629,9 @@ NXHashTable *NXCreateHashTable (NXHashTablePrototype prototype, unsigned capacit
 
 如果在创建 `NXHashTable` 时传入 `capacity.integerValue`：
 
-```objectivec
+~~~objectivec
   NXHashTable *hashTable = NXCreateHashTable(NXPtrPrototype, capacity.integerValue, NULL);
-```
+~~~
 
 重新运行代码，测量性能：
 
@@ -705,13 +705,13 @@ NXHashTable *NXCreateHashTable (NXHashTablePrototype prototype, unsigned capacit
 
 在整个 objc/runtime 中，作为**私有**的数据结构 `NXHashTable`，直接使用了它的就是**存储所有类或者元类**的哈希表（在这里会忽略对元类的存储，因为实现几乎完全相同）：
 
-```objectivec
+~~~objectivec
 static NXHashTable *realized_class_hash = nil;
-```
+~~~
 
 我么可以使用 `objc_copyClassList` 获取类的数组：
 
-```objectivec
+~~~objectivec
 Class *
 objc_copyClassList(unsigned int *outCount)
 {
@@ -737,7 +737,7 @@ objc_copyClassList(unsigned int *outCount)
     if (outCount) *outCount = count;
     return result;
 }
-```
+~~~
 
 1. 调用 `realizedClasses` 返回 `realized_class_hash` 哈希表
 2. 使用 `NSHashState` 遍历 `realized_class_hash` 中的类，并将所有的类存入 `result`
@@ -752,13 +752,13 @@ objc_copyClassList(unsigned int *outCount)
 
 `NXHashTable` 可以说有着**非常非常**久远的历史了，最早可以追溯到将近 30 多年前 NeXT 时代：
 
-```c
+~~~c
 // hashtable2.mm 文件中
 
 hashtable2.m
 Copyright 1989-1996 NeXT Software, Inc.
 Created by Bertrand Serlet, Feb 89
-```
+~~~
 
 `NSHashTable` 对哈希表的实现还是非常优雅的，可以说非常标准的使用了[拉链法](https://en.wikipedia.org/wiki/Hash_table#Separate_chaining_with_linked_lists)实现哈希表。
 

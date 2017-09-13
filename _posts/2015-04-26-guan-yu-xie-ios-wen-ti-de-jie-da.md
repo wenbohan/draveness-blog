@@ -116,7 +116,7 @@ ARC 是 Automatic Reference Counting 的缩写, 即自动引用计数. 这是苹
 
 我们也可以使用另一种比较复杂的方式来为图片添加圆角, 这里就用到了贝塞尔曲线.
 
-```objectivec
+~~~objectivec
 UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 100, 100)];
 imageView.center = CGPointMake(200, 300);
 UIImage *anotherImage = [UIImage imageNamed:@"image"];
@@ -127,7 +127,7 @@ UIGraphicsBeginImageContextWithOptions(imageView.bounds.size, NO, 1.0);
 imageView.image = UIGraphicsGetImageFromCurrentImageContext();
 UIGraphicsEndImageContext();
 [self.view addSubview:imageView];
-```
+~~~
 
 在这里使用了贝塞尔曲线"切割"个这个图片, 给 `UIImageView` 添加了的圆角.
 

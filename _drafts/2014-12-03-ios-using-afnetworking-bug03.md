@@ -13,19 +13,19 @@ During these days development, when I connect our iOS App to Python `back-end` u
 	
 At first, I do not know, what it's mean, but I ask my partner, he tells me, in order to beautify the `JSON` he use some method, to make them like this, I do not know exactly what he did, but `JSON` looks like this.
 
-```
+~~~
 {
   "message": "success", 
   "posts": [], 
   "status": 0
 }
-```
+~~~
 
 It is not like the `JSON` I used to deal with before, I think they should be this shape:
 
-```
+~~~
 { "message": "success", "posts": [],  "status": 0 }
-```
+~~~
 	
 But it's not, at that time, he explains that if I could not deal with this, he could modify them back. For he can not change this immediately, so I tried to fix this problem.
 
@@ -37,9 +37,9 @@ I search this on google and stackoverflow, someone says add a `acceptableContent
 
 I add a `acceptableContentType` to the `responseSerializer`, and I fix this. But I think this quiet messy, everytime I use this framework, I had to add an `acceptableContentType`. I am too naive to realize this as a mistake. So I open an `issue` on `AFNetworking` and add this `type` `text/html` to the source code.
 
-```
+~~~
    self.acceptableContentTypes = [NSSet setWithObjects:@"application/json", @"text/json", @"text/javascript", @"text/html", nil];
-```
+~~~
 
 And soon, the author of `AFNetworking` reply me as follows:
 

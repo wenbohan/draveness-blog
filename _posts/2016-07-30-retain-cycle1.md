@@ -13,7 +13,7 @@ tags: iOS
 
 但是遇到下面这样的情况，如果只看其实现代码，也很难仅仅凭借肉眼上的观察以及简单的推理就能分析出其中存在的循环引用问题，更何况真实情况往往比这复杂的多：
 
-```objectivec
+~~~objectivec
 testObject1.object = testObject2;
 testObject1.secondObject = testObject3;
 testObject2.object = testObject4;
@@ -23,7 +23,7 @@ testObject5.object = testObject6;
 testObject4.object = testObject1;
 testObject5.secondObject = testObject7;
 testObject7.object = testObject2;
-```
+~~~
 
 上述代码确实是存在循环引用的问题：
 
@@ -40,7 +40,7 @@ testObject7.object = testObject2;
 
 简单介绍一下 `FBRetainCycleDetector` 的使用方法：
 
-```objectivec
+~~~objectivec
 _RCDTestClass *testObject = [_RCDTestClass new];
 testObject.object = testObject;
 
@@ -49,7 +49,7 @@ FBRetainCycleDetector *detector = [FBRetainCycleDetector new];
 NSSet *retainCycles = [detector findRetainCycles];
 
 NSLog(@"%@", retainCycles);
-```
+~~~
 
 1. 初始化一个 `FBRetainCycleDetector` 的实例
 2. 调用 `- addCandidate:` 方法添加潜在的泄露对象
@@ -57,13 +57,13 @@ NSLog(@"%@", retainCycles);
 
 在控制台中的输出是这样的：
 
-```c
+~~~c
 2016-07-29 15:26:42.043 xctest[30610:1003493] {(
 		(
 		"-> _object -> _RCDTestClass "
 	)
 )}
-```
+~~~
 
 说明 `FBRetainCycleDetector` 在代码中发现了循环引用。
 
@@ -71,7 +71,7 @@ NSLog(@"%@", retainCycles);
 
 在具体开始分析 `FBRetainCycleDetector` 代码之前，我们可以先观察一下方法 `findRetainCycles` 的调用栈：
 
-```objectivec
+~~~objectivec
 - (NSSet<NSArray<FBObjectiveCGraphElement *> *> *)findRetainCycles
 └── - (NSSet<NSArray<FBObjectiveCGraphElement *> *> *)findRetainCyclesWithMaxCycleLength:(NSUInteger)length
     └── - (NSSet<NSArray<FBObjectiveCGraphElement *> *> *)_findRetainCyclesInObject:(FBObjectiveCGraphElement *)graphElement stackDepth:(NSUInteger)stackDepth
@@ -80,11 +80,11 @@ NSLog(@"%@", retainCycles);
                 ├── - (NSArray<FBObjectiveCGraphElement *> *)_unwrapCycle:(NSArray<FBNodeEnumerator *> *)cycle
                 ├── - (NSArray<FBObjectiveCGraphElement *> *)_shiftToUnifiedCycle:(NSArray<FBObjectiveCGraphElement *> *)array
                 └── - (void)addObject:(ObjectType)anObject;
-```
+~~~
 
 调用栈中最上面的两个简单方法的实现都是比较容易理解的：
 
-```objectivec
+~~~objectivec
 - (NSSet<NSArray<FBObjectiveCGraphElement *> *> *)findRetainCycles {
 	return [self findRetainCyclesWithMaxCycleLength:kFBRetainCycleDetectorDefaultStackDepth];
 }
@@ -100,13 +100,13 @@ NSLog(@"%@", retainCycles);
 
 	return allRetainCycles;
 }
-```
+~~~
 
 `- findRetainCycles` 调用了 `- findRetainCyclesWithMaxCycleLength:` 传入了 `kFBRetainCycleDetectorDefaultStackDepth` 参数来限制查找的深度，如果超过该深度（默认为 10）就不会继续处理下去了（查找的深度的增加会对性能有非常严重的影响）。
 
 在 `- findRetainCyclesWithMaxCycleLength:` 中，我们会遍历所有潜在的内存泄露对象 `candidate`，执行整个框架中最核心的方法 `- _findRetainCyclesInObject:stackDepth:`，由于这个方法的实现太长，这里会分几块对其进行介绍，并会省略其中的注释：
 
-```objectivec
+~~~objectivec
 - (NSSet<NSArray<FBObjectiveCGraphElement *> *> *)_findRetainCyclesInObject:(FBObjectiveCGraphElement *)graphElement
 																 stackDepth:(NSUInteger)stackDepth {
 	NSMutableSet<NSArray<FBObjectiveCGraphElement *> *> *retainCycles = [NSMutableSet new];
@@ -118,7 +118,7 @@ NSLog(@"%@", retainCycles);
 
 	...
 }
-```
+~~~
 
 其实整个对象的相互引用情况可以看做一个**有向图**，对象之间的引用就是图的 `Edge`，每一个对象就是 `Vertex`，**查找循环引用的过程就是在整个有向图中查找环的过程**，所以在这里我们使用 DFS 来扫面图中的环，这些环就是对象之间的循环引用。
 
@@ -126,7 +126,7 @@ NSLog(@"%@", retainCycles);
 
 接下来就是 DFS 的实现：
 
-```objectivec
+~~~objectivec
 - (NSSet<NSArray<FBObjectiveCGraphElement *> *> *)_findRetainCyclesInObject:(FBObjectiveCGraphElement *)graphElement
 																 stackDepth:(NSUInteger)stackDepth {
 	...
@@ -172,11 +172,11 @@ NSLog(@"%@", retainCycles);
 	}
 	return retainCycles;
 }
-```
+~~~
 
 这里其实就是对 DFS 的具体实现，其中比较重要的有两点，一是使用 `nextObject` 获取下一个需要遍历的对象，二是对查找到的环进行处理和筛选；在这两点之中，第一点相对重要，因为 `nextObject` 的实现是调用 `allRetainedObjects` 方法获取被当前对象持有的对象，如果没有这个方法，我们就无法获取当前对象的邻接结点，更无从谈起遍历了：
 
-```objectivec
+~~~objectivec
 - (FBNodeEnumerator *)nextObject {
 	if (!_object) {
 		return nil;
@@ -193,7 +193,7 @@ NSLog(@"%@", retainCycles);
 
 	return nil;
 }
-```
+~~~
 
 基本上所有图中的对象 `FBObjectiveCGraphElement` 以及它的子类 `FBObjectiveCBlock` `FBObjectiveCObject` 和 `FBObjectiveCNSCFTimer` 都实现了这个方法返回其持有的对象数组。获取数组之后，就再把其中的对象包装成新的 `FBNodeEnumerator` 实例，也就是下一个 `Vertex`。
 
@@ -205,7 +205,7 @@ NSLog(@"%@", retainCycles);
 
 `- _unwrapCycle:` 的作用是将数组中的每一个 `FBNodeEnumerator` 实例转换成 `FBObjectiveCGraphElement`：
 
-```objectivec
+~~~objectivec
 - (NSArray<FBObjectiveCGraphElement *> *)_unwrapCycle:(NSArray<FBNodeEnumerator *> *)cycle {
 	NSMutableArray *unwrappedArray = [NSMutableArray new];
 	for (FBNodeEnumerator *wrapped in cycle) {
@@ -214,22 +214,22 @@ NSLog(@"%@", retainCycles);
 
 	return unwrappedArray;
 }
-```
+~~~
 
 `- _shiftToUnifiedCycle:` 方法将每一个环中的元素按照**地址递增以及字母顺序**来排序，方法签名很好的说明了它们的功能，两个方法的代码就不展示了，它们的实现没有什么值得注意的地方：
 
-```objectivec
+~~~objectivec
 - (NSArray<FBObjectiveCGraphElement *> *)_shiftToUnifiedCycle:(NSArray<FBObjectiveCGraphElement *> *)array {
 	return [self _shiftToLowestLexicographically:[self _shiftBufferToLowestAddress:array]];
 }
-```
+~~~
 
 方法的作用是防止出现**相同环的不同表示方式**，比如说下面的两个环其实是完全相同的：
 
-```
+~~~
 -> object1 -> object2
 -> object2 -> object1
-```
+~~~
 
 在获取图中的环并排序好之后，就可以讲这些环 union 一下，去除其中重复的元素，最后返回所有查找到的循环引用了。
 

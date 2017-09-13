@@ -13,7 +13,7 @@ Swift 中的协议扩展为 iOS 开发带来了非常多的可能性，它为我
 
 在 Swift 中比较出名的 Then 就是使用了协议扩展为所有的 `AnyObject` 添加方法，而且不需要调用 runtime 相关的 API，其实现简直是我见过最简单的开源框架之一：
 
-```swift
+~~~swift
 public protocol Then {}
 
 extension Then where Self: AnyObject {
@@ -24,16 +24,16 @@ extension Then where Self: AnyObject {
 }
 
 extension NSObject: Then {}
-```
+~~~
 
 只有这么几行代码，就能为所有的 `NSObject` 添加下面的功能：
 
-```swift
+~~~swift
 let titleLabel = UILabel().then {
 	$0.textColor = .blackColor()
 	$0.textAlignment = .Center
 }
-```
+~~~
 
 这里没有调用任何的 runtime 相关 API，也没有在 `NSObject` 中进行任何的方法声明，甚至 `protocol Then {}` 协议本身都只有一个大括号，整个 Then 框架就是基于协议扩展来实现的。
 
@@ -51,7 +51,7 @@ let titleLabel = UILabel().then {
 
 我们先来看一下如何使用 ProtocolKit，首先定义一个协议：
 
-```objectivec
+~~~objectivec
 @protocol TestProtocol
 
 @required
@@ -63,11 +63,11 @@ let titleLabel = UILabel().then {
 - (void)buzz;
 
 @end
-```
+~~~
 
 在协议中定义了两个方法，必须实现的方法 `fizz` 以及可选实现 `buzz`，然后使用 ProtocolKit 提供的接口 `defs` 来定义协议中方法的实现了：
 
-```objectivec
+~~~objectivec
 @defs(TestProtocol)
 
 - (void)buzz {
@@ -75,7 +75,7 @@ let titleLabel = UILabel().then {
 }
 
 @end
-```
+~~~
 
 这样所有遵循 `TestProtocol` 协议的对象都可以调用 `buzz` 方法，哪怕它们没有实现：
 
@@ -98,7 +98,7 @@ ProtocolKit 中有两条重要的执行路线：
 
 首先要解决的问题是如何将方法实现加载到内存中，这里可以先了解一下上面使用到的 `defs` 接口，它其实只是一个调用了其它宏的**超级宏**~~这名字是我编的~~：
 
-```objectivec
+~~~objectivec
 #define defs _pk_extension
 
 #define _pk_extension($protocol) _pk_extension_imp($protocol, _pk_get_container_class($protocol))
@@ -114,13 +114,13 @@ ProtocolKit 中有两条重要的执行路线：
 #define _pk_get_container_class($protocol) _pk_get_container_class_imp($protocol, __COUNTER__)
 #define _pk_get_container_class_imp($protocol, $counter) _pk_get_container_class_imp_concat(__PKContainer_, $protocol, $counter)
 #define _pk_get_container_class_imp_concat($a, $b, $c) $a ## $b ## _ ## $c
-```
+~~~
 
 > 使用 `defs` 作为接口的是因为它是一个保留的 keyword，Xcode 会将它渲染成与 `@property` 等其他关键字相同的颜色。
 
 上面的这一坨宏并不需要一个一个来分析，只需要看一下最后展开会变成什么：
 
-```objectivec
+~~~objectivec
 @protocol TestProtocol;
 
 @interface __PKContainer_TestProtocol_0 : NSObject <TestProtocol>
@@ -132,7 +132,7 @@ ProtocolKit 中有两条重要的执行路线：
 + (void)load {
 	_pk_extension_load(@protocol(TestProtocol), __PKContainer_TestProtocol_0.class);
 }
-```
+~~~
 
 根据上面宏的展开结果，这里可以介绍上面的一坨宏的作用：
 
@@ -143,7 +143,7 @@ ProtocolKit 中有两条重要的执行路线：
 
 通过宏的运用成功隐藏了 `__PKContainer_TestProtocol_0` 类的声明以及实现，还有 `_pk_extension_load` 函数的调用：
 
-```objectivec
+~~~objectivec
 void _pk_extension_load(Protocol *protocol, Class containerClass) {
 
 	pthread_mutex_lock(&protocolsLoadingLock);
@@ -163,7 +163,7 @@ void _pk_extension_load(Protocol *protocol, Class containerClass) {
 
 	pthread_mutex_unlock(&protocolsLoadingLock);
 }
-```
+~~~
 
 ProtocolKit 使用了 `protocolsLoadingLock` 来保证静态变量 `allExtendedProtocols` 以及 `extendedProtcolCount` `extendedProtcolCapacity` 不会因为线程竞争导致问题：
 
@@ -172,7 +172,7 @@ ProtocolKit 使用了 `protocolsLoadingLock` 来保证静态变量 `allExtendedP
 
 方法的后半部分会在静态变量中寻找或创建传入的 `protocol` 对应的 `PKExtendedProtocol` 结构体：
 
-```objectivec
+~~~objectivec
 size_t resultIndex = SIZE_T_MAX;
 for (size_t index = 0; index < extendedProtcolCount; ++index) {
 	if (allExtendedProtocols[index].protocol == protocol) {
@@ -194,11 +194,11 @@ if (resultIndex == SIZE_T_MAX) {
 }
 
 _pk_extension_merge(&(allExtendedProtocols[resultIndex]), containerClass);
-```
+~~~
 
 这里调用的 `_pk_extension_merge` 方法非常重要，不过在介绍 `_pk_extension_merge` 之前，首先要了解一个用于保存协议扩展信息的私有结构体 `PKExtendedProtocol`：
 
-```objectivec
+~~~objectivec
 typedef struct {
 	Protocol *__unsafe_unretained protocol;
 	Method *instanceMethods;
@@ -206,13 +206,13 @@ typedef struct {
 	Method *classMethods;
 	unsigned classMethodCount;
 } PKExtendedProtocol;
-```
+~~~
 
 `PKExtendedProtocol` 结构体中保存了协议的指针、实例方法、类方法、实例方法数以及类方法数用于框架记录协议扩展的状态。
 
 回到 `_pk_extension_merge` 方法，它会将新的扩展方法追加到 `PKExtendedProtocol` 结构体的数组 `instanceMethods` 以及 `classMethods` 中：
 
-```objectivec
+~~~objectivec
 void _pk_extension_merge(PKExtendedProtocol *extendedProtocol, Class containerClass) {
 	// Instance methods
 	unsigned appendingInstanceMethodCount = 0;
@@ -228,7 +228,7 @@ void _pk_extension_merge(PKExtendedProtocol *extendedProtocol, Class containerCl
 	// Class methods
 	...
 }
-```
+~~~
 
 > 因为类方法的追加与实例方法几乎完全相同，所以上述代码省略了向结构体中的类方法追加方法的实现代码。
 
@@ -236,7 +236,7 @@ void _pk_extension_merge(PKExtendedProtocol *extendedProtocol, Class containerCl
 
 `_pk_extension_create_merged` 只是重新 `malloc` 一块内存地址，然后使用 `memcpy` 将所有的方法都复制到了这块内存地址中，最后返回首地址：
 
-```objectivec
+~~~objectivec
 Method *_pk_extension_create_merged(Method *existMethods, unsigned existMethodCount, Method *appendingMethods, unsigned appendingMethodCount) {
 
 	if (existMethodCount == 0) {
@@ -248,7 +248,7 @@ Method *_pk_extension_create_merged(Method *existMethods, unsigned existMethodCo
 	memcpy(mergedMethods + existMethodCount, appendingMethods, appendingMethodCount * sizeof(Method));
 	return mergedMethods;
 }
-```
+~~~
 
 这一节的代码从使用宏生成的类中抽取方法实现，然后以结构体的形式加载到内存中，等待之后的方法注入。
 
@@ -256,13 +256,13 @@ Method *_pk_extension_create_merged(Method *existMethods, unsigned existMethodCo
 
 注入方法的时间点在 main 函数执行之前议实现的注入并不是在 `+ load` 方法 `+ initialize` 方法调用时进行的，而是使用的编译器指令(compiler directive) `__attribute__((constructor))` 实现的：
 
-```objectivec
+~~~objectivec
 __attribute__((constructor)) static void _pk_extension_inject_entry(void);
-```
+~~~
 
 使用上述编译器指令的函数会在 shared library 加载的时候执行，也就是 main 函数之前，可以看 StackOverflow 上的这个问题 [How exactly does __attribute__((constructor)) work?](http://stackoverflow.com/questions/2053029/how-exactly-does-attribute-constructor-work)。
 
-```objectivec
+~~~objectivec
 __attribute__((constructor)) static void _pk_extension_inject_entry(void) {
 	#1：加锁
 	unsigned classCount = 0;
@@ -282,11 +282,11 @@ __attribute__((constructor)) static void _pk_extension_inject_entry(void) {
 	}
 	#2：解锁并释放 allClasses、allExtendedProtocols
 }
-```
+~~~
 
 `_pk_extension_inject_entry` 会在 main 执行之前遍历内存中的**所有** `Class`（整个遍历过程都是在一个自动释放池中进行的），如果某个类遵循了`allExtendedProtocols` 中的协议，调用 `_pk_extension_inject_class` 向类中注射（inject）方法实现：
 
-```objectivec
+~~~objectivec
 static void _pk_extension_inject_class(Class targetClass, PKExtendedProtocol extendedProtocol) {
 
 	for (unsigned methodIndex = 0; methodIndex < extendedProtocol.instanceMethodCount; ++methodIndex) {
@@ -304,11 +304,11 @@ static void _pk_extension_inject_class(Class targetClass, PKExtendedProtocol ext
 
 	#1: 注射类方法
 }
-```
+~~~
 
 如果类中没有实现该实例方法就会通过 runtime 中的 `class_addMethod` 注射该实例方法；而类方法的注射有些不同，因为类方法都是保存在元类中的，而一些类方法由于其特殊地位最好不要改变其原有实现，比如 `+ load` 和 `+ initialize` 这两个类方法就比较特殊，如果想要了解这两个方法的相关信息，可以在 [Reference](#reference) 中查看相关的信息。
 
-```objectivec
+~~~objectivec
 Class targetMetaClass = object_getClass(targetClass);
 for (unsigned methodIndex = 0; methodIndex < extendedProtocol.classMethodCount; ++methodIndex) {
 	Method method = extendedProtocol.classMethods[methodIndex];
@@ -325,7 +325,7 @@ for (unsigned methodIndex = 0; methodIndex < extendedProtocol.classMethodCount; 
 	const char *types = method_getTypeEncoding(method);
 	class_addMethod(targetMetaClass, selector, imp, types);
 }
-```
+~~~
 
 实现上的不同仅仅在获取元类、以及跳过 `+ load` 和 `+ initialize` 方法上。
 

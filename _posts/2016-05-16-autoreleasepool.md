@@ -22,13 +22,13 @@ tags: iOS Runtime
 
 `main.m` 文件中的内容是这样的：
 
-```objectivec
+~~~objectivec
 int main(int argc, char * argv[]) {
     @autoreleasepool {
         return UIApplicationMain(argc, argv, nil, NSStringFromClass([AppDelegate class]));
     }
 }
-```
+~~~
 
 在这个 `@autoreleasepool` block 中只包含了一行代码，这行代码将所有的事件、消息全部交给了 `UIApplication` 来处理，但是这不是本文关注的重点。
 
@@ -38,9 +38,9 @@ int main(int argc, char * argv[]) {
 
 `@autoreleasepool` 到底是什么？我们在命令行中使用 `clang -rewrite-objc main.m` 让编译器重新改写这个文件：
 
-```c
+~~~c
 $ clang -rewrite-objc main.m
-```
+~~~
 
 在生成了一大堆警告之后，当前目录下多了一个 `main.cpp` 文件
 
@@ -50,29 +50,29 @@ $ clang -rewrite-objc main.m
 
 在这个文件中，有一个非常奇怪的 `__AtAutoreleasePool` 的结构体，前面的注释写到 `/* @autoreleasepopl */`。也就是说 `@autoreleasepool {}` 被转换为一个 `__AtAutoreleasePool` 结构体：
 
-```objectivec
+~~~objectivec
 {
     __AtAutoreleasePool __autoreleasepool;
 }
-```
+~~~
 
 想要弄清楚这行代码的意义，我们要在 `main.cpp` 中查找名为 `__AtAutoreleasePool` 的结构体：
 
 ![objc-autorelease-main-cpp-struct](http://img.draveness.me/2016-05-16-objc-autorelease-main-cpp-struct.png)
 
-```objectivec
+~~~objectivec
 struct __AtAutoreleasePool {
   __AtAutoreleasePool() {atautoreleasepoolobj = objc_autoreleasePoolPush();}
   ~__AtAutoreleasePool() {objc_autoreleasePoolPop(atautoreleasepoolobj);}
   void * atautoreleasepoolobj;
 };
-```
+~~~
 
 这个结构体会在初始化时调用 `objc_autoreleasePoolPush()` 方法，会在析构时调用 `objc_autoreleasePoolPop` 方法。
 
 这表明，我们的 `main` 函数在实际工作时其实是这样的：
 
-```objectivec
+~~~objectivec
 int main(int argc, const char * argv[]) {
     {
         void * atautoreleasepoolobj = objc_autoreleasePoolPush();
@@ -83,7 +83,7 @@ int main(int argc, const char * argv[]) {
     }
     return 0;
 }
-```
+~~~
 
 `@autoreleasepool` 只是帮助我们少写了这两行代码而已，让代码看起来更美观，然后要根据上述两个方法来分析自动释放池的实现。
 
@@ -91,7 +91,7 @@ int main(int argc, const char * argv[]) {
 
 这一节开始分析方法 `objc_autoreleasePoolPush` 和 `objc_autoreleasePoolPop` 的实现：
 
-```objectivec
+~~~objectivec
 void *objc_autoreleasePoolPush(void) {
     return AutoreleasePoolPage::push();
 }
@@ -99,7 +99,7 @@ void *objc_autoreleasePoolPush(void) {
 void objc_autoreleasePoolPop(void *ctxt) {
     AutoreleasePoolPage::pop(ctxt);
 }
-```
+~~~
 
 上面的方法看上去是对 `AutoreleasePoolPage` 对应**静态方法** `push` 和 `pop` 的封装。
 
@@ -117,7 +117,7 @@ void objc_autoreleasePoolPop(void *ctxt) {
 
 它在 `NSObject.mm` 中的定义是这样的：
 
-```objectivec
+~~~objectivec
 class AutoreleasePoolPage {
     magic_t const magic;
     id *next;
@@ -127,17 +127,17 @@ class AutoreleasePoolPage {
     uint32_t const depth;
     uint32_t hiwat;
 };
-```
+~~~
 
 + `magic` 用于对当前 `AutoreleasePoolPage` **完整性**的校验
 + `thread` 保存了当前页所在的线程
 
 **每一个自动释放池都是由一系列的 `AutoreleasePoolPage` 组成的，并且每一个 `AutoreleasePoolPage` 的大小都是 `4096` 字节（16 进制 0x1000）**
 
-```c
+~~~c
 #define I386_PGBYTES 4096
 #define PAGE_SIZE I386_PGBYTES
-```
+~~~
 
 #### 双向链表
 
@@ -169,13 +169,13 @@ class AutoreleasePoolPage {
 
 首先回答第一个问题： `POOL_SENTINEL` 只是 `nil` 的别名。
 
-```objectivec
+~~~objectivec
 #define POOL_SENTINEL nil
-```
+~~~
 
 在每个自动释放池初始化调用 `objc_autoreleasePoolPush` 的时候，都会把一个 `POOL_SENTINEL` push 到自动释放池的栈顶，并且返回这个 `POOL_SENTINEL` 哨兵对象。
 
-```objectivec
+~~~objectivec
 int main(int argc, const char * argv[]) {
     {
         void * atautoreleasepoolobj = objc_autoreleasePoolPush();
@@ -186,7 +186,7 @@ int main(int argc, const char * argv[]) {
     }
     return 0;
 }
-```
+~~~
 
 > 上面的 `atautoreleasepoolobj` 就是一个 `POOL_SENTINEL`。
 
@@ -198,23 +198,23 @@ int main(int argc, const char * argv[]) {
 
 了解了 `POOL_SENTINEL`，我们来重新回顾一下 `objc_autoreleasePoolPush` 方法：
 
-```objectivec
+~~~objectivec
 void *objc_autoreleasePoolPush(void) {
     return AutoreleasePoolPage::push();
 }
-```
+~~~
 
 它调用 `AutoreleasePoolPage` 的类方法 `push`，也非常简单：
 
-```objectivec
+~~~objectivec
 static inline void *push() {
    return autoreleaseFast(POOL_SENTINEL);
 }
-```
+~~~
 
 <a id='autoreleaseFast'></a>在这里会进入一个比较关键的方法 `autoreleaseFast`，并传入哨兵对象 `POOL_SENTINEL`：
 
-```objectivec
+~~~objectivec
 static inline id *autoreleaseFast(id obj)
 {
    AutoreleasePoolPage *page = hotPage();
@@ -226,7 +226,7 @@ static inline id *autoreleaseFast(id obj)
        return autoreleaseNoPage(obj);
    }
 }
-```
+~~~
 
 上述方法分三种情况选择不同的代码执行：
 
@@ -247,14 +247,14 @@ static inline id *autoreleaseFast(id obj)
 
 `id *add(id obj)` 将对象添加到自动释放池页中：
 
-```objectivec
+~~~objectivec
 id *add(id obj) {
     id *ret = next;
     *next = obj;
     next++;
     return ret;
 }
-```
+~~~
 
 > 笔者对这个方法进行了处理，更方便理解。
 
@@ -264,7 +264,7 @@ id *add(id obj) {
 
 `autoreleaseFullPage` 会在当前的 `hotPage` 已满的时候调用：
 
-```objectivec
+~~~objectivec
 static id *autoreleaseFullPage(id obj, AutoreleasePoolPage *page) {
     do {
         if (page->child) page = page->child;
@@ -274,7 +274,7 @@ static id *autoreleaseFullPage(id obj, AutoreleasePoolPage *page) {
     setHotPage(page);
     return page->add(obj);
 }
-```
+~~~
 
 它会从传入的 `page` 开始遍历整个双向链表，直到：
 
@@ -287,7 +287,7 @@ static id *autoreleaseFullPage(id obj, AutoreleasePoolPage *page) {
 
 如果当前内存中不存在 `hotPage`，就会调用 `autoreleaseNoPage` 方法初始化一个 `AutoreleasePoolPage`：
 
-```objectivec
+~~~objectivec
 static id *autoreleaseNoPage(id obj) {
     AutoreleasePoolPage *page = new AutoreleasePoolPage(nil);
     setHotPage(page);
@@ -298,7 +298,7 @@ static id *autoreleaseNoPage(id obj) {
 
     return page->add(obj);
 }
-```
+~~~
 
 既然当前内存中不存在 `AutoreleasePoolPage`，就要**从头开始构建这个自动释放池的双向链表**，也就是说，新的 `AutoreleasePoolPage` 是没有 `parent` 指针的。
 
@@ -310,11 +310,11 @@ static id *autoreleaseNoPage(id obj) {
 
 同样，回顾一下上面提到的 `objc_autoreleasePoolPop` 方法：
 
-```objectivec
+~~~objectivec
 void objc_autoreleasePoolPop(void *ctxt) {
     AutoreleasePoolPage::pop(ctxt);
 }
-```
+~~~
 
 > 看起来传入任何一个指针都是可以的，但是在整个工程并没有发现传入其他对象的例子。不过在这个方法中**传入其它的指针也是可行的**，会将自动释放池释放到相应的位置。
 
@@ -328,7 +328,7 @@ void objc_autoreleasePoolPop(void *ctxt) {
 
 下面是 `main.m` 文件中的源代码：
 
-```objectivec
+~~~objectivec
 #import <Foundation/Foundation.h>
 
 int main(int argc, const char * argv[]) {
@@ -340,7 +340,7 @@ int main(int argc, const char * argv[]) {
     }
     return 0;
 }
-```
+~~~
 
 在代码的这一行打一个断点，因为这里会调用 `autorelease` 方法，将字符串加入自动释放池：
 
@@ -365,7 +365,7 @@ int main(int argc, const char * argv[]) {
 
 让我们重新回到对 `objc_autoreleasePoolPop` 方法的分析，也就是 `AutoreleasePoolPage::pop` 方法的调用：
 
-```objectivec
+~~~objectivec
 static inline void pop(void *token) {
     AutoreleasePoolPage *page = pageForPointer(token);
     id *stop = (id *)token;
@@ -380,7 +380,7 @@ static inline void pop(void *token) {
         }
     }
 }
-```
+~~~
 
 > 在这个方法中删除了大量无关的代码，以及对格式进行了调整。
 
@@ -392,19 +392,19 @@ static inline void pop(void *token) {
 
 > 我到现在也不是很清楚为什么要根据当前页的不同状态 `kill` 掉不同 `child` 的页面。
 
-```objectivec
+~~~objectivec
 if (page->lessThanHalfFull()) {
     page->child->kill();
 } else if (page->child->child) {
     page->child->child->kill();
 }
-```
+~~~
 
 #### pageForPointer 获取 AutoreleasePoolPage
 
 `pageForPointer` 方法主要是通过内存地址的操作，获取当前指针所在页的首地址：
 
-```objectivec
+~~~objectivec
 static AutoreleasePoolPage *pageForPointer(const void *p) {
     return pageForPointer((uintptr_t)p);
 }
@@ -420,15 +420,15 @@ static AutoreleasePoolPage *pageForPointer(uintptr_t p) {
 
     return result;
 }
-```
+~~~
 
 将指针与页面的大小，也就是 4096 取模，得到当前指针的偏移量，因为所有的 `AutoreleasePoolPage` 在内存中都是对齐的：
 
-```
+~~~
 p = 0x100816048
 p % SIZE = 0x48
 result = 0x100816000
-```
+~~~
 
 而最后调用的方法 `fastCheck()` 用来检查当前的 `result` 是不是一个 `AutoreleasePoolPage`。
 
@@ -438,7 +438,7 @@ result = 0x100816000
 
 `releaseUntil` 方法的实现如下：
 
-```objectivec
+~~~objectivec
 void releaseUntil(id *stop) {
     while (this->next != stop) {
         AutoreleasePoolPage *page = hotPage();
@@ -460,7 +460,7 @@ void releaseUntil(id *stop) {
 
     setHotPage(this);
 }
-```
+~~~
 
 它的实现还是很容易的，用一个 `while` 循环持续释放 `AutoreleasePoolPage` 中的内容，直到 `next` 指向了 `stop` 。
 
@@ -470,7 +470,7 @@ void releaseUntil(id *stop) {
 
 到这里，没有分析的方法就只剩下 `kill` 了，而它会将当前页面以及子页面全部删除：
 
-```objectivec
+~~~objectivec
 void kill() {
     AutoreleasePoolPage *page = this;
     while (page->child) page = page->child;
@@ -487,13 +487,13 @@ void kill() {
         delete deathptr;
     } while (deathptr != this);
 }
-```
+~~~
 
 ### autorelease 方法
 
 我们已经对自动释放池生命周期有一个比较好的了解，最后需要了解的话题就是 `autorelease` 方法的实现，先来看一下方法的调用栈：
 
-```objectivec
+~~~objectivec
 - [NSObject autorelease]
 └── id objc_object::rootAutorelease()
     └── id objc_object::rootAutorelease2()
@@ -506,13 +506,13 @@ void kill() {
                 └── static id *autoreleaseNoPage(id obj)
                     ├── AutoreleasePoolPage(AutoreleasePoolPage *newParent)
                     └── id *add(id obj)
-```
+~~~
 
 在 `autorelease` 方法的调用栈中，最终都会调用上面提到的 [autoreleaseFast](#autoreleaseFast) 方法，将当前对象加到 `AutoreleasePoolPage` 中。
 
 这一小节中这些方法的实现都非常容易，只是进行了一些参数上的检查，最终还要调用 [autoreleaseFast](#autoreleaseFast) 方法：
 
-```objectivec
+~~~objectivec
 inline id objc_object::rootAutorelease() {
     if (isTaggedPointer()) return (id)this;
     if (prepareOptimizedReturn(ReturnAtPlus1)) return (id)this;
@@ -528,7 +528,7 @@ static inline id autorelease(id obj) {
    id *dest __unused = autoreleaseFast(obj);
    return obj;
 }
-```
+~~~
 
 由于在上面已经分析过 `autoreleaseFast` 方法的实现，这里就不会多说了。
 

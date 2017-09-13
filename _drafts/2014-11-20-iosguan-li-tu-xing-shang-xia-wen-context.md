@@ -10,12 +10,12 @@ permalink: /:title
 ##hidden 属性
 我们首先来解释一下 `hidden 属性, 如果将一个控件设置的 `view` 属性设置为 `YES` , 那么这个 `view` 根本不会被绘制, 它通常等于 `alpha` 值被设置为 `0`, 但是设置 `hidden` 属性并不会产生动画, 如果你需要动画完成过渡就需要修改 `alpha` 的值.
 
-```
+~~~
 //without animation
 (view.alpha = 0) == (view.hidden = YES)
 //with animation
 (view.alpha = 0) != (view.hideen = YES)
-```
+~~~
 	
 ---
 ##alpha 属性
@@ -31,8 +31,8 @@ permalink: /:title
 ---
 我们可以通过设置以下的属性, 创建一个透明的视图接收事件.
 
-```
+~~~
 view.alpha = 1;
 view.opaque = NO;
 view.backgroundColor = [UIColor clearColor];
-```
+~~~

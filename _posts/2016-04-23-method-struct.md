@@ -38,17 +38,17 @@ Blog: [Draveness](http://draveness.me)
 
 在 `objc_class` 结构体中的注释写到 `class_data_bits_t` 相当于 `class_rw_t` 指针加上 rr/alloc 的标志。
 
-```objectivec
+~~~objectivec
 class_data_bits_t bits;    // class_rw_t * plus custom rr/alloc flags
-```
+~~~
 
 它为我们提供了便捷方法用于返回其中的 `class_rw_t *` 指针：
 
-```objectivec
+~~~objectivec
 class_rw_t* data() {
    return (class_rw_t *)(bits & FAST_DATA_MASK);
 }
-```
+~~~
 
 将 `bits` 与 `FAST_DATA_MASK` 进行位运算，只取其中的 `[3, 47]` 位转换成 `class_rw_t *` 返回。
 
@@ -59,12 +59,12 @@ class_rw_t* data() {
 ![objc-method-class_data_bits_t](http://7xrlu3.com1.z0.glb.clouddn.com/2016-04-23-objc-method-class_data_bits_t.png)
 
 
-```objectivec
+~~~objectivec
 #define FAST_IS_SWIFT           (1UL<<0)
 #define FAST_HAS_DEFAULT_RR     (1UL<<1)
 #define FAST_REQUIRES_RAW_ISA   (1UL<<2)
 #define FAST_DATA_MASK          0x00007ffffffffff8UL
-```
+~~~
 
 + `isSwift()`
     + `FAST_IS_SWIFT` 用于判断 Swift 类
@@ -75,7 +75,7 @@ class_rw_t* data() {
 
 执行 `class_data_bits_t` 结构体中的 `data()` 方法或者调用 `objc_class` 中的 `data()` 方法会返回同一个 `class_rw_t *` 指针，因为 `objc_class` 中的方法只是对 `class_data_bits_t` 中对应方法的封装。
 
-```objectivec
+~~~objectivec
 // objc_class 中的 data() 方法
 class_data_bits_t bits;
 
@@ -89,13 +89,13 @@ uintptr_t bits;
 class_rw_t* data() {
    return (class_rw_t *)(bits & FAST_DATA_MASK);
 }
-```
+~~~
 
 ### `class_rw_t` 和 `class_ro_t`
 
 ObjC 类中的属性、方法还有遵循的协议等信息都保存在 `class_rw_t` 中：
 
-```objectivec
+~~~objectivec
 struct class_rw_t {
     uint32_t flags;
     uint32_t version;
@@ -109,11 +109,11 @@ struct class_rw_t {
     Class firstSubclass;
     Class nextSiblingClass;
 };
-```
+~~~
 
 其中还有一个指向常量的指针 `ro`，其中存储了**当前类在编译期就已经确定的属性、方法以及遵循的协议**。
 
-```objectivec
+~~~objectivec
 struct class_ro_t {
     uint32_t flags;
     uint32_t instanceStart;
@@ -130,7 +130,7 @@ struct class_ro_t {
     const uint8_t * weakIvarLayout;
     property_list_t *baseProperties;
 };
-```
+~~~
 
 **在编译期间**类的结构中的 `class_data_bits_t *data` 指向的是一个 `class_ro_t *` 指针：
 
@@ -144,13 +144,13 @@ struct class_ro_t {
 3. 设置结构体 `ro` 的值以及 `flag`
 4. 最后设置正确的 `data`。
 
-```objectivec
+~~~objectivec
 const class_ro_t *ro = (const class_ro_t *)cls->data();
 class_rw_t *rw = (class_rw_t *)calloc(sizeof(class_rw_t), 1);
 rw->ro = ro;
 rw->flags = RW_REALIZED|RW_REALIZING;
 cls->setData(rw);
-```
+~~~
 
 下图是 `realizeClass` 方法执行过后的类所占用内存的布局，你可以与上面调用方法前的内存布局对比以下，看有哪些更改：
 
@@ -163,7 +163,7 @@ cls->setData(rw);
 
 下面，我们将分析一个类 `XXObject` 在运行时初始化过程中内存的更改，这是 `XXObject` 的接口与实现：
 
-```objectivec
+~~~objectivec
 // XXObject.h 文件
 #import <Foundation/Foundation.h>
 
@@ -184,7 +184,7 @@ cls->setData(rw);
 }
 
 @end
-```
+~~~
 
 > 这段代码是运行在 Mac OS X 10.11.3 (x86_64)版本中，而不是运行在 iPhone 模拟器或者真机上的，如果你在 iPhone 或者真机上运行，可能有一定差别。
 
@@ -193,7 +193,7 @@ cls->setData(rw);
 
 这是主程序的代码：
 
-```objectivec
+~~~objectivec
 #import <Foundation/Foundation.h>
 #import "XXObject.h"
 
@@ -204,15 +204,15 @@ int main(int argc, const char * argv[]) {
     }
     return 0;
 }
-```
+~~~
 
 ### 编译后内存中类的结构
 
 因为**类在内存中的位置是编译期就确定的**，先运行一次代码获取 `XXObject` 在内存中的地址。
 
-```objectivec
+~~~objectivec
 0x100001168
-```
+~~~
 
 接下来，在整个 ObjC 运行时初始化之前，也就是 `_objc_init` 方法中加入一个断点：
 
@@ -220,7 +220,7 @@ int main(int argc, const char * argv[]) {
 
 然后在 lldb 中输入以下命令：
 
-```objectivec
+~~~objectivec
 (lldb) p (objc_class *)0x100001168
 (objc_class *) $0 = 0x0000000100001168
 (lldb) p (class_data_bits_t *)0x100001188
@@ -244,13 +244,13 @@ warning: could not load any Objective-C class information. This will significant
   weakIvarLayout = 0x0000000000000000 <no value available>
   baseProperties = 0x0000000000000000
 }
-```
+~~~
 
 ![objc-method-lldb-print-before-realize](http://7xrlu3.com1.z0.glb.clouddn.com/2016-04-23-objc-method-lldb-print-before-realize.png)
 
 现在我们获取了类经过编译器处理后的只读属性 `class_ro_t`：
 
-```objectivec
+~~~objectivec
 (class_ro_t) $4 = {
   flags = 128
   instanceStart = 8
@@ -264,13 +264,13 @@ warning: could not load any Objective-C class information. This will significant
   weakIvarLayout = 0x0000000000000000 <no value available>
   baseProperties = 0x0000000000000000
 }
-```
+~~~
 
 可以看到这里面只有 `baseMethodList` 和 `name` 是有值的，其它的 `ivarLayout`、 `baseProtocols`、 `ivars`、`weakIvarLayout` 和 `baseProperties` 都指向了空指针，因为类中没有实例变量，协议以及属性。所以这里的结构体符合我们的预期。
 
 通过下面的命令查看 `baseMethodList` 中的内容：
 
-```objectivec
+~~~objectivec
 (lldb) p $4.baseMethodList
 (method_list_t *) $5 = 0x00000001000010c8
 (lldb) p $5->get(0)
@@ -284,7 +284,7 @@ Assertion failed: (i < count), function get, file /Users/apple/Desktop/objc-runt
 error: Execution was interrupted, reason: signal SIGABRT.
 The process has been returned to the state before expression evaluation.
 (lldb)
-```
+~~~
 
 ![objc-method-lldb-print-method-list](http://7xrlu3.com1.z0.glb.clouddn.com/2016-04-23-objc-method-lldb-print-method-list.png)
 
@@ -297,9 +297,9 @@ The process has been returned to the state before expression evaluation.
 + 分配可读写数据空间
 + 返回真正的类结构
 
-```objectivec
+~~~objectivec
 static Class realizeClass(Class cls)
-```
+~~~
 
 上面就是这个方法的签名，我们需要在这个方法中打一个条件断点，来判断当前类是否为 `XXObject`：
 
@@ -327,7 +327,7 @@ static Class realizeClass(Class cls)
 
 我们再来打印类的结构:
 
-```objectivec
+~~~objectivec
 (lldb) p (objc_class *)cls // 打印类指针
 (objc_class *) $262 = 0x0000000100001168
 (lldb) p (class_data_bits_t *)0x0000000100001188 // 在类指针上加 32 的 offset 打印 class_data_bits_t 指针
@@ -398,19 +398,19 @@ error: Execution was interrupted, reason: signal SIGABRT.
 The process has been returned to the state before expression evaluation.
 Assertion failed: (i < count), function get, file /Users/apple/Desktop/objc-runtime/runtime/objc-runtime-new.h, line 110.
 (lldb)
-```
+~~~
 
 ![objc-method-print-class-struct-after-realize](http://7xrlu3.com1.z0.glb.clouddn.com/2016-04-23-objc-method-print-class-struct-after-realize.png)
 
 > 最后一个操作实在是截取不到了
 
-```objectivec
+~~~objectivec
 const class_ro_t *ro = (const class_ro_t *)cls->data();
 class_rw_t *rw = (class_rw_t *)calloc(sizeof(class_rw_t), 1);
 rw->ro = ro;
 rw->flags = RW_REALIZED|RW_REALIZING;
 cls->setData(rw);
-```
+~~~
 
 在上述的代码运行之后，类的只读指针 `class_ro_t` 以及可读写指针 `class_rw_t` 都被正确的设置了。但是到这里，其 `class_rw_t` 部分的方法等成员都指针均为空，这些会在 `methodizeClass` 中进行设置：
 
@@ -422,13 +422,13 @@ cls->setData(rw);
 
 说了这么多，到现在我们可以简单看一下方法的结构，与类和对象一样，方法在内存中也是一个结构体。
 
-```objectivec
+~~~objectivec
 struct method_t {
     SEL name;
     const char *types;
     IMP imp;
 };
-```
+~~~
 
 其中包含方法名，类型还有方法的实现指针 `IMP`：
 
@@ -436,11 +436,11 @@ struct method_t {
 
 上面的 `-[XXObject hello]` 方法的结构体是这样的：
 
-```objectivec
+~~~objectivec
 name = "hello"
 types = 0x0000000100000fa4 "v16@0:8"
 imp = 0x0000000100000e90 (method`-[XXObject hello] at XXObject.m:13
-```
+~~~
 
 方法的名字在这里没有什么好说的。其中，方法的类型是一个非常奇怪的字符串 `"v16@0:8"` 这在 ObjC 中叫做*类型编码*(Type Encoding)，你可以看这篇[官方文档](https://developer.apple.com/library/mac/documentation/Cocoa/Conceptual/ObjCRuntimeGuide/Articles/ocrtTypeEncodings.html)了解与类型编码相关的信息。
 

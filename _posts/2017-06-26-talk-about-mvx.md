@@ -205,7 +205,7 @@ MVP 的第一个主要变种就是被动视图（Passive View）；顾名思义�
 
 被动的视图层就像前端中的 HTML 和 CSS 代码，只负责展示视图的结构和内容，本身不具有任何的逻辑：
 
-```swift
+~~~swift
 <article class="post">
   <header class="post-header">
     <h2 class="post-title"><a href="/mvx-controller.html">谈谈 MVX 中的 Controller</a></h2>
@@ -219,7 +219,7 @@ MVP 的第一个主要变种就是被动视图（Passive View）；顾名思义�
     <time class="post-date" datetime="2017-06-23">23 Jun 2017</time>
   </footer>
 </article>
-```
+~~~
 
 #### 依赖关系
 
@@ -252,9 +252,9 @@ MVP 的第一个主要变种就是被动视图（Passive View）；顾名思义�
 
 对于用户输入的处理，监督控制器的做法与标准 MVP 中的 Presenter 完全相同；但是对于视图、模型的同步工作，监督控制器会尽可能地将所有简单的属性**以数据绑定的形式声明在视图层中**，类似于 Vue 中双向绑定的简化版本：
 
-```html
+~~~html
 <a v-bind:href="url"></a>
-```
+~~~
 
 剩下的无法通过上述方式直接绑定的属性就需要通过监督控制器来操作和更新了。
 
@@ -344,7 +344,7 @@ MVVM 架构模式是微软在 2005 年诞生的，从诞生一开始就与 WPF �
 
 在实现 PM 模式时，我们需要处理视图和展示模型之间状态的同步，也就是 MVVM 中的视图和视图模型，我们使用隐式的 Binder 和 XAML 文件来完成视图和视图模型两者之间的双向绑定：
 
-```xml
+~~~xml
 <Window x:Class ="WPFDataBinding.MainWindow" Title="MainWindow" Height="350" Width="604">
    <Grid>
       <Label Name="nameLabel" Margin="2">_Name:</Label>
@@ -355,7 +355,7 @@ MVVM 架构模式是微软在 2005 年诞生的，从诞生一开始就与 WPF �
          Text="{Binding Age}"/>
    </Grid>
 </Window>
-```
+~~~
 
 在 WPF 中我们可以使用 Binding 关键字在 XAML 中完成双向绑定，当 `TextBox` 中的文字更新时，Binder 也会更新 ViewModel 中对应属性 `Name` 或者 `Age` 的值。
 

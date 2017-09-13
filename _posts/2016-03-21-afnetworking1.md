@@ -46,7 +46,7 @@ Blog: [Draveness](http://draveness.me)
 4. 向 data task 发送消息 `- resume`，开始执行这个任务
 5. 在 completionHandler 中将数据编码，返回字符串
 
-```objectivec
+~~~objectivec
 NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:[[NSURL alloc] initWithString:@"https://github.com"]];
 NSURLSession *session = [NSURLSession sharedSession];
 NSURLSessionDataTask *task = [session dataTaskWithRequest:request
@@ -55,11 +55,11 @@ NSURLSessionDataTask *task = [session dataTaskWithRequest:request
                                            NSLog(@"%@", dataStr);
                                        }];
 [task resume];
-```
+~~~
 
 这一段代码可以说是使用 `NSURLSession` 发送请求最简单的一段代码了，当你运行这段代码会在控制台看到一坨 [github](github.com) 首页的 html。
 
-```
+~~~
 <!DOCTYPE html>
 <html lang="en" class="">
   <head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# object: http://ogp.me/ns/object# article: http://ogp.me/ns/article# profile: http://ogp.me/ns/profile#">
@@ -68,7 +68,7 @@ NSURLSessionDataTask *task = [session dataTaskWithRequest:request
 	</head>
 	...
 </html>
-```
+~~~
 
 ## AFNetworking
 
@@ -77,7 +77,7 @@ AFNetworking 的使用也是比较简单的，使用它来发出 HTTP 请求有�
 1. 以服务器的**主机地址或者域名**生成一个 AFHTTPSessionManager 的实例
 2. 调用 `- GET:parameters:progress:success:failure:` 方法
 
-```objectivec
+~~~objectivec
 AFHTTPSessionManager *manager = [[AFHTTPSessionManager alloc] initWithBaseURL:[[NSURL alloc] initWithString:@"hostname"]];
 [manager GET:@"relative_url" parameters:nil progress:nil
     success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
@@ -85,7 +85,7 @@ AFHTTPSessionManager *manager = [[AFHTTPSessionManager alloc] initWithBaseURL:[[
     } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
         NSLog(@"%@", error);
     }];
-```
+~~~
 
 > 注意：在 iOS9 中，苹果默认全局 HTTPs，如果你要发送不安全的 HTTP 请求，需要在 info.plist 中加入如下键值对才能发出不安全的 HTTP 请求
 >
@@ -97,7 +97,7 @@ AFHTTPSessionManager *manager = [[AFHTTPSessionManager alloc] initWithBaseURL:[[
 
 在这一节中我们要分析一下在上面两个方法的调用栈，首先来看的是 `AFHTTPSessionManager` 的初始化方法 `- initWithBaseURL:`
 
-```objectivec
+~~~objectivec
 - [AFHTTPSessionManager initWithBaseURL:]
 	- [AFHTTPSessionManager initWithBaseURL:sessionConfiguration:]
 		- [AFURLSessionManager initWithSessionConfiguration:]
@@ -107,7 +107,7 @@ AFHTTPSessionManager *manager = [[AFHTTPSessionManager alloc] initWithBaseURL:[[
 			- [AFNetworkReachabilityManager sharedManager] // 查看网络连接情况
 		- [AFHTTPRequestSerializer serializer] // 负责序列化请求
 		- [AFJSONResponseSerializer serializer] // 负责序列化响应
-```
+~~~
 
 从这个初始化方法的调用栈，我们可以非常清晰地了解这个框架的结构：
 
@@ -117,7 +117,7 @@ AFHTTPSessionManager *manager = [[AFHTTPSessionManager alloc] initWithBaseURL:[[
 
 初始化方法很好地揭示了 AFNetworking 整个框架的架构，接下来我们要通过分析另一个方法 `- GET:parameters:process:success:failure:` 的调用栈，看一下 HTTP 请求是如何发出的：
 
-```objectivec
+~~~objectivec
 - [AFHTTPSessionManager GET:parameters:process:success:failure:]
 	- [AFHTTPSessionManager dataTaskWithHTTPMethod:parameters:uploadProgress:downloadProgress:success:failure:] // 返回 NSURLSessionDataTask #1
 		- [AFHTTPRequestSerializer requestWithMethod:URLString:parameters:error:] // 返回 NSMutableURLRequest
@@ -127,7 +127,7 @@ AFHTTPSessionManager *manager = [[AFHTTPSessionManager alloc] initWithBaseURL:[[
 				- [AFURLSessionManagerTaskDelegate init]
 				- [AFURLSessionManager setDelegate:forTask:]
 	- [NSURLSessionDataTask resume]
-```
+~~~
 
 在这里 `#1` `#2` `#3` 处返回的是同一个 data task，我们可以看到，在 `#3` 处调用的方法 `- [NSURLSession dataTaskWithRequest:]` 和只使用 `NSURLSession` 发出 HTTP 请求时调用的方法 `- [NSURLSession dataTaskWithRequest:completionHandler:]` 差不多。在这个地方返回 data task 之后，我们再调用 `- resume` 方法执行请求，并在某些事件执行时通知代理 `AFURLSessionManagerTaskDelegate`
 

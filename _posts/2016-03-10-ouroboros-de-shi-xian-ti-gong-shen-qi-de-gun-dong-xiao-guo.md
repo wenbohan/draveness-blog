@@ -37,7 +37,7 @@ tags: iOS
 
 我在 `UIScrollView` 中通过 method swizillzing 动态地改变了原有的 `-setContentOffset:` 方法的实现.
 
-```objectivec
+~~~objectivec
 - (void)ou_setContentOffset:(CGPoint)contentOffset {
     [self ou_setContentOffset:contentOffset];
     [[NSNotificationCenter defaultCenter] postNotificationName:OURScrollViewUpdateContentOffset
@@ -45,7 +45,7 @@ tags: iOS
                                                       userInfo:@{@"contentOffset": [NSValue valueWithCGPoint:contentOffset],
                                                                  @"direction":@(self.ou_scrollDirection)}];
 }
-```
+~~~
 
 当 `UIScrollView` 滚动时, 它的 `contentOffset` 会不断发生改变, 而我们就可以通过方法调剂改变原有方法的实现, 在 `contentOffset` 改变时发出通知, 来通知 `Ouroboros` 中的其他模块根据 `contentOffset` 和  `ou_scrollDirection` 来对视图的状态进行更新.
 
@@ -53,7 +53,7 @@ tags: iOS
 
 `UIView+Ouroboros` 这个分类与大多数框架中的分类的作用一样, 为 `UIView` 提供"开箱即用"的方法, 其核心方法为 `-our_animateWithProperty:configureBlock:`, :
 
-```objectivec
+~~~objectivec
 - (void)our_animateWithProperty:(OURAnimationProperty)property
                  configureBlock:(ScaleAnimationBlock)configureBlock {
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateState:) name:OURScrollViewUpdateContentOffset object:nil];
@@ -63,7 +63,7 @@ tags: iOS
     NSMutableArray<Scale *> *scales = [ouroboros mutableArrayValueForKey:@"scales"];
     [scales addObject:scale];
 }
-```
+~~~
 
 当这个方法被调用时:
 
@@ -75,7 +75,7 @@ tags: iOS
 
 在这里有这样几个问题, **每一个视图对应的一组 `property` 相同的动画, 都由相同的 `ouroboros` 对象来处理**, 这样做的主要原因是防止在同一区间中改变视图的同一属性多次的问题.
 
-```objectivec
+~~~objectivec
 [yellowView our_animateWithProperty:OURAnimationPropertyViewHeight configureBlock:^(Scale * _Nonnull scale) {
     scale.toValue = @(200);
     scale.trigger = 0;
@@ -86,7 +86,7 @@ tags: iOS
     scale.trigger = 320;
     scale.offset = 320 * 0.5;
 }];
-```
+~~~
 
 在这里当我们第一次调用 `-our_animateWithProperty:configureBlock:` 方法时, 在 `[0, 640]` 之间改变了视图的高度, 而在我们第二次为视图高度添加动画时, 在 `[320, 480]` 之间改变了视图的高度, 而这时就造成了冲突. 而这就是 `ouroboros` 要解决的一个问题.
 
@@ -96,7 +96,7 @@ tags: iOS
 2. 然后遍历视图自己持有的 `ouroboroses` 数组
 3. 通过其中的每一个 `ouroboros` 获取当前位置下的值, 根据 `ouroboros.property` 更新视图的状态.
 
-```objectivec
+~~~objectivec
 - (void)updateState:(NSNotification *)notification {
     CGPoint contentOffset = [[notification userInfo][@"contentOffset"] CGPointValue];
     OURScrollDirection direction = [[notification userInfo][@"direction"] integerValue];
@@ -120,7 +120,7 @@ tags: iOS
         }
     }
 }
-```
+~~~
 
 其中的 `-getCurrentValueWithPosition:` 方法会在下面介绍.
 
@@ -129,15 +129,15 @@ tags: iOS
 `Ouroboros` 作为这个框架的核心类, 它为视图的更新提供数据支持, 并且负责管理器持有的 `Scale` 对象, 发现其中的可能的动画冲突,
 在这个类中也提供了几个创建 `CGRect` `CGSize` 和 `CGPoint` 的方法.
 
-```objectivec
+~~~objectivec
 NSValue *NSValueFromCGRectParameters(CGFloat x, CGFloat y, CGFloat width, CGFloat height);
 NSValue *NSValueFromCGPointParameters(CGFloat x, CGFloat y);
 NSValue *NSValueFromCGSizeParameters(CGFloat width, CGFloat height);
-```
+~~~
 
 当 `UIView` 调用 `-updateState:` 方法更新视图时, 调用了 `-getCurrentValueWithPosition:` 方法, 该方法根据当前的状态获取了视图该 `property` 对应的值.
 
-```objectivec
+~~~objectivec
 - (id)getCurrentValueWithPosition:(CGFloat)position {
     Scale *previousScale = nil;
     Scale *afterScale = nil;
@@ -159,7 +159,7 @@ NSValue *NSValueFromCGSizeParameters(CGFloat width, CGFloat height);
     NSAssert(NO, @"FATAL ERROR, Unknown current value for property %@", @(self.property));
     return [[NSObject alloc] init];
 }
-```
+~~~
 
 `Ouroboros` 对象会遍历持有的 `scales` 数组, 这时可能会发生三种情况:
 
@@ -171,9 +171,9 @@ NSValue *NSValueFromCGSizeParameters(CGFloat width, CGFloat height);
 
 比如说, 存在以下两个 `scales`
 
-```
+~~~
 [100, 200] [400, 500]
-```
+~~~
 
 1. 如果当前位置在 `[100, 200]` 或者 `[400, 500]` 之间, 那么直接通过这两个 `scale` 计算就能获得当前位置的值.
 2. 如果在 `[-Inf, 100]` 之间, 就会返回 `100` 处的值.
@@ -188,13 +188,13 @@ NSValue *NSValueFromCGSizeParameters(CGFloat width, CGFloat height);
 
 `Objective-C` 中对数组的 `KVO` 主要由这三个方法实现, 首先需要通过 `-mutableArrayValueForKey:` 方法获取需要 observe 的可变数组
 
-```objectivec
+~~~objectivec
 NSMutableArray<Scale *> *scales = [ouroboros mutableArrayValueForKey:@"scales"];
-```
+~~~
 
 然后在操作这个数组, 例如 `-addObject:` 等方法时, 就会调用 `-insertObject:in<Key>AtIndex:`, `-removeObjectFrom<Key>AtIndex:` 方法, 而我们在只要在 `ouroboros` 覆写这两个方法就可以了.
 
-```objectivec
+~~~objectivec
 - (void)insertObject:(Scale *)currentScale inScalesAtIndex:(NSUInteger)index {
     Scale *previousScale = nil;
     Scale *afterScale = nil;
@@ -224,7 +224,7 @@ NSMutableArray<Scale *> *scales = [ouroboros mutableArrayValueForKey:@"scales"];
 - (void)removeObjectFromScalesAtIndex:(NSUInteger)index {
     [self.scales removeObjectAtIndex:index];
 }
-```
+~~~
 
 在这里 `-removeObjectFromScalesAtIndex:` 方法的实现并不重要, 我们需要关注的是 `-insertObject:inScalesAtIndex:` 方法. 这个方法在最开始会先将即将插入的 `scale` 与其它所有的 `scale` 进行比较, 查看是否有 overlapping, 并找出最近的 `previousScale` 和 `afterScale`. 重新设置 `currentScale` 和 `afterScale` 的初始值. 我相信由于上面也有类似的代码, 这里的逻辑也很好解释.
 
@@ -241,7 +241,7 @@ NSMutableArray<Scale *> *scales = [ouroboros mutableArrayValueForKey:@"scales"];
 
 这个方法的实现非常长, 我们在这里只截取其中的一部分
 
-```objectivec
+~~~objectivec
 - (id)calculateInternalValueWithPercent:(CGFloat)percent {
     percent = [self justifyPercent:percent];
 
@@ -259,7 +259,7 @@ NSMutableArray<Scale *> *scales = [ouroboros mutableArrayValueForKey:@"scales"];
 
     return result;
 }
-```
+~~~
 
 当 `percent` 传进来之后, 要调用 `-justifyPercent:` 方法保证当前 `percent` 值的范围在 `[0, 1]` 之间, 然后通过 `functionBlock` 根据不同的函数曲线偏移当前的 `offset` 值, 默认的函数曲线为线性的, 也就是不会改变 `percent` 值. 在这之后, 由于 `fromValue` 和 `toValue` 的值有不同的类型, 要根据值类型的不同, 计算出不同的 `resultValue`. 公式差不多都是这样的:
 

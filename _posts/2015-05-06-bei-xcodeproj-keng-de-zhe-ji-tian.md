@@ -61,12 +61,12 @@ tags: iOS
 
 作为一个~~闲的蛋疼~~专业的工程师, 我的第一想法是, 这需求肯定很多, 干脆造一个轮子好了, 于是我打开了 `project.pbxproj` 文件. 立刻被里面的数据所淹没了.
 
-```
+~~~
 /* Begin PBXBuildFile section */
 		0DFDC45E10D450EE9CA10394 /* UITableViewCell+BackgroundColor.h in Headers */ = {isa = PBXBuildFile; fileRef = A9EE3067770E740BB65F5B9D /* UITableViewCell+BackgroundColor.h */; };
 		186AC5221AF855410095ED95 /* DKNightVersionManagerTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 186AC5211AF855410095ED95 /* DKNightVersionManagerTest.m */; };
 		18D2288D1AF8BA4F00872BF1 /* UINavigationBar+Animation.m in Sources */ = {isa = PBXBuildFile; fileRef = 18D2288C1AF8BA4F00872BF1 /* UINavigationBar+Animation.m */; };
-```
+~~~
 
 七百多行的文件, 我在这里只选取了三行. 因为这个文件中的**数据**实在是太多了. 你会看到每一行的前面大概都是一个 **24 位的 16 进制数字** 然后就是一个文件名 `UITableViewCell+BackgroundColor.h` 在最后有一个 `isa` 和一个 `fileRef`.
 
@@ -148,9 +148,9 @@ FileRef 其实就是 File Reference 的缩写, 当你从 Xcode 中删除一个�
 
 在使用 xcodeproj 时, 只需要**查找 `*.xcodeproj` 文件**而不是 `*.pbxproj`. 我们通过调用 `Project` 的类方法来打开文件.
 
-```ruby
+~~~ruby
 project = Xcodeproj::Project.open(path)
-```
+~~~
 
 #### 获取 Target
 
@@ -168,9 +168,9 @@ Tips:
 
 而在这里我想要获得的就是以项目名命名的 Target, 一般都是 `targets` 数组中的第一个.
 
-```ruby
+~~~ruby
 target = project.targets.first
-```
+~~~
 
 #### 创建 Group
 
@@ -178,15 +178,15 @@ target = project.targets.first
 
 在获取 Target 之后, 需要创建或者获取一个文件即将被添加进去的 `group`, 我一般使用 `find_subpath` 这个方法
 
-```ruby
+~~~ruby
 def find_subpath(path, should_create = false)
-```
+~~~
 
 它能比较快捷的根据路径名寻找 `group`, 如果当前的 `group` 不存在, 它还会递归地创建(可选).
 
-```ruby
+~~~ruby
 group = project.main_group.find_subpath(File.join('DKNightVersion', 'Pod', 'Classes', 'UIKit'), true)
-```
+~~~
 
 因为这个方法是一个 `group` 的实例方法, 所以先通过 `main_group` 获取主 `group`, 然后再调用这个方法, 最后会返回指定的 `group`. 在工程中创建这样一种的结构.
 
@@ -194,9 +194,9 @@ group = project.main_group.find_subpath(File.join('DKNightVersion', 'Pod', 'Clas
 
 在成功获取之后还**需要把 `group` 的 `source_tree` 设置成 `'SOURCE_ROOT'`**, 这样在加入到 Build Phases 的时候, 它会从工程文件的根目录下开始寻找你所添加的文件, 不会出现一些非常奇怪的问题.
 
-```ruby
+~~~ruby
 group.set_source_tree('SOURCE_ROOT')
-```
+~~~
 
 ### 向 `group` 中添加文件
 
@@ -204,9 +204,9 @@ group.set_source_tree('SOURCE_ROOT')
 
 我们在获取 `group` 之后就可以向其中添加文件了. 在这时使用 `new_reference` 方法, 为文件创建一个 `FileRef` 添加到 `group` 中.
 
-```ruby
+~~~ruby
 file_ref = group.new_reference(file_path)
-```
+~~~
 
 这样这个文件就添加到了 `group` 中, 会出现在工程中的导航栏中.
 
@@ -218,9 +218,9 @@ file_ref = group.new_reference(file_path)
 
 在前面获取到的 `Target` 在这一步就开始起了作用, 我们需要获取 `Target` 的 `Build Phase` 并将在上面添加的文件添加到 `Build Phase` 中.
 
-```ruby
+~~~ruby
 target.add_file_references([file_ref])
-```
+~~~
 
 `add_file_references` 就负责把一组 `FileRef` 添加到对应的 `Build Phases` 中, `source_build_phase` `headers_build_phase` `resource_build_phase` `framework_build_phase` 在 GUI 中你可以找到这四者对应的 section.
 
@@ -228,22 +228,22 @@ target.add_file_references([file_ref])
 
 但是从 `Build Phase` 中移除文件就需要手动获取这些 `*_build_phase` 然后从中调用 `remove_reference` 来删除文件或者资源.
 
-```ruby
+~~~ruby
 target.source_build_phase.remove_file_reference(file_ref)
 target.headers_build_phase.remove_file_refernece(file_ref)
-```
+~~~
 
 #### 保存 Project
 
 在最后, 我们只需要调用 `save` 方法来保存整个工程就好了.
 
-```ruby
+~~~ruby
 project.save
-```
+~~~
 
 ## 总结
 
-```ruby
+~~~ruby
 project = Xcodeproj::Project.open(path)
 target = project.targets.first
 group = project.main_group.find_subpath(File.join('DKNightVersion', 'Pod', 'Classes', 'UIKit'), true)
@@ -251,6 +251,6 @@ group.set_source_tree('SOURCE_ROOT')
 file_ref = group.new_reference(file_path)
 target.add_file_references([file_ref])
 project.save
-```
+~~~
 
 其实到现在为止, 我感觉到使用代码向 Xcodeproj 中添加文件是很简单的事情, 那是因为, 首先有 Xcodeproj 这样文档糟糕但是功能还是比较齐全的第三方框架, 而且这是我在几天不停地阅读源代码, 不停被坑, 一点一点尝试才摸索出来的结果, 都是泪啊...不想多说了...不过最后把这个问题解决之后, ~~自我感觉还是蛮好的~~还是挺高兴的. 嗯, 就这样.

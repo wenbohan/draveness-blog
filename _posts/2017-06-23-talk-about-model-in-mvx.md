@@ -19,7 +19,7 @@ tags: iOS MVC
 
 在大多数 iOS 的项目中，Model 层只是一个单纯的数据结构，你可以看到的绝大部分模型都是这样的：
 
-```swift
+~~~swift
 struct User {
     enum Gender: String {
         case male = "male"
@@ -30,7 +30,7 @@ struct User {
     let age: Int
     let gender: Gender
 }
-```
+~~~
 
 模型起到了定义一堆『坑』的作用，只是一个简单的模板，并没有参与到实际的业务逻辑，只是在模型层进行了一层**抽象**，将服务端发回的 JSON 或者说 `Dictionary` 对象中的字段一一取出并装填到预先定义好的模型中。
 
@@ -38,20 +38,20 @@ struct User {
 
 我们可以将这种模型层中提供的对象理解为『即开即用』的 `Dictionary` 实例；在使用时，可以直接从模型中取出属性，省去了从 `Dictionary` 中抽出属性以及验证是否合法的过程。
 
-```swift
+~~~swift
 let user = User...
 
 nameLabel.text = user.name
 emailLabel.text = user.email
 ageLabel.text = "\(user.age)"
 genderLabel.text = user.gender.rawValue
-```
+~~~
 
 ### JSON -> Model
 
 使用 Swift 将 `Dictionary` 转换成模型，在笔者看来其实是一件比较麻烦的事情，主要原因是 Swift 作为一个号称类型安全的语言，有着使用体验非常差的 Optional 特性，从 `Dictionary` 中取出的值都是不一定存在的，所以如果需要纯手写这个过程其实还是比较麻烦的。
 
-```swift
+~~~swift
 extension User {
     init(json: [String: Any]) {
         let name = json["name"] as! String
@@ -61,7 +61,7 @@ extension User {
         self.init(name: name, email: email, age: age, gender: gender)
     }
 }
-```
+~~~
 
 这里为 `User` 模型创建了一个 extension 并写了一个简单的模型转换的初始化方法，当我们从 JSON 对象中取值时，得到的都是 Optional 对象；而在大多数情况下，我们都没有办法直接对 Optional 对象进行操作，这就非常麻烦了。
 
@@ -69,7 +69,7 @@ extension User {
 
 在 Swift 中遇到无法立即使用的 Optional 对象时，我们可以会使用 `!` 默认将字典中取出的值当作非 Optional 处理，但是如果服务端发回的数据为空，这里就会直接崩溃；当然，也可使用更加安全的 `if let` 对 Optional 对象进行解包（unwrap）。
 
-```swift
+~~~swift
 extension User {
     init?(json: [String: Any]) {
         if let name = json["name"] as? String,
@@ -82,11 +82,11 @@ extension User {
         return nil
     }
 }
-```
+~~~
 
 上面的代码看起来非常的丑陋，而正是因为上面的情况在 Swift 中非常常见，所以社区在 Swift 2.0 中引入了 `guard` 关键字来优化代码的结构。
 
-```swift
+~~~swift
 extension User {
     init?(json: [String: Any]) {
         guard let name = json["name"] as? String,
@@ -99,7 +99,7 @@ extension User {
         self.init(name: name, email: email, age: age, gender: gender)
     }
 }
-```
+~~~
 
 不过，上面的代码在笔者看来，并没有什么本质的区别，不过使用 `guard` 对错误的情况进行提前返回确实是一个非常好的编程习惯。
 
@@ -111,7 +111,7 @@ extension User {
 
 OC 作为动态语言，这种设计思路其实还是非常优秀的，它避免了大量由于对象不存在导致无法完成方法调用造成的崩溃；同时，作为开发者，我们往往都不需要考虑 `nil` 的存在，所以使用 OC 时写出的模型转换的代码都相对好看很多。
 
-```objectivec
+~~~objectivec
 // User.h
 typedef NS_ENUM(NSUInteger, Gender) {
     Male = 0,
@@ -141,13 +141,13 @@ typedef NS_ENUM(NSUInteger, Gender) {
 }
 
 @end
-```
+~~~
 
 当然，在 OC 中也有很多优秀的 JSON 转模型的框架，如果我们使用 YYModel 这种开源框架，其实只需要写一个 `User` 类的定义就可以获得 `-yy_modelWithJSON:` 等方法来初始化 `User` 对象：
 
-```objectivec
+~~~objectivec
 User *user = [User yy_modelWithJSON:json];
-```
+~~~
 
 而这也是通过 Objective-C 强大的运行时特性做到的。
 
@@ -184,7 +184,7 @@ iOS 中的 Service 层大体上有两种常见的组织方式，其中一种是�
 
 命令式的 Service 层一般都会为每一个或者一组 API 写一个专门用于 HTTP 请求的 Manager 类，在这个类中，我们会在每一个静态方法中使用 AFNetworking 或者 Alamofire 等网络框架发出 HTTP 请求。
 
-```objectivec
+~~~objectivec
 import Foundation
 import Alamofire
 
@@ -212,18 +212,18 @@ final class UserManager {
         }
     }
 }
-```
+~~~
 
 在这个方法中，我们完成了网络请求、数据转换 JSON、JSON 转换到模型以及最终使用 `completion` 回调的过程，调用 Service 服务的 Controller 可以直接从回调中使用构建好的 Model 对象。
 
-```objectivec
+~~~objectivec
 UserManager.user(id: 1) { user in
     self.nameLabel.text = user.name
     self.emailLabel.text = user.email
     self.ageLabel.text = "\(user.age)"
     self.genderLabel.text = user.gender.rawValue
 }
-```
+~~~
 
 #### 声明式
 
@@ -233,7 +233,7 @@ UserManager.user(id: 1) { user in
 
 如果是在 Objective-C 中，一般会定义一个抽象的基类，并让所有的 Request 都继承它；但是在 Swift 中，我们可以使用协议以及协议扩展的方式实现这一功能。
 
-```swift
+~~~swift
 protocol AbstractRequest {
     var requestURL: String { get }
     var method: HTTPMethod { get }
@@ -249,11 +249,11 @@ extension AbstractRequest {
         }
     }
 }
-```
+~~~
 
 在 `AbstractRequest` 协议中，我们定义了发出一个请求所需要的全部参数，并在协议扩展中实现了 `start(completion:)` 方法，这样实现该协议的类都可以直接调用 `start(completion:)` 发出网络请求。
 
-```swift
+~~~swift
 final class AllUsersRequest: AbstractRequest {
     let requestURL = "http://localhost:3000/users"
     let method = HTTPMethod.get
@@ -269,18 +269,18 @@ final class FindUserRequest: AbstractRequest {
         self.requestURL = "http://localhost:3000/users/\(id)"
     }
 }
-```
+~~~
 
 我们在这里写了两个简单的 `Request` 类 `AllUsersRequest` 和 `FindUserRequest`，它们两个一个负责获取所有的 `User` 对象，一个负责从服务端获取指定的 `User`；在使用上面的声明式 Service 层时也与命令式有一些不同：
 
-```swift
+~~~swift
 FindUserRequest(id: 1).start { json in
     if let json = json as? [String: Any],
         let user = User(json: json) {
         print(user)
     }
 }
-```
+~~~
 
 因为在 Swift 中，我们没法将 JSON 在 Service 层转换成模型对象，所以我们不得不在 `FindUserRequest` 的回调中进行类型以及 JSON 转模型等过程；又因为 HTTP 请求可能依赖其他的参数，所以在使用这种形式请求资源时，我们需要在初始化方法传入参数。
 
@@ -340,7 +340,7 @@ Model 层作为数据库中表的映射，它就需要实现两部分功能：
 
 ActiveRecord 为数据库的迁移和更新提供了一种名为 Migration 的机制，它可以被理解为一种 DSL，对数据库中的表的字段、类型以及约束进行描述：
 
-```ruby
+~~~ruby
 class CreateProducts < ActiveRecord::Migration[5.0]
   def change
     create_table :products do |t|
@@ -349,26 +349,26 @@ class CreateProducts < ActiveRecord::Migration[5.0]
     end
   end
 end
-```
+~~~
 
 上面的 Ruby 代码创建了一个名为 `Products` 表，其中包含三个字段 `name`、`description` 以及一个默认的主键 `id`，然而在上述文件生成时，数据库中对应的表还不存在，当我们在命令行中执行 `rake db:migrate` 时，才会执行下面的 SQL 语句生成一张表：
 
-```sql
+~~~sql
 CREATE TABLE products (
     id int(11)   DEFAULT NULL auto_increment PRIMARY KEY
     name         VARCHAR(255),
     description  text,
 );
-```
+~~~
 
 同样地，如果我们想要更新数据库中的表的字段，也需要创建一个 Migration 文件，ActiveRecord 会为我们直接生成一个 SQL 语句并在数据库中执行。
 
 ActiveRecord 对数据库的增删改查功能都做了相应的实现，在使用它进行数据库查询时，会生成一条 SQL 语句，在数据库中执行，并将执行的结果初始化成一个 Model 的实例并返回：
 
-```ruby
+~~~ruby
 user = User.find(10)
 # => SELECT * FROM users WHERE (users.id = 10) LIMIT 1
-```
+~~~
 
 这就是 ActiveRecord 作为 Model 层的 ORM 框架解决两个关键问题的方式，其最终结果都是生成一条 SQL 语句并扔到数据库中执行。
 
@@ -384,13 +384,13 @@ Model 与数据库之间的关系其实大多数都与数据的存储查询有�
 
 这种说法形成的原因是，在绝大部分的 MVC 框架中，Controller 的作用都是将请求代理给 Model 去完成，它本身并不包含任何的业务逻辑，任何实际的查询、更新和删除操作都不应该在 Controller 层直接进行，而是要讲这些操作交给 Model 去完成。
 
-```ruby
+~~~ruby
 class UsersController
   def show
     @user = User.find params[:id]
   end
 end
-```
+~~~
 
 这也就是为什么在后端应用中设计合理的 Controller 实际上并没有多少行代码，因为大多数业务逻辑相关的代码都会放到 Model 层。
 
@@ -456,7 +456,7 @@ Controller 的作用更像是胶水，将 Model 层中获取的模型传入 View
 
 如果服务端的 API 严格地按照 RESTful 的形式进行设计，那么就可以在客户端的 Model 层建立起一一对应的关系，拿最基本的几个 API 请求为例：
 
-```swift
+~~~swift
 extension RESTful {
     static func index(completion: @escaping ([Self]) -> ())
 
@@ -468,22 +468,22 @@ extension RESTful {
 
     static func delete(id: Int, completion: @escaping () -> ())
 }
-```
+~~~
 
 我们在 Swift 中通过 Protocol Extension 的方式为所有遵循 `RESTful` 协议的模型添加基本的 CRUD 方法，那么 `RESTful` 协议本身又应该包含什么呢？
 
-```swift
+~~~swift
 protocol RESTful {
     init?(json: [String: Any])
     static var url: String { get }
 }
-```
+~~~
 
 RESTful 协议本身也十分简单，一是 JSON 转换方法，也就是如何将服务器返回的 JSON 数据转换成对应的模型，另一个是资源的 `url`
 
 > 对于这里的 `url`，我们可以遵循约定优于配置的原则，通过反射获取一个**默认**的资源链接，从而简化原有的 `RESTful` 协议，但是这里为了简化代码并没有使用这种方法。
 
-```swift
+~~~swift
 extension User: RESTful {
     static var url: String {
         return "http://localhost:3000/users"
@@ -501,11 +501,11 @@ extension User: RESTful {
         self.init(id: id, name: name, email: email, age: age, gender: gender)
     }
 }
-```
+~~~
 
 在 `User` 模型遵循上述协议之后，我们就可以简单的通过它的静态方法来对服务器上的资源进行一系列的操作。
 
-```swift
+~~~swift
 User.index { users in
     // users
 }
@@ -513,7 +513,7 @@ User.index { users in
 User.create(params: ["name": "Stark", "email": "example@email.com", "gender": 0, "age": 100]) { user in
     // user
 }
-```
+~~~
 
 当然 RESTful 的 API 接口仍然需要服务端提供支持，不过以 Model 取代 Service 作为 HTTP 请求的发出者确实是可行的。
 
@@ -521,10 +521,10 @@ User.create(params: ["name": "Stark", "email": "example@email.com", "gender": 0,
 
 虽然上述的方法简化了 Service 层，但是在真正使用时确实会遇到较多的限制，比如，用户需要对另一用户进行关注或者取消关注操作，这样的 API 如果要遵循 RESTful 就需要使用以下的方式进行设计：
 
-```swift
+~~~swift
 POST   /api/users/1/follows
 DELETE /api/users/1/follows
-```
+~~~
 
 这种情况就会导致在当前的客户端的 Model 层没法建立合适的抽象，因为 `follows` 并不是一个真实存在的模型，它只代表两个用户之间的关系，所以在当前所设计的模型层中没有办法实现上述的功能，还需要引入 Service 层，来对服务端中的每一个 Controller 的 action 进行抽象，在这里就不展开讨论了。
 
@@ -547,18 +547,18 @@ DELETE /api/users/1/follows
 
 熟悉 ActiveRecord 的开发者应该都熟悉下面的使用方式：
 
-```ruby
+~~~ruby
 User.find_by_name "draven"
-```
+~~~
 
 在 Swift 中通过现有的特性很难提供这种 API，所以很多情况下只能退而求其次，继承 `NSObject` 并且使用 `dynamic` 关键字记住 Objective-C 的特性实现一些功能：
 
-```objectivec
+~~~objectivec
 class User: Object {
     dynamic var name = ""
     dynamic var age = 0
 }
-```
+~~~
 
 这确实是一种解决办法，但是并不是特别的优雅，如果我们在编译器间获得模型信息，然后使用这些信息生成代码就可以解决这些问题了，这种方法同时也能够在 Xcode 编译器中添加代码提示。
 

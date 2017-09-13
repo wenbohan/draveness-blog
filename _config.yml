@@ -1,13 +1,18 @@
 # Jykell configuration
-markdown: redcarpet
-redcarpet:
-  syntax_highlighter_opts:
-    disable: true
-# highlighter: pygments
-# markdown: kramdown
-# kramdown:
+# markdown: redcarpet
+# redcarpet:
 #   syntax_highlighter_opts:
-#     disable : true
+#     disable: true
+
+# highlighter: pygments
+markdown: kramdown
+kramdown:
+  syntax_highlighter_opts:
+    disable : true
+  auto_ids: true
+  input: GFM
+  toc_levels: 1..6
+
 highlighter: none
 # highlighter: rouge
 paginate: 30

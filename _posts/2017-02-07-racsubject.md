@@ -23,17 +23,17 @@ tags: iOS RAC
 
 相比于 `RACSignal` 丰富的头文件 ，`RACSubject` 对外的接口并没有提供太多的方法：
 
-```objectivec
+~~~objectivec
 @interface RACSubject : RACSignal <RACSubscriber>
 
 + (instancetype)subject;
 
 @end
-```
+~~~
 
 唯一提供的接口就是用于返回一个新实例的 `+subject` 方法；除此之外，在笔者看来它与 `RACSignal` 最大的不同就是：`RACSubject` 实现了 `RACSubscriber` 协议，也就是下面的这些方法：
 
-```objectivec
+~~~objectivec
 @protocol RACSubscriber <NSObject>
 @required
 
@@ -43,7 +43,7 @@ tags: iOS RAC
 - (void)didSubscribeWithDisposable:(RACCompoundDisposable *)disposable;
 
 @end
-```
+~~~
 
 我们并不能在一个 `RACSignal` 对象上执行这些方法，只能在创建信号的 block 里面向遵循 `RACSubscriber` 协议的对象发送新的值或者错误，这也是 `RACSubject` 和父类最大的不同：在 `RACSubject` 实例初始化之后，也可以通过这个实例向所有的订阅者发送消息。
 
@@ -73,7 +73,7 @@ tags: iOS RAC
 
 前面的文章中已经对 `RACSignal` 冷信号有了很多的介绍，这里也就不会多说了；这一小节主要的内容是想通过一个例子，简单展示 `RACSubject` 的订阅者收到的内容与订阅时间的关系：
 
-```objectivec
+~~~objectivec
 RACSubject *subject = [RACSubject subject];
 
 // Subscriber 1
@@ -94,7 +94,7 @@ RACSubject *subject = [RACSubject subject];
 }];
 [subject sendNext:@3];
 [subject sendCompleted];
-```
+~~~
 
 这里以图的方式来展示整个订阅与订阅者接收消息的过程：
 
@@ -106,7 +106,7 @@ RACSubject *subject = [RACSubject subject];
 
 `RACSubject` 的实现并不复杂，它『可变』的特性都来源于持有的订阅者数组 `subscribers`，在每次执行 `subscribeNext:error:completed:` 一类便利方法时，都会将传入的 `id<RACSubscriber>` 对象加入数组：
 
-```objectivec
+~~~objectivec
 - (RACDisposable *)subscribe:(id<RACSubscriber>)subscriber {
 	RACCompoundDisposable *disposable = [RACCompoundDisposable compoundDisposable];
 	subscriber = [[RACPassthroughSubscriber alloc] initWithSubscriber:subscriber signal:self disposable:disposable];
@@ -128,7 +128,7 @@ RACSubject *subject = [RACSubject subject];
 
 	return disposable;
 }
-```
+~~~
 
 订阅的过程分为三个部分：
 
@@ -142,7 +142,7 @@ RACSubject *subject = [RACSubject subject];
 
 在上一节的例子中，我们能对 `RACSubject` 发送 `-sendNext:` 等消息也都取决于它实现了 `RACSubscriber` 协议：
 
-```objectivec
+~~~objectivec
 - (void)sendNext:(id)value {
 	[self enumerateSubscribersUsingBlock:^(id<RACSubscriber> subscriber) {
 		[subscriber sendNext:value];
@@ -164,7 +164,7 @@ RACSubject *subject = [RACSubject subject];
 		[subscriber sendCompleted];
 	}];
 }
-```
+~~~
 
 `RACSubject` 会在自身接受到这些方法时，下发给持有的全部的 `subscribers`。
 
@@ -172,7 +172,7 @@ RACSubject *subject = [RACSubject subject];
 
 代码中的 `-enumerateSubscribersUsingBlock:` 只是一个使用 `for` 循环遍历 `subscribers` 的安全方法：
 
-```objectivec
+~~~objectivec
 - (void)enumerateSubscribersUsingBlock:(void (^)(id<RACSubscriber> subscriber))block {
 	NSArray *subscribers;
 	@synchronized (self.subscribers) {
@@ -183,21 +183,21 @@ RACSubject *subject = [RACSubject subject];
 		block(subscriber);
 	}
 }
-```
+~~~
 
 `RACSubject` 就是围绕一个 `NSMutableArray` 数组实现的，实现还是非常简单的，只是在需要访问 `subscribers` 的方法中使用 `@synchronized` 避免线程竞争。
 
-```objectivec
+~~~objectivec
 @interface RACSubject ()
 
 @property (nonatomic, strong, readonly) NSMutableArray *subscribers;
 
 @end
-```
+~~~
 
 `RACSubject` 提供的初始化类方法 `+subject` 也只是初始化了几个成员变量：
 
-```objectivec
+~~~objectivec
 + (instancetype)subject {
 	return [[self alloc] init];
 }
@@ -211,7 +211,7 @@ RACSubject *subject = [RACSubject subject];
 
 	return self;
 }
-```
+~~~
 
 至此，对于 `RACSubject` 的分析就结束了，接下来会分析更多的子类。
 
@@ -223,30 +223,30 @@ RACSubject *subject = [RACSubject subject];
 
 先来介绍两者中实现较简单的 `RACBehaviorSubject`，它在内部会保存一个 `currentValue` 对象，也就是最后一次发送的消息：
 
-```objectivec
+~~~objectivec
 @interface RACBehaviorSubject ()
 
 @property (nonatomic, strong) id currentValue;
 
 @end
-```
+~~~
 
 在每次执行 `-sendNext:` 时，都会对 `RACBehaviorSubject` 中保存的 `currentValue` 进行更新，并使用父类的 `-sendNext:` 方法，向所有的订阅者发送最新的消息：
 
-```objectivec
+~~~objectivec
 - (void)sendNext:(id)value {
 	@synchronized (self) {
 		self.currentValue = value;
 		[super sendNext:value];
 	}
 }
-```
+~~~
 
 `RACBehaviorSubject` 最重要的特性就是在订阅时，向最新的订阅者发送之前的消息，这是通过覆写 `-subscribe:` 方法实现的。
 
 在调用子类的 `-subscribe:` 方法之后，会在 `subscriber` 对象上执行 `-sendNext:` 方法：
 
-```objectivec
+~~~objectivec
 - (RACDisposable *)subscribe:(id<RACSubscriber>)subscriber {
 	RACDisposable *subscriptionDisposable = [super subscribe:subscriber];
 
@@ -261,11 +261,11 @@ RACSubject *subject = [RACSubject subject];
 		[schedulingDisposable dispose];
 	}];
 }
-```
+~~~
 
 接下来，通过一个简单的例子来演示 `RACBehaviorSubject` 到底是如何工作的：
 
-```objectivec
+~~~objectivec
 RACBehaviorSubject *subject = [RACBehaviorSubject subject];
 
 [subject subscribeNext:^(id  _Nullable x) {
@@ -283,7 +283,7 @@ RACBehaviorSubject *subject = [RACBehaviorSubject subject];
 }];
 [subject sendNext:@3];
 [subject sendCompleted];
-```
+~~~
 
 上面的代码其实与 `RACSubject` 一节中的代码差不多，只将 `RACSubject` 转换成了 `RACBehaviorSubject` 对象。
 
@@ -293,9 +293,9 @@ RACBehaviorSubject *subject = [RACBehaviorSubject subject];
 
 `RACBehaviorSubject` 有一个用于创建包含默认值的类方法 `+behaviorSubjectWithDefaultValue:`，如果将上面的第一行代码改成：
 
-```objectivec
+~~~objectivec
 RACBehaviorSubject *subject = [RACBehaviorSubject behaviorSubjectWithDefaultValue:@0];
-```
+~~~
 
 那么在第一个订阅者刚订阅 `RACBehaviorSubject` 时就会收到 `@0` 对象。
 
@@ -305,24 +305,24 @@ RACBehaviorSubject *subject = [RACBehaviorSubject behaviorSubjectWithDefaultValu
 
 `RACReplaySubject` 相当于一个自带 `buffer` 的 `RACBehaviorSubject`，它可以在每次有新的订阅者订阅之后发送之前的全部消息。
 
-```objectivec
+~~~objectivec
 @interface RACReplaySubject ()
 
 @property (nonatomic, assign, readonly) NSUInteger capacity;
 @property (nonatomic, strong, readonly) NSMutableArray *valuesReceived;
 
 @end
-```
+~~~
 
 实现的方式是通过持有一个 `valuesReceived` 的数组和能够存储的对象的上限 `capacity`，默认值为：
 
-```objectivec
+~~~objectivec
 const NSUInteger RACReplaySubjectUnlimitedCapacity = NSUIntegerMax;
-```
+~~~
 
 当然你可以用 `+replaySubjectWithCapacity:` 初始化一个其它大小的 `RACReplaySubject` 对象：
 
-```objectivec
+~~~objectivec
 + (instancetype)replaySubjectWithCapacity:(NSUInteger)capacity {
 	return [(RACReplaySubject *)[self alloc] initWithCapacity:capacity];
 }
@@ -335,11 +335,11 @@ const NSUInteger RACReplaySubjectUnlimitedCapacity = NSUIntegerMax;
 
 	return self;
 }
-```
+~~~
 
 在每次调用 `-sendNext:` 方法发送消息时，都会将其加入 `valuesReceived` 数组中，并踢出之前的元素：
 
-```objectivec
+~~~objectivec
 - (void)sendNext:(id)value {
 	@synchronized (self) {
 		[self.valuesReceived addObject:value ?: RACTupleNil.tupleNil];
@@ -350,7 +350,7 @@ const NSUInteger RACReplaySubjectUnlimitedCapacity = NSUIntegerMax;
 		}
 	}
 }
-```
+~~~
 
 需要注意的有两点，一是对 `valuesReceived` 的数组的操作必须使用 `@synchronized` 加锁；第二，如果 `value` 为空的话，也需要将其转换成 `RACTupleNil.tupleNil` 对象进行保存。
 
@@ -358,7 +358,7 @@ const NSUInteger RACReplaySubjectUnlimitedCapacity = NSUIntegerMax;
 
 `-sendError:` 和 `-sendCompleted` 方法都会标记对应 `flag`，即 `hasCompleted` 和 `hasError`，这里就不介绍了；同样的，`RACReplaySubject` 也覆写了 `-subscribe:` 方法，在每次有订阅者订阅时重新发送所有的序列：
 
-```objectivec
+~~~objectivec
 - (RACDisposable *)subscribe:(id<RACSubscriber>)subscriber {
 	RACCompoundDisposable *compoundDisposable = [RACCompoundDisposable compoundDisposable];
 
@@ -387,11 +387,11 @@ const NSUInteger RACReplaySubjectUnlimitedCapacity = NSUIntegerMax;
 
 	return compoundDisposable;
 }
-```
+~~~
 
 我们仍然使用上一节中的例子来展示 `RACReplaySubject` 是如何工作的，只修改第一行代码：
 
-```objectivec
+~~~objectivec
 RACReplaySubject *subject = [RACReplaySubject subject];
 
 [subject subscribeNext:^(id  _Nullable x) {
@@ -409,7 +409,7 @@ RACReplaySubject *subject = [RACReplaySubject subject];
 }];
 [subject sendNext:@3];
 [subject sendCompleted];
-```
+~~~
 
 运行这段代码之后，会得到如下图的结果：
 

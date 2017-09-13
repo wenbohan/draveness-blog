@@ -27,17 +27,17 @@ tags: Redis Server Database NoSQL
 
 在 `redis-server` 启动时，首先会初始化一些 redis 服务的配置，最后会调用 `aeMain` 函数陷入 `aeEventLoop` 循环中，等待外部事件的发生：
 
-```c
+~~~c
 int main(int argc, char **argv) {
     ...
 
     aeMain(server.el);
 }
-```
+~~~
 
 `aeMain` 函数其实就是一个封装的 `while` 循环，循环中的代码会一直运行直到 `eventLoop` 的 `stop` 被设置为 `true`：
 
-```c
+~~~c
 void aeMain(aeEventLoop *eventLoop) {
     eventLoop->stop = 0;
     while (!eventLoop->stop) {
@@ -46,11 +46,11 @@ void aeMain(aeEventLoop *eventLoop) {
         aeProcessEvents(eventLoop, AE_ALL_EVENTS);
     }
 }
-```
+~~~
 
 它会不停尝试调用 `aeProcessEvents` 对可能存在的多种事件进行处理，而 `aeProcessEvents` 就是实际用于处理事件的函数：
 
-```c
+~~~c
 int aeProcessEvents(aeEventLoop *eventLoop, int flags) {
     int processed = 0, numevents;
 
@@ -83,7 +83,7 @@ int aeProcessEvents(aeEventLoop *eventLoop, int flags) {
     if (flags & AE_TIME_EVENTS) processed += processTimeEvents(eventLoop);
     return processed;
 }
-```
+~~~
 
 上面的代码省略了 I/O 多路复用函数的等待时间，不过不会影响我们对代码的理解，整个方法大体由两部分代码组成，一部分处理文件事件，另一部分处理时间事件。
 
@@ -93,7 +93,7 @@ int aeProcessEvents(aeEventLoop *eventLoop, int flags) {
 
 在一般情况下，`aeProcessEvents` 都会先**计算最近的时间事件发生所需要等待的时间**，然后调用 `aeApiPoll` 方法在这段时间中等待事件的发生，在这段时间中如果发生了文件事件，就会优先处理文件事件，否则就会一直等待，直到最近的时间事件需要触发：
 
-```c
+~~~c
 numevents = aeApiPoll(eventLoop, tvp);
 for (j = 0; j < numevents; j++) {
     aeFileEvent *fe = &eventLoop->events[eventLoop->fired[j].fd];
@@ -111,18 +111,18 @@ for (j = 0; j < numevents; j++) {
     }
     processed++;
 }
-```
+~~~
 
 文件事件如果绑定了对应的读/写事件，就会执行对应的对应的代码，并传入事件循环、文件描述符、数据以及掩码：
 
-```c
+~~~c
 fe->rfileProc(eventLoop,fd,fe->clientData,mask);
 fe->wfileProc(eventLoop,fd,fe->clientData,mask);
-```
+~~~
 
 其中 `rfileProc` 和 `wfileProc` 就是在文件事件被创建时传入的函数指针：
 
-```c
+~~~c
 int aeCreateFileEvent(aeEventLoop *eventLoop, int fd, int mask, aeFileProc *proc, void *clientData) {
     aeFileEvent *fe = &eventLoop->events[fd];
 
@@ -136,7 +136,7 @@ int aeCreateFileEvent(aeEventLoop *eventLoop, int fd, int mask, aeFileProc *proc
         eventLoop->maxfd = fd;
     return AE_OK;
 }
-```
+~~~
 
 需要注意的是，传入的 `proc` 函数会在对应的 `mask` 位事件发生时执行。
 
@@ -149,7 +149,7 @@ int aeCreateFileEvent(aeEventLoop *eventLoop, int fd, int mask, aeFileProc *proc
 
 时间事件的处理在 `processTimeEvents` 中进行，我们会分三部分分析这个方法的实现：
 
-```c
+~~~c
 static int processTimeEvents(aeEventLoop *eventLoop) {
     int processed = 0;
     aeTimeEvent *te, *prev;
@@ -164,21 +164,21 @@ static int processTimeEvents(aeEventLoop *eventLoop) {
         }
     }
     eventLoop->lastTime = now;
-```
+~~~
 
 由于对系统时间的调整会影响当前时间的获取，进而影响时间事件的执行；如果系统时间先被设置到了未来的时间，又设置成正确的值，这就会导致**时间事件会随机延迟一段时间执行**，也就是说，时间事件不会按照预期的安排尽早执行，而 `eventLoop` 中的 `lastTime` 就是用于检测上述情况的变量：
 
-```c
+~~~c
 typedef struct aeEventLoop {
     ...
     time_t lastTime;     /* Used to detect system clock skew */
     ...
 } aeEventLoop;
-```
+~~~
 
 如果发现了系统时间被改变（小于上次 `processTimeEvents` 函数执行的开始时间），就会强制所有时间事件尽早执行。
 
-```c
+~~~c
     prev = NULL;
     te = eventLoop->timeEventHead;
     maxId = eventLoop->timeEventNextId-1;
@@ -198,11 +198,11 @@ typedef struct aeEventLoop {
             te = next;
             continue;
         }
-```
+~~~
 
 Redis 处理时间事件时，不会在当前循环中直接移除不再需要执行的事件，而是会在当前循环中将时间事件的 `id` 设置为 `AE_DELETED_EVENT_ID`，然后再下一个循环中删除，并执行绑定的 `finalizerProc`。
 
-```c
+~~~c
         aeGetTime(&now_sec, &now_ms);
         if (now_sec > te->when_sec ||
             (now_sec == te->when_sec && now_ms >= te->when_ms))
@@ -223,7 +223,7 @@ Redis 处理时间事件时，不会在当前循环中直接移除不再需要�
     }
     return processed;
 }
-```
+~~~
 
 在移除不需要执行的时间事件之后，我们就开始通过比较时间来判断是否需要调用 `timeProc` 函数，`timeProc` 函数的返回值 `retval` 为时间事件执行的时间间隔：
 
@@ -232,13 +232,13 @@ Redis 处理时间事件时，不会在当前循环中直接移除不再需要�
 
 以使用 `aeCreateTimeEvent` 一个创建的简单时间事件为例：
 
-```c
+~~~c
 aeCreateTimeEvent(config.el,1,showThroughput,NULL,NULL)
-```
+~~~
 
 时间事件对应的函数 `showThroughput` 在每次执行时会返回一个数字，也就是该事件发生的时间间隔：
 
-```c
+~~~c
 int showThroughput(struct aeEventLoop *eventLoop, long long id, void *clientData) {
     ...
     float dt = (float)(mstime()-config.start)/1000.0;
@@ -247,7 +247,7 @@ int showThroughput(struct aeEventLoop *eventLoop, long long id, void *clientData
     fflush(stdout);
     return 250; /* every 250ms */
 }
-```
+~~~
 
 这样就不需要重新 `malloc` 一块相同大小的内存，提高了时间事件处理的性能，并减少了内存的使用量。
 
@@ -257,7 +257,7 @@ int showThroughput(struct aeEventLoop *eventLoop, long long id, void *clientData
 
 创建时间事件的方法实现其实非常简单，在这里不想过多分析这个方法，唯一需要注意的就是时间事件的 `id` 跟数据库中的大多数主键都是递增的：
 
-```c
+~~~c
 long long aeCreateTimeEvent(aeEventLoop *eventLoop, long long milliseconds,
         aeTimeProc *proc, void *clientData,
         aeEventFinalizerProc *finalizerProc) {
@@ -275,7 +275,7 @@ long long aeCreateTimeEvent(aeEventLoop *eventLoop, long long milliseconds,
     eventLoop->timeEventHead = te;
     return id;
 }
-```
+~~~
 
 ## 事件的处理
 

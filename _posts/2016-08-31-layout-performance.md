@@ -36,7 +36,7 @@ iOS 中视图所需要的布局信息只有两个，分别是 `origin/center` �
 
 以左上角的 `(0, 0)` 为坐标的原点，找到坐标 `(x, y)`，然后绘制一个大小为 `(width, height)` 的矩形，这样就完成了一个最简单的布局。而 Auto Layout 的布局方式与上面所说的 `frame` 有些不同，`frame` 表示与父视图之间的绝对距离，但是 Auto Layout 中大部分的约束都是**描述性的**，表示视图间相对距离，以上图为例：
 
-```objectivec
+~~~objectivec
 A.left = Superview.left + 50
 A.top  = Superview.top + 30
 A.width  = 100
@@ -46,7 +46,7 @@ B.left = (A.left + A.width)/(A.right) + 30
 B.top  = A.top
 B.width  = A.width
 B.height = A.height
-```
+~~~
 
 虽然上面的约束很好的表示了各个视图之间的关系，但是 Auto Layout 实际上并没有改变原有的 Hard-Coded 形式的布局方式，只是将原有没有太多意义的 `(x, y)` 值，变成了描述性的代码。
 
@@ -143,11 +143,11 @@ Auto Layout 不止在复杂 UI 界面布局的表现不佳，它还会强制视�
 
 这里简单介绍一下手动布局使用的 `-[ASDisplayNode calculatedSizeThatFits:]` 方法，这个方法与 `UIView` 中的 `-[UIView sizeThatFits:]` 非常相似，其区别只是在 ASDK 中，所有的计算出的大小都会通过缓存来提升性能。
 
-```objectivec
+~~~objectivec
 - (CGSize)calculateSizeThatFits:(CGSize)constrainedSize {
   return _preferredFrameSize;
 }
-```
+~~~
 
 子类可以在这个方法中进行计算，通过覆写这个方法返回一个合适的大小，不过一般情况下都不会使用手动布局的方式。
 
@@ -155,7 +155,7 @@ Auto Layout 不止在复杂 UI 界面布局的表现不佳，它还会强制视�
 
 在 ASDK 中，更加常用的是使用 `ASLayoutSpec` 布局，在上面提到的 `ASLayout` 是一个保存布局信息的媒介，而真正计算视图布局的代码都在 `ASLayoutSpec` 中；所有 ASDK 中的布局（手动 / Spec）都是由 `-[ASLayoutable measureWithSizeRange:]` 方法触发的，在这里我们以 `ASDisplayNode` 的调用栈为例看一下方法的执行过程：
 
-```objectivec
+~~~objectivec
 -[ASDisplayNode measureWithSizeRange:]
 	-[ASDisplayNode shouldMeasureWithSizeRange:]
 	-[ASDisplayNode calculateLayoutThatFits:]
@@ -163,13 +163,13 @@ Auto Layout 不止在复杂 UI 界面布局的表现不佳，它还会强制视�
 		-[ASLayoutSpec measureWithSizeRange:]
 		+[ASLayout layoutWithLayoutableObject:constrainedSizeRange:size:sublayouts:]
 		-[ASLayout filteredNodeLayoutTree]
-```
+~~~
 
 ASDK 的文档中推荐在子类中覆写 `- layoutSpecThatFits:` 方法，返回一个用于布局的 `ASLayoutSpec` 对象，然后使用 `ASLayoutSpec` 中的 `- measureWithSizeRange:` 方法对它指定的视图进行布局，不过通过覆写 [ASDK 的布局引擎](#asdk-的布局引擎) 一节中的其它方法也都是可以的。
 
 如果我们使用 `ASStackLayoutSpec` 对视图进行布局的话，方法调用栈大概是这样的：
 
-```objectivec
+~~~objectivec
 -[ASDisplayNode measureWithSizeRange:]
 	-[ASDisplayNode shouldMeasureWithSizeRange:]
 	-[ASDisplayNode calculateLayoutThatFits:]
@@ -178,7 +178,7 @@ ASDK 的文档中推荐在子类中覆写 `- layoutSpecThatFits:` 方法，返�
 			ASStackUnpositionedLayout::compute
 			ASStackPositionedLayout::compute			ASStackBaselinePositionedLayout::compute		+[ASLayout layoutWithLayoutableObject:constrainedSizeRange:size:sublayouts:]
 		-[ASLayout filteredNodeLayoutTree]
-```
+~~~
 
 这里只是执行了 `ASStackLayoutSpec` 对应的 `- measureWithSizeRange:` 方法，对其中的视图进行布局。在 `- measureWithSizeRange:` 中调用了一些 C++ 方法 `ASStackUnpositionedLayout`、`ASStackPositionedLayout` 以及 `ASStackBaselinePositionedLayout` 的 `compute` 方法，这些方法完成了对 `ASStackLayoutSpec` 中视图的布局。
 
@@ -190,7 +190,7 @@ ASDK 的文档中推荐在子类中覆写 `- layoutSpecThatFits:` 方法，返�
 
 `ASLayout` 表示当前的结点在布局树中的大小和位置；当然，它还有一些其它的奇怪的属性：
 
-```objectivec
+~~~objectivec
 @interface ASLayout : NSObject
 
 @property (nonatomic, weak, readonly) id<ASLayoutable> layoutableObject;
@@ -202,13 +202,13 @@ ASDK 的文档中推荐在子类中覆写 `- layoutSpecThatFits:` 方法，返�
 ...
 
 @end
-```
+~~~
 
 代码中的 `layoutableObject` 表示当前的对象，`sublayouts` 表示当前视图的子布局 `ASLayout` 数组。
 
 整个类的实现都没有什么值得多说的，除了大量的构造方法，唯一一个做了一些事情的就是 `-[ASLayout filteredNodeLayoutTree]` 方法了：
 
-```objectivec
+~~~objectivec
 - (ASLayout *)filteredNodeLayoutTree {
   NSMutableArray *flattenedSublayouts = [NSMutableArray array];
   struct Context {
@@ -236,7 +236,7 @@ ASDK 的文档中推荐在子类中覆写 `- layoutSpecThatFits:` 方法，返�
 										 size:_size
 								   sublayouts:flattenedSublayouts];
 }
-```
+~~~
 
 而这个方法也只是将 `sublayouts` 中的内容展平，然后实例化一个新的 `ASLayout` 对象。
 
@@ -254,7 +254,7 @@ ASDK 的文档中推荐在子类中覆写 `- layoutSpecThatFits:` 方法，返�
 
 因为计算视图的 `CGRect` 进行布局是一种非常昂贵的操作，所以 ASDK 在这里面加入了缓存机制，在每次执行 `- measureWithSizeRange:` 方法时，都会通过 `-shouldMeasureWithSizeRange:` 判断是否需要重新计算布局：
 
-```objectivec
+~~~objectivec
 - (BOOL)shouldMeasureWithSizeRange:(ASSizeRange)constrainedSize {
   return [self _hasDirtyLayout] || !ASSizeRangeEqualToSizeRange(constrainedSize, _calculatedLayout.constrainedSizeRange);
 }
@@ -262,13 +262,13 @@ ASDK 的文档中推荐在子类中覆写 `- layoutSpecThatFits:` 方法，返�
 - (BOOL)_hasDirtyLayout {
   return _calculatedLayout == nil || _calculatedLayout.isDirty;
 }
-```
+~~~
 
 在一般情况下，只有当前结点被标记为 `dirty` 或者这一次布局传入的 `constrainedSize` 不同时，才需要进行重新计算。在不需要重新计算布局的情况下，只需要直接返回 `_calculatedLayout` 布局对象就可以了。
 
 因为 ASDK 实现的布局引擎其实只是对 `frame` 的计算，所以无论是在主线程还是后台的异步并发进程中都是可以执行的，也就是说，你可以在任意线程中调用 `- measureWithSizeRange:` 方法，ASDK 中的一些 `ViewController` 比如：`ASDataViewController` 就会在后台并发进程中执行该方法：
 
-```objectivec
+~~~objectivec
 - (NSArray<ASCellNode *> *)_layoutNodesFromContexts:(NSArray<ASIndexedNodeContext *> *)contexts {
   ...
 
@@ -289,7 +289,7 @@ ASDK 的文档中推荐在子类中覆写 `- layoutSpecThatFits:` 方法，返�
 
   return nodes;
 }
-```
+~~~
 
 > 上述代码做了比较大的修改，将原有一些方法调用放到了当前方法中，并省略了大量的代码。
 

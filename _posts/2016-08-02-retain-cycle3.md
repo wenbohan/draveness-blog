@@ -24,7 +24,7 @@ FBRetainCycleDetector 在对关联对象进行追踪时，修改了底层处理�
 
 在 `FBAssociationManager` 的类方法 `+ hook` 调用时，fishhook 会修改 `objc_setAssociatedObject` 和 `objc_removeAssociatedObjects` 方法：
 
-```objectivec
+~~~objectivec
 + (void)hook {
 #if _INTERNAL_RCD_ENABLED
 	std::lock_guard<std::mutex> l(*FB::AssociationManager::hookMutex);
@@ -42,13 +42,13 @@ FBRetainCycleDetector 在对关联对象进行追踪时，修改了底层处理�
 	FB::AssociationManager::hookTaken = true;
 #endif //_INTERNAL_RCD_ENABLED
 }
-```
+~~~
 
 将它们的实现替换为 `FB::AssociationManager:: fb_objc_setAssociatedObject` 以及 `FB::AssociationManager::fb_objc_removeAssociatedObjects` 这两个 Cpp 静态方法。
 
 上面的两个方法实现都位于 `FB::AssociationManager` 的命名空间中：
 
-```objectivec
+~~~objectivec
 namespace FB { namespace AssociationManager {
 	using ObjectAssociationSet = std::unordered_set<void *>;
 	using AssociationMap = std::unordered_map<id, ObjectAssociationSet *>;
@@ -61,7 +61,7 @@ namespace FB { namespace AssociationManager {
 
 	...
 }
-```
+~~~
 
 命名空间中有两个用于存储关联对象的数据结构：
 
@@ -76,7 +76,7 @@ namespace FB { namespace AssociationManager {
 
 用于追踪关联对象的静态方法 `fb_objc_setAssociatedObject` 只会追踪强引用：
 
-```objectivec
+~~~objectivec
 static void fb_objc_setAssociatedObject(id object, void *key, id value, objc_AssociationPolicy policy) {
 	{
 		std::lock_guard<std::mutex> l(*_associationMutex);
@@ -91,13 +91,13 @@ static void fb_objc_setAssociatedObject(id object, void *key, id value, objc_Ass
 
 	fb_orig_objc_setAssociatedObject(object, key, value, policy);
 }
-```
+~~~
 
 `std::lock_guard<std::mutex> l(*_associationMutex)` 对 `fb_objc_setAssociatedObject` 过程加锁，防止死锁问题，不过 `_associationMutex` 会在作用域之外被释放。
 
 通过输入的 `policy` 我们可以判断哪些是强引用对象，然后调用 `_threadUnsafeSetStrongAssociation` 追踪它们，如果不是强引用对象，通过 `_threadUnsafeResetAssociationAtKey` 将 `key` 对应的 `value` 删除，保证追踪的正确性：
 
-```objectivec
+~~~objectivec
 void _threadUnsafeSetStrongAssociation(id object, void *key, id value) {
 	if (value) {
 		auto i = _associationMap->find(object);
@@ -113,11 +113,11 @@ void _threadUnsafeSetStrongAssociation(id object, void *key, id value) {
 		_threadUnsafeResetAssociationAtKey(object, key);
 	}
 }
-```
+~~~
 
 `_threadUnsafeSetStrongAssociation` 会以 object 作为键，查找或者创建一个 `ObjectAssociationSet *` 集合，将新的 `key` 插入到集合中，当然，如果 `value == nil` 或者上面 `fb_objc_setAssociatedObject` 方法中传入的 `policy` 是非 `retain` 的就会调用 `_threadUnsafeResetAssociationAtKey ` 重置 `ObjectAssociationSet` 中的关联对象：
 
-```objectivec
+~~~objectivec
 void _threadUnsafeResetAssociationAtKey(id object, void *key) {
 	auto i = _associationMap->find(object);
 
@@ -131,11 +131,11 @@ void _threadUnsafeResetAssociationAtKey(id object, void *key) {
 		refs->erase(j);
 	}
 }
-```
+~~~
 
 同样在查找到对应的 `ObjectAssociationSet` 之后会擦除 `key` 对应的值，`_threadUnsafeRemoveAssociations` 的实现与这个方法也差不多，相较于 reset 方法移除某一个对象的**所有**关联对象，该方法仅仅移除了某一个 `key` 对应的值。
 
-```objectivec
+~~~objectivec
 void _threadUnsafeRemoveAssociations(id object) {
 	if (_associationMap->size() == 0 ){
 		return;
@@ -150,12 +150,12 @@ void _threadUnsafeRemoveAssociations(id object) {
 	delete refs;
 	_associationMap->erase(i);
 }
-```
+~~~
 
 
 调用 `_threadUnsafeRemoveAssociations` 的方法 `fb_objc_removeAssociatedObjects` 的实现也很简单，利用了上面的方法，并在执行结束后，使用原 `obj_removeAssociatedObjects` 方法对应的函数指针 `fb_orig_objc_removeAssociatedObjects` 移除关联对象：
 
-```objectivec
+~~~objectivec
 static void fb_objc_removeAssociatedObjects(id object) {
 	{
 		std::lock_guard<std::mutex> l(*_associationMutex);
@@ -164,13 +164,13 @@ static void fb_objc_removeAssociatedObjects(id object) {
 
 	fb_orig_objc_removeAssociatedObjects(object);
 }
-```
+~~~
 
 ## FBObjectiveCGraphElement 获取关联对象
 
 因为在获取某一个对象持有的所有强引用时，不可避免地需要获取其强引用的关联对象；因此我们也就需要使用 `FBAssociationManager` 提供的 `+ associationsForObject:` 接口获取所有**强引用**关联对象：
 
-```objectivec
+~~~objectivec
 - (NSSet *)allRetainedObjects {
 	NSArray *retainedObjectsNotWrapped = [FBAssociationManager associationsForObject:_object];
 	NSMutableSet *retainedObjects = [NSMutableSet new];
@@ -184,11 +184,11 @@ static void fb_objc_removeAssociatedObjects(id object) {
 
 	return retainedObjects;
 }
-```
+~~~
 
 这个接口调用我们在上一节中介绍的 `_associationMap`，最后得到某一个对象的所有关联对象的强引用：
 
-```objectivec
+~~~objectivec
 + (NSArray *)associationsForObject:(id)object {
 	return FB::AssociationManager::associations(object);
 }
@@ -216,7 +216,7 @@ NSArray *associations(id object) {
 
 	return array;
 }
-```
+~~~
 
 这部分的代码没什么好解释的，遍历所有的 `key`，检测是否真的存在关联对象，然后加入可变数组，最后返回。
 

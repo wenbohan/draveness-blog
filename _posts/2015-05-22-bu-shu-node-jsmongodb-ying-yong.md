@@ -27,39 +27,39 @@ tags: Node.js MongoDB
 
 你只需要远程登录到你的服务器
 
-```
+~~~
 ssh root@url.com
-```
+~~~
 
 然后依次输入下面的命令就好了
 
-```
+~~~
 sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 7F0CEB10
 echo "deb http://repo.mongodb.org/apt/ubuntu "$(lsb_release -sc)"/mongodb-org/3.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-3.0.list
 sudo apt-get update
 sudo apt-get install -y mongodb-org
-```
+~~~
 
 它们会自动的安装最新版本的 mongodb.
 
 mongodb 就已经安装完成了. 然后你需要在 mongodb 中创建与你的 Web 应用相同名字的 document(与本地开发环境中创建的相同).
 
-```
+~~~
 mongo
 
 > use sportjoin
-```
+~~~
 
 
 ## git clone
 
 我从 bitbucket 上使用 git clone 命令, 将我的 Node 代码抓去下来, 然后先安装所 App 所需要的依赖.
 
-```
+~~~
 git clone <repo.git>
 cd <folder>
 npm install
-```
+~~~
 
 ## pm2
 
@@ -67,16 +67,16 @@ npm install
 
 先在全局中安装 pm2
 
-```
+~~~
 npm install -g pm2
-```
+~~~
 
 然后在工程的根目录下运行 Web 应用
 
-```
+~~~
 cd <folder>
 pm2 start <app.js>
-```
+~~~
 
 到目前为止部署就完成了, 对于更加详细的配置, 可以看 pm2 github 的文档找到更多的资料.
 

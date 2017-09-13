@@ -17,15 +17,15 @@ tags: Node.js
 
 关于 [Node.js 入门](http://www.nodebeginner.org/index-zh-cn.html) 这本书写的还是非常好的. 不过读这本书之前或者说学习 Node.js 之前还是点亮 Javascript 这个前置技能比较好.
 
-```javascript
+~~~javascript
 console.log("Hello World");
-```
+~~~
 
 ## Node.js 权威指南
 
 [Node.js 权威指南](http://www.amazon.cn/Node-js%E6%9D%83%E5%A8%81%E6%8C%87%E5%8D%97-%E9%99%86%E5%87%8C%E7%89%9B/dp/B00JQTOAEI/ref=sr_1_1?ie=UTF8&qid=1429414848&sr=8-1&keywords=Node.js+%E6%9D%83%E5%A8%81%E6%8C%87%E5%8D%97) 写的如何我并不能做出评论, 不过书中使用的 Express 框架, 也就是 Node.js 中用于搭建 Web 服务器的框架版本巨低, 很多代码根本无法运行, 所以我不是很推荐, 因为我在这本书的阅读过程(写书中的实例代码)中还是极其痛苦的, 完全无法快乐的玩耍 (/= _ =)/~┴┴, 而无法快乐的写代码与我的信仰是冲突的 (￣^￣), 我只能放弃了.
 
-```javascript
+~~~javascript
 var http = require('http');
 
 var server = http.createServer(function (request, response) {
@@ -36,7 +36,7 @@ var server = http.createServer(function (request, response) {
 server.listen(8888);
 
 console.log("Server running at http://127.0.0.1:8888/");
-```
+~~~
 
 ## Node.js 并不是一门语言
 
@@ -54,27 +54,27 @@ console.log("Server running at http://127.0.0.1:8888/");
 
 Sinatra:
 
-```ruby
+~~~ruby
 get '/hi' do
   "Hello World!"
 end
-```
+~~~
 
 Flask:
 
-```python
+~~~python
 @app.route("/")
 def hello():
     return "Hello World!"
-```
+~~~
 
 Express:
 
-```javascript
+~~~javascript
 app.get('/', function(req, res) {
   res.send('hello world');
 });
-```
+~~~
 
 可以看到这三个框架在使用上或者说形式是相似的. 但是, 它们也有很多的不同.
 

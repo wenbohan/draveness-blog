@@ -37,18 +37,18 @@ tags: iOS
 
 ![](/content/images/2015/04/6D760453-E328-4CA6-BAD8-04DA1831E3E5.png)
 
-```
+~~~
 'required' initialize 'init(coder:)' must be provided by subclass of 'UITableViewCell'
-```
+~~~
 
 这是什么意思(,,#ﾟДﾟ), 好吧, 这个错误竟然可以点. 于是开心地双击, 然后呢, Xcode 在我们的屏幕中自动生成了这些东西:
 
 
-```swift
+~~~swift
 required init(coder aDecoder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
 }
-```
+~~~
 
 随后, 我就如在 ObjC 中一样在 `init` 方法中调用了 `super.init()`, (/= _ =)/~┴┴  怎么还有错误?
 
@@ -56,33 +56,33 @@ required init(coder aDecoder: NSCoder) {
 
 这是啥意思?
 
-```
+~~~
 Must call a designated initializer of the superclass 'UITableViewCell'
-```
+~~~
 
 必须调用一个 `UITableViewCell` 的指定构造器. 算了先不管了, 继续写好了. 于是又出现呢了下面的提示:
 
 ![](/content/images/2015/04/8381E08C-BA7B-4E4B-8363-6358EEAE8C5F.png)
 
-```
+~~~
 Convenience initializer for 'TableViewCell' must delegate (with 'self.init') rather than chaining to a superclass initializer (with 'super.init')
-```
+~~~
 
 既然说 convenience 构造器不能调用 `super.init`, 那么按照错误提示改成 `self.init` 应该就好了.
 
 ![](/content/images/2015/04/650D9072-EF4A-49BB-BB4E-018759813171.png)
 
-```
+~~~
 Could not find member 'Default'
-```
+~~~
 
 既然报了这个错误, 那么如果加上 `UITableViewCellStyle` 呢
 
 ![](/content/images/2015/04/F48408EA-ABC6-4F67-A2BC-E593EFB728FE.png)
 
-```
+~~~
 Could not fond an overload for 'init' that accepts the supplied arguments
-```
+~~~
 
 找不到 init 方法接收所提供参数的重载.
 
@@ -90,9 +90,9 @@ Could not fond an overload for 'init' that accepts the supplied arguments
 
 ![](/content/images/2015/04/4D7B47B7-D87E-4F7B-BDE2-125EF89B90CE.png)
 
-```
+~~~
 Property 'self.label' not initialized at super.init call
-```
+~~~
 
 Orz, 到这里我已经放弃了自己通过尝试来解决这些问题了. 于是我求助于 Google, 最后怒看苹果的官网文档并找到了以上错误的全部答案.
 
@@ -117,22 +117,22 @@ Designated Initializer 在本篇博客中译为指定构造器, 而 Convenience 
 
 每个类应该只有少量的指定构造器, 大多数类只有**一个**指定构造器, 我们使用 Swift 做 iOS 开发时就会用到很多 UIKit 框架类的指定构造器, 比如说:
 
-```swift
+~~~swift
 init()
 init(frame: CGRect)
 init(style: UITableViewCellStyle, reuseIdentifier: String?)
-```
+~~~
 
 这些都是类指定构造器, 并且这些方法的前面是没有任何的关键字的(包括 `override`).
 
 当定义一个指定构造器的时候, 必须调用父类的某一个指定构造器:
 
-```swift
+~~~swift
 init(imageName: String, prompt: String = "") {
 	super.init(style: .Default, reuseIdentifier: nil)
 	...
 }
-```
+~~~
 
 在这里我们的指定构造器调用了父类的指定构造器 `super.init(style: .Default, reuseIdentifier: nil)`.
 
@@ -147,11 +147,11 @@ init(imageName: String, prompt: String = "") {
 
 在这里我们就不举例了, 但是我们要提一下便利构造器的语法:
 
-```swift
+~~~swift
 convenience init(parameters) {
     statements
 }
-```
+~~~
 
 ### init 规则
 
@@ -242,7 +242,7 @@ Swift 的编译器会对初始化的方法进行安全地检查已保证实例�
 
 ### 错误 2
 
-```swift
+~~~swift
 class TableViewCell: UITableViewCell {
 
     init() {
@@ -254,7 +254,7 @@ class TableViewCell: UITableViewCell {
     }
 
 }
-```
+~~~
 
 我们已经手动覆写了这个方法, 然后, 因为 `init()` 方法虽然被重载了, 但是并没有调用父类的指定构造器:
 
@@ -262,7 +262,7 @@ class TableViewCell: UITableViewCell {
 
 所以我们让这个指定构造器调用 `super.init(style: UITableViewCellStyle, reuseIdentifier: String?)`, 解决了这个问题.
 
-```swift
+~~~swift
 class TableViewCell: UITableViewCell {
 
     init() {
@@ -274,11 +274,11 @@ class TableViewCell: UITableViewCell {
     }
 
 }
-```
+~~~
 
 ### 错误 3
 
-```swift
+~~~swift
 class TableViewCell: UITableViewCell {
 
     convenience init() {
@@ -290,7 +290,7 @@ class TableViewCell: UITableViewCell {
     }
 
 }
-```
+~~~
 
 `错误 3` 跟前面的两个错误没有直接的联系. 这里的构造器是一个便利构造器(注意前面的 `convenience` 关键字), 而这里的错误违反了这一条规则:
 
@@ -298,7 +298,7 @@ class TableViewCell: UITableViewCell {
 
 所以我们让这个便利构造器调用同一个类的 `self.init(style: UITableViewCellStyle, reuseIdentifier: String?)` 的指定构造器.
 
-```swift
+~~~swift
 class TableViewCell: UITableViewCell {
 
     convenience init() {
@@ -310,7 +310,7 @@ class TableViewCell: UITableViewCell {
     }
 
 }
-```
+~~~
 
 而这段代码目前还是有问题的, 而这就是 `错误 4` 的代码.
 
@@ -320,20 +320,20 @@ class TableViewCell: UITableViewCell {
 
 > 如果子类没有定义任何的指定构造器, 那么会默认继承所有来自父类的指定构造器.
 
-```swift
+~~~swift
 class TableViewCell: UITableViewCell {
 
     convenience init() {
         self.init(style: .Default, reuseIdentifier: nil)
     }
 }
-```
+~~~
 
 只需要删掉这个 `init(coder aDecoder: NSCoder)` 方法就可以解决这个错误了.
 
 ### 错误 5
 
-```swift
+~~~swift
 class TableViewCell: UITableViewCell {
 
     let label : UILabel
@@ -347,7 +347,7 @@ class TableViewCell: UITableViewCell {
     }
 
 }
-```
+~~~
 
 `错误 5` 的主要原因是违反了这一条规则, 它在调用 `super.init(style: .Default, reuseIdentifier: nil)` 之前并没有初始化自己的所有属性.
 
@@ -355,16 +355,16 @@ class TableViewCell: UITableViewCell {
 
 因为 `label` 属性不是 `optional` 的, 所以这个属性就必须初始化.
 
-```swift
+~~~swift
 init(imageName: String) {
     self.label = UILabel()
     super.init(style: .Default, reuseIdentifier: nil)
 }
-```
+~~~
 
 这是第一个解决的办法, 不过我一般使用另一种, 在属性定义的时候就为他说初始化一个值.
 
-```swift
+~~~swift
 class TableViewCell: UITableViewCell {
 
     let label = UILabel()
@@ -378,7 +378,7 @@ class TableViewCell: UITableViewCell {
     }
 
 }
-```
+~~~
 
 这些就是我在使用 swift 的构造其中遇到的全部错误了.
 

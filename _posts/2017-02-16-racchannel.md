@@ -46,10 +46,10 @@ tags: iOS RAC
 
 为什么向 `RACChannelTerminal` 发送消息，它的订阅者获取不到？先来看一下它在头文件中的定义：
 
-```objectivec
+~~~objectivec
 @interface RACChannelTerminal : RACSignal <RACSubscriber>
 @end
-```
+~~~
 
 `RACChannelTerminal` 是一个信号的子类，同时它还遵循了 `RACSubscriber` 协议，也就是可以向它调用 `-sendNext:` 等方法；`RAChannelTerminal` 中持有了两个对象：
 
@@ -57,26 +57,26 @@ tags: iOS RAC
 
 在初始化时，需要传入 `values` 和 `otherTerminal` 这两个属性，其中 `values` 表示当前断点，`otherTerminal` 表示远程端点：
 
-```objectivec
+~~~objectivec
 - (instancetype)initWithValues:(RACSignal *)values otherTerminal:(id<RACSubscriber>)otherTerminal {
 	self = [super init];
 	_values = values;
 	_otherTerminal = otherTerminal;
 	return self;
 }
-```
+~~~
 
 当然，作为 `RACSignal` 的子类，`RACChannelTerminal` 必须覆写 `-subscribe:` 方法：
 
-```objectivec
+~~~objectivec
 - (RACDisposable *)subscribe:(id<RACSubscriber>)subscriber {
 	return [self.values subscribe:subscriber];
 }
-```
+~~~
 
 在订阅者调用 `-subscribeNext:` 等方法发起订阅时，实际上订阅的是当前端点；如果向当前端点发送消息，会被转发到远程端点上，而这也就是当前端点的订阅者不会接收到向当前端点发送消息的原因：
 
-```objectivec
+~~~objectivec
 - (void)sendNext:(id)value {
 	[self.otherTerminal sendNext:value];
 }
@@ -86,13 +86,13 @@ tags: iOS RAC
 - (void)sendCompleted {
 	[self.otherTerminal sendCompleted];
 }
-```
+~~~
 
 ### RACChannel 的初始化
 
 我们在任何情况下都不应该直接使用 `-init` 方法初始化 `RACChannelTerminal` 的实例，而是应该以创建 `RACChannel` 的方式生成它：
 
-```objectivec
+~~~objectivec
 - (instancetype)init {
 	self = [super init];
 
@@ -107,7 +107,7 @@ tags: iOS RAC
 
 	return self;
 }
-```
+~~~
 
 两个 `RACChannelTerminal` 中包装的其实是两个 `RACSubject` 热信号，它们既可以作为订阅者，也可以接收其他对象发送的消息；我们并不希望 `leadingSubject` 有任何的初始值，但是我们需要 `error` 和 `completed` 信息可以被重播。
 
@@ -125,11 +125,11 @@ tags: iOS RAC
 
 UIKit 中的这些组件都提供了使用 `RACChannel` 的接口，用以降低数据双向绑定的复杂度，我们以 `UITextField` 为例，它在分类的接口中提供了 `rac_newTextChannel` 方法：
 
-```objectivec
+~~~objectivec
 - (RACChannelTerminal *)rac_newTextChannel {
 	return [self rac_channelForControlEvents:UIControlEventAllEditingEvents key:@keypath(self.text) nilValue:@""];
 }
-```
+~~~
 
 上述方法用于返回一个一端绑定 `UIControlEventAllEditingEvents` 事件的 `RACChannelTerminal` 对象。
 
@@ -139,7 +139,7 @@ UIKit 中的这些组件都提供了使用 `RACChannel` 的接口，用以降低
 
 在 `rac_newTextChannel` 中调用的方法 `-rac_channelForControlEvents:key:nilValue:` 是一个 `UIControl` 的私有方法：
 
-```objectivec
+~~~objectivec
 - (RACChannelTerminal *)rac_channelForControlEvents:(UIControlEvents)controlEvents key:(NSString *)key nilValue:(id)nilValue {
 	key = [key copy];
 	RACChannel *channel = [[RACChannel alloc] init];
@@ -162,13 +162,13 @@ UIKit 中的这些组件都提供了使用 `RACChannel` 的接口，用以降低
 
 	return channel.leadingTerminal;
 }
-```
+~~~
 
 这个方法为所有的 `UIControl` 子类，包括 `UITextField`、`UISegmentedControl` 等等，它的主要作用就是当传入的 `controlEvents` 事件发生时，将 UIKit 组件的属性 `key` 发送到返回的 `RACChannelTerminal` 实例中；同时，在向返回的 `RACChannelTerminal` 实例中发送消息时，也会自动更新 UIKit 组件的属性。
 
 上面的代码在初始化 `RACChannel` 之后做了两件事情，首先是在 `UIControlEventAllEditingEvents` 事件发生时，将 `text` 属性发送到 `followingTerminal` 中：
 
-```objectivec
+~~~objectivec
 RACSignal *eventSignal = [[[self
     rac_signalForControlEvents:controlEvents]
     mapReplace:key]
@@ -178,17 +178,17 @@ RACSignal *eventSignal = [[[self
 [[self
     rac_liftSelector:@selector(valueForKey:) withSignals:eventSignal, nil]
     subscribe:channel.followingTerminal];
-```
+~~~
 
 第二个是在 `followingTerminal` 接收到来自 `leadingTerminal` 的消息时，更新 `UITextField` 的 `text` 属性。
 
-```objectivec
+~~~objectivec
 RACSignal *valuesSignal = [channel.followingTerminal
     map:^(id value) {
         return value ?: nilValue;
     }];
 [self rac_liftSelector:@selector(setValue:forKey:) withSignals:valuesSignal, [RACSignal return:key], nil];
-```
+~~~
 
 这两件事情都是通过 `-rac_liftSelector:withSignals:` 方法来完成的，不过，我们不会在这篇文章中介绍这个方法。
 
@@ -200,19 +200,19 @@ RACSignal *valuesSignal = [channel.followingTerminal
 
 在 `RACKVOChannel` 提供的接口中，我们一般都会使用 `RACChannelTo` 来观测某一个对象的对应属性，三个参数依次为对象、属性和默认值：
 
-```objectivec
+~~~objectivec
 RACChannelTerminal *integerChannel = RACChannelTo(self, integerProperty, @42);
-```
+~~~
 
 而 `RACChannelTo` 是 `RACKVOChannel` 头文件中的一个宏，上面的表达式可以展开成为：
 
-```objectivec
+~~~objectivec
 RACChannelTerminal *integerChannel = [[RACKVOChannel alloc] initWithTarget:self keyPath:@"integerProperty" nilValue:@42][@"followingTerminal"];
-```
+~~~
 
 该宏初始化了一个 `RACKVOChannel` 对象，并通过方括号的方式获取其中的 `followingTerminal`，这种获取类属性的方式是通过覆写以下的两个方法实现的：
 
-```objectivec
+~~~objectivec
 - (RACChannelTerminal *)objectForKeyedSubscript:(NSString *)key {
 	RACChannelTerminal *terminal = [self valueForKey:key];
 	return terminal;
@@ -223,15 +223,15 @@ RACChannelTerminal *integerChannel = [[RACKVOChannel alloc] initWithTarget:self 
 	[otherTerminal subscribe:selfTerminal];
 	[[selfTerminal skip:1] subscribe:otherTerminal];
 }
-```
+~~~
 
 又由于覆写了这两个方法，在 `-setObject:forKeyedSubscript:` 时会自动调用 `-subscribe:` 方法完成双向绑定，所以我们可以使用 `=` 来对两个 `RACKVOChannel` 进行双向绑定：
 
-```objectivec
+~~~objectivec
 RACChannelTo(view, property) = RACChannelTo(model, property);
 
 [[RACKVOChannel alloc] initWithTarget:view keyPath:@"property" nilValue:nil][@"followingTerminal"] = [[RACKVOChannel alloc] initWithTarget:model keyPath:@"property" nilValue:nil][@"followingTerminal"];
-```
+~~~
 
 以上的两种方式是完全等价的，它们都会在对方的属性更新时更新自己的属性。
 
@@ -249,17 +249,17 @@ RACChannelTo(view, property) = RACChannelTo(model, property);
 
 在整个视图上有两个 `UITextField`，我们想让这两个 `UITextField` `text` 的值相互绑定，在一个 `UITextField` 编辑时也改变另一个 `UITextField` 中的内容：
 
-```objectivec
+~~~objectivec
 @property (weak, nonatomic) IBOutlet UITextField *textField;
 @property (weak, nonatomic) IBOutlet UITextField *anotherTextField;
-```
+~~~
 
 实现的过程非常简单，分别获取两个 `UITextField` 的 `rac_newTextChannel` 属性，并让它们订阅彼此的内容：
 
-```objectivec
+~~~objectivec
 [self.textField.rac_newTextChannel subscribe:self.anotherTextField.rac_newTextChannel];
 [self.anotherTextField.rac_newTextChannel subscribe:self.textField.rac_newTextChannel];
-```
+~~~
 
 这样在使用两个文本输入框时就能达到预期的效果了，这是一个非常简单的例子，可以得到如下的结构图。
 

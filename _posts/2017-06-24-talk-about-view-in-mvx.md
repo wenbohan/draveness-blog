@@ -35,7 +35,7 @@ UIKit 是 Cocoa Touch 中用于构建和管理应用的用户界面的框架，�
 
 我们暂且抛开不继承自 `UIView` 的 `UIBarItem` 类簇不提，先通过一段代码分析一下 `UIView` 具有哪些特性。
 
-```objectivec
+~~~objectivec
 UIImageView *backgroundView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"backgoundImage"]];
 UIImageView *logoView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"logo"]];
 
@@ -48,33 +48,33 @@ UIButton *loginButton = [[UIButton alloc] init];
 [self.view addSubview:backgroundView];
 [backgroundView addSubview:logoView];
 [backgroundView addSubview:loginButton];
-```
+~~~
 
 `UIView` 作为视图层大部分元素的根类，提供了两个非常重要的特性：
 
 + 由于 `UIView` 具有 `frame` 属性，所以为所有继承自 `UIView` 的类提供了绝对布局相关的功能，也就是在 Cocoa Touch 中，所有的视图元素都可以通过 `frame` 设置自己在父视图中的绝对布局；
 + `UIView` 在接口中提供了操作和管理视图层级的属性和方法，比如 `superview`、`subviews` 以及 `-addSubview:` 等方法；
 
-    ```objectivec
-    @interface UIView (UIViewHierarchy)
+  ~~~objectivec
+  @interface UIView (UIViewHierarchy)
 
-    @property (nullable, nonatomic, readonly) UIView       *superview;
-    @property (nonatomic, readonly, copy) NSArray<__kindof UIView *> *subviews;
+  @property (nullable, nonatomic, readonly) UIView       *superview;
+  @property (nonatomic, readonly, copy) NSArray<__kindof UIView *> *subviews;
 
-    - (void)addSubview:(UIView *)view;
+  - (void)addSubview:(UIView *)view;
 
-    ...
+  ...
 
-    @end
-    ```
+  @end
+  ~~~
 
-    也就是说 **UIView 和它所有的子类都可以拥有子视图，成为容器并包含其他 UIView 的实例**。
+  也就是说 **UIView 和它所有的子类都可以拥有子视图，成为容器并包含其他 UIView 的实例**。
 
-    ```objectivec
-    [self.view addSubview:backgroundView];
-    [backgroundView addSubview:logoView];
-    [backgroundView addSubview:loginButton];
-    ```
+  ~~~objectivec
+  [self.view addSubview:backgroundView];
+  [backgroundView addSubview:logoView];
+  [backgroundView addSubview:loginButton];
+  ~~~
 
 这种使用 `UIView` 同时为子类提供默认的 `frame` 布局以及子视图支持的方式在一定程度上能够降低视图模型的复杂度：因为所有的视图都是一个容器，所以在开发时不需要区分视图和容器，但是这种方式虽然带来了一些方便，但是也不可避免地带来了一些问题。
 
@@ -128,15 +128,15 @@ Auto Layout 和 `UIStackView` 的出现虽然为布局提供了一些方便，�
 
 在 Auto Layout 出现之前，由于一切布局都是使用 `frame` 工作的，所以在 iOS 中完成对动画的编写十分容易。
 
-```objectivec
+~~~objectivec
 UIView.animate(withDuration: 1.0) {
     view.frame = CGRect(x: 10, y: 10, width: 200, height: 200)
 }
-```
+~~~
 
 而当大部分的 iOS 应用都转而使用 Auto Layout 之后，对于视图大小、位置有关的动画就比较麻烦了：
 
-```objectivec
+~~~objectivec
 topConstraint.constant = 10
 leftConstraint.constant = 10
 heightConstraint.constant = 200
@@ -144,7 +144,7 @@ widthConstraint.constant = 200
 UIView.animate(withDuration: 1.0) {
     view.layoutIfNeeded()
 }
-```
+~~~
 
 我们需要对视图上的约束对象一一修改并在最后调用 `layoutIfNeeded` 方法才可以完成相同的动画。由于 Auto Layout 对动画的支持并不是特别的优秀，所以在很多时候笔者在使用 Auto Layout 的视图上，都会使用 `transform` 属性来改变视图的位置，这样虽然也没有那么的优雅，不过也是一个比较方便的解决方案。
 
@@ -167,7 +167,7 @@ UIView.animate(withDuration: 1.0) {
 
 但是如果为 `UIStackView` 中的视图设置 `frame` 的话，这个属性就完全没什么作用了，比如下面的代码：
 
-```objectivec
+~~~objectivec
 UIStackView *stackView = [[UIStackView alloc] init];
 stackView.frame = self.view.frame;
 [self.view addSubview:stackView];
@@ -181,7 +181,7 @@ UIView *redView = [[UIView alloc] init];
 redView.backgroundColor = [UIColor redColor];
 redView.frame = CGRectMake(0, 0, 100, 100);
 [stackView addArrangedSubview:redView];
-```
+~~~
 
 `frame` 属性在 `UIStackView` 上基本上就完全失效了，我们还需要使用约束来控制 `UIStackView` 中视图的大小，不过如果你要使用 `frame` 属性来查看视图在父视图的位置和大小，在恰当的时机下是可行的。
 
@@ -205,11 +205,11 @@ redView.frame = CGRectMake(0, 0, 100, 100);
 
 父视图通过调用子视图的 `-layoutSpecThatFits:` 方法获取子视图布局所需要的大小，而子视图通过父视图传入的 `CGSizeRange` 来设置自己的大小。
 
-```objectivec
+~~~objectivec
 - (ASLayoutSpec *)layoutSpecThatFits:(ASSizeRange)constrainedSize
     ...
 }
-```
+~~~
 
 通过这种方式，子视图对父视图一无所知，它不知道父视图的任何属性，只通过 `-layoutSpecThatFits:` 方法传入的参数进行布局，实现了解耦以及代码复用。
 
@@ -229,7 +229,7 @@ redView.frame = CGRectMake(0, 0, 100, 100);
 
 与 iOS 上使用命令式的风格生成界面不同，Android 使用声明式的 XML 对界面进行描述，在这里举一个最简单的例子：
 
-```xml
+~~~xml
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -248,17 +248,17 @@ redView.frame = CGRectMake(0, 0, 100, 100);
         app:layout_constraintTop_toTopOf="parent" />
 
 </android.support.constraint.ConstraintLayout>
-```
+~~~
 
 > 整个 XML 文件同时描述了视图的结构和样式，而这也是 Android 对于视图层的设计方式，将结构和样式混合在一个文件中。
 
 我们首先来分析一下上述代码的结构，整个 XML 文件中只有两个元素，如果我们去掉其中所有的属性，整个界面的元素就是这样的：
 
-```xml
+~~~xml
 <ConstraintLayout>
     <TextView/>
 </ConstraintLayout>
-```
+~~~
 
 由一个 `ConstraintLayout` 节点包含一个 `TextView` 节点。
 
@@ -266,7 +266,7 @@ redView.frame = CGRectMake(0, 0, 100, 100);
 
 我们再来看一个 Android 中稍微复杂的视图结构：
 
-```xml
+~~~xml
 <LinearLayout>
     <RelativeLayout>
         <ImageView/>
@@ -277,7 +277,7 @@ redView.frame = CGRectMake(0, 0, 100, 100);
     </RelativeLayout>
     <View/>
 </LinearLayout>
-```
+~~~
 
 上面的 XML 代码描述了一个更加复杂的视图树，这里通过一张图更清晰地展示该视图表示的结构：
 
@@ -308,7 +308,7 @@ redView.frame = CGRectMake(0, 0, 100, 100);
 
 现在最流行的 Web 前端框架有三个，分别是 React、Vue 和 Angular。不过，这篇文章会以最根本的 HTML 和 CSS 为例，简单介绍 Web 前端中的视图层是如何工作的。
 
-```html
+~~~html
 <div>
   <h1 class="text-center">Header</h1>
 </div>
@@ -316,7 +316,7 @@ redView.frame = CGRectMake(0, 0, 100, 100);
 .text-center {
   text-align: center;
 }
-```
+~~~
 
 在 HTML 中其实并没有视图和容器这种概念的划分，绝大多数的元素节点都可以包含子节点，只有少数的无内容标签，比如说 `br`、`hr`、`img`、`input`、`link` 以及 `meta` 才不会**解析**自己的子节点。
 
@@ -324,10 +324,10 @@ redView.frame = CGRectMake(0, 0, 100, 100);
 
 与 Android 在定义视图时，使用混合的结构与样式不同，Web 前端在视图层中，采用 HTML 与 CSS 分离，即结构与样式分离的方式进行设计；虽然在 HTML 中，我们也可以使用 `style` 将 CSS 代码写在视图层的结构中，不过在一般情况下，我们并不会这么做。
 
-```html
+~~~html
 <body style="background-color:powderblue;">
 </body>
-```
+~~~
 
 ### 结构与样式
 
@@ -353,10 +353,10 @@ Android 和 Web 前端使用不同的方式对视图层的结构和样式进行�
 
 这其实是一个比较难以回答的问题，不过严格意义上的后端是没有用于展示内容的视图层的，也就是为客户端提供 API 接口的后端，它们的视图层，其实就是用于返回 JSON 的模板。
 
-```ruby
+~~~ruby
 json.extract! user, :id, :mobile, :nickname, :gender, :created_at, :updated_at
 json.url user_url user, format: :json
-```
+~~~
 
 在 Ruby on Rails 中一般都是类似于上面的 jbuilder 代码。拥有视图层的后端应用大多都是使用了模板引擎技术，直接为 HTTP 请求返回渲染之后的 HTML 和 CSS 等前端代码。
 
@@ -377,7 +377,7 @@ iOS 中理想的视图层需要解决两个最关键的问题：
 
 `Node` 会作为 `UIView` 的代理，同时也作为整个视图层新的根类，它将屏蔽掉外界与 `UIView` 层级操作的有关方法，比如说：`-addSubview:` 等，同时，它也会屏蔽掉 `frame` 属性，这样每一个 `Node` 类的实例就只能设置自己的大小了。
 
-```swift
+~~~swift
 public class Node: Buildable {
     public typealias Element = Node
     public let view: UIView = UIView()
@@ -388,7 +388,7 @@ public class Node: Buildable {
         return self
     }    
 }
-```
+~~~
 
 上面的代码简单说明了这一设计的实现原理，我们可以理解为 `Node` 作为 `UIView` 的透明代理，它不提供任何与视图层级相关的方法以及 `frame` 属性。
 
@@ -398,13 +398,13 @@ public class Node: Buildable {
 
 除了添加一个用于展示内容的 `Node` 类，我们还需要一个 `Container` 的概念，提供为管理子视图的 API 和方法，在这里，我们添加了一个空的 `Container` 协议：
 
-```swift
+~~~swift
 public protocol Container { }
-```
+~~~
 
 利用这个协议，我们构建一个 iOS 中最简单的容器 `AbsoluteContainer`，内部使用 `frame` 对子视图进行布局，它应该为外界提供添加子视图的接口，在这里就是 `build(closure:)` 方法：
 
-```swift
+~~~swift
 public class AbsoluteContainer: Node, Container {
     typealias Element = AbsoluteContainer
     @discardableResult
@@ -414,11 +414,11 @@ public class AbsoluteContainer: Node, Container {
         return Relation<AbsoluteContainer>(container: self, node: node)
     }
 }
-```
+~~~
 
 该方法会在调用后返回一个 `Relation` 对象，这主要是因为在这种设计下的 `origin` 或者 `center` 等属性不再是 `Node` 的一个接口，它应该是 `Node` 节点出现在 `AbsoluteContainer` 时的产物，也就是说，只有在这两者同时出现时，才可以使用这些属性更新 `Node` 节点的位置：
 
-```swift
+~~~swift
 public class Relation<Container> {
     public let container: Container
     public let node: Node
@@ -436,7 +436,7 @@ public extension Relation where Container == AbsoluteContainer {
         return self
     }
 }
-```
+~~~
 
 这样就完成了对于 `UIView` 中视图层级和位置功能的剥离，同时使用透明代理以及 `Relation` 为 `Node` 提供其他用于设置视图位置的接口。
 

@@ -61,12 +61,12 @@ MySQL 使用 InnoDB 存储表时，会将**表的定义**和**数据索引**等�
 
 无论在 MySQL 中选择了哪个存储引擎，所有的 MySQL 表都会在硬盘上创建一个 `.frm` 文件用来描述表的格式或者说定义；`.frm` 文件的格式在不同的平台上都是相同的。
 
-```sql
+~~~sql
 CREATE TABLE test_frm(
     column1 CHAR(5),
     column2 INTEGER
 );
-```
+~~~
 
 当我们使用上面的代码创建表时，会在磁盘上的 `datadir` 文件夹中生成一个 `test_frm.frm` 的文件，这个文件中就包含了表结构相关的信息：
 
@@ -148,7 +148,7 @@ B+ 树是平衡树，它查找任意节点所耗费的时间都是完全相同�
 
 InnoDB 存储引擎中的表都是使用索引组织的，也就是按照键的顺序存放；聚集索引就是按照表中主键的顺序构建一颗 B+ 树，并在叶节点中存放表中的行记录数据。
 
-```sql
+~~~sql
 CREATE TABLE users(
     id INT NOT NULL,
     first_name VARCHAR(20) NOT NULL,
@@ -158,7 +158,7 @@ CREATE TABLE users(
     KEY(last_name, first_name, age)
     KEY(first_name)
 );
-```
+~~~
 
 如果使用上面的 SQL 在数据库中创建一张表，B+ 树就会使用 `id` 作为索引的键，并在叶子节点中存储一条记录中的**所有**信息。
 
@@ -245,7 +245,7 @@ CREATE TABLE users(
 
 记录锁（Record Lock）是加到**索引记录**上的锁，假设我们存在下面的一张表 `users`：
 
-```sql
+~~~sql
 CREATE TABLE users(
     id INT NOT NULL AUTO_INCREMENT,
     last_name VARCHAR(255) NOT NULL,
@@ -255,7 +255,7 @@ CREATE TABLE users(
     KEY(last_name),
     KEY(age)
 );
-```
+~~~
 
 如果我们使用 `id` 或者 `last_name` 作为 SQL 中 `WHERE` 语句的过滤条件，那么 InnoDB 就可以通过索引建立的 B+ 树找到行记录并添加索引，但是如果使用 `first_name` 作为过滤条件时，由于 InnoDB 不知道待修改的记录具体存放的位置，也无法对将要修改哪条记录提前做出判断就会锁定整个表。
 
@@ -271,7 +271,7 @@ CREATE TABLE users(
 
 Next-Key 锁相比前两者就稍微有一些复杂，它是记录锁和记录前的间隙锁的结合，在 `users` 表中有以下记录：
 
-```sql
+~~~sql
 +------+-------------+--------------+-------+
 |   id | last_name   | first_name   |   age |
 |------+-------------+--------------+-------|
@@ -281,18 +281,18 @@ Next-Key 锁相比前两者就稍微有一些复杂，它是记录锁和记录�
 |    5 | jeff        | dean         |    50 |
 |    2 | donald      | trump        |    80 |
 +------+-------------+--------------+-------+
-```
+~~~
 
 如果使用 Next-Key 锁，那么 Next-Key 锁就可以在需要的时候锁定以下的范围：
 
-```sql
+~~~sql
 (-∞, 21]
 (21, 30]
 (30, 40]
 (40, 50]
 (50, 80]
 (80, ∞)
-```
+~~~
 
 > 既然叫 Next-Key 锁，锁定的应该是当前值和后面的范围，但是实际上却不是，Next-Key 锁锁定的是当前值和前面的范围。
 
@@ -331,12 +331,12 @@ MySQL 中默认的事务隔离级别就是 `REPEATABLE READ`，但是它通过 N
 
 接下来，我们将数据库中创建如下的表并通过个例子来展示在不同的事务隔离级别之下，会发生什么样的问题：
 
-```sql
+~~~sql
 CREATE TABLE test(
     id INT NOT NULL,
     UNIQUE(id)
 );
-```
+~~~
 
 ### 脏读
 

@@ -9,33 +9,33 @@ tags: iOS Masonry
 
 Masonry 的使用还是很简洁的:
 
-```objectivec
+~~~objectivec
 [button mas_makeConstraints:^(MASConstraintMaker *make) {
 	make.centerX.equalTo(self.view);
 	make.top.equalTo(self.view).with.offset(40);
 	make.width.equalTo(@185);
 	make.height.equalTo(@38);
 }];
-```
+~~~
 
 ## 从 mas_makeConstraints: 开始
 
 其中最常用的方法就是
 
-```objectivec
+~~~objectivec
 // View+MASAdditions.h
 
 - (NSArray *)mas_makeConstraints:(void(^)(MASConstraintMaker *make))block;
-```
+~~~
 
 同样, 也有用于**更新和重新构建**约束的分类方法:
 
-```objectivec
+~~~objectivec
 // View+MASAdditions.h
 
 - (NSArray *)mas_updateConstraints:(void(^)(MASConstraintMaker *make))block;
 - (NSArray *)mas_remakeConstraints:(void(^)(MASConstraintMaker *make))block;
-```
+~~~
 
 ## Constraint Maker Block
 
@@ -47,7 +47,7 @@ Masonry 的使用还是很简洁的:
 
 方法的实现如下:
 
-```objectivec
+~~~objectivec
 // View+MASAdditions.m
 
 - (NSArray *)mas_makeConstraints:(void(^)(MASConstraintMaker *))block {
@@ -56,7 +56,7 @@ Masonry 的使用还是很简洁的:
     block(constraintMaker);
     return [constraintMaker install];
 }
-```
+~~~
 
 因为 Masonry 是封装的苹果的 AutoLayout 框架, 所以我们要在为视图添加约束前将 `translatesAutoresizingMaskIntoConstraints` 属性设置为 `NO`. 如果这个属性没有被正确设置, 那么视图的约束不会被成功添加.
 
@@ -74,7 +74,7 @@ Masonry 的使用还是很简洁的:
 
 在初始化 `MASConstraintMaker` 的实例时, 它会**持有一个对应 view 的弱引用**, 并初始化一个  `constraints` 的空可变数组用来之后配置属性时持有所有的约束.
 
-```objectivec
+~~~objectivec
 // MASConstraintMaker.m
 
 - (id)initWithView:(MAS_VIEW *)view {
@@ -86,32 +86,32 @@ Masonry 的使用还是很简洁的:
 
     return self;
 }
-```
+~~~
 
 这里的 `MAS_VIEW` 是一个宏, 是 `UIView` 的 alias.
 
-```c
+~~~c
 // MASUtilities.h
 
 #define MAS_VIEW UIView
-```
+~~~
 
 ## Setup MASConstraintMaker
 
 在调用 `block(constraintMaker)` 时, 实际上是对 `constraintMaker` 的配置.
 
-```objectivec
+~~~objectivec
 make.centerX.equalTo(self.view);
 make.top.equalTo(self.view).with.offset(40);
 make.width.equalTo(@185);
 make.height.equalTo(@38);
-```
+~~~
 
 ### make.left
 
 访问 `make` 的 `left` `right` `top` `bottom`  等属性时, 会调用 `constraint:addConstraintWithLayoutAttribute:` 方法.
 
-```objectivec
+~~~objectivec
 // MASViewConstraint.m
 
 - (MASConstraint *)left {
@@ -132,7 +132,7 @@ make.height.equalTo(@38);
     }
     return newConstraint;
 }
-```
+~~~
 
 在调用链上最终会达到 `constraint:addConstraintWithLayoutAttribute:` 这一方法, 在这里省略了一些暂时不需要了解的问题. 因为在这个类中传入该方法的第一个参数一直为 `nil`, 所以这里省略的代码不会执行.
 
@@ -144,13 +144,13 @@ make.height.equalTo(@38);
 
 在 `make.left` 返回 `MASConstraint` 之后, 我们会继续在这个链式的语法中调用下一个方法来指定约束的关系.
 
-```objectivec
+~~~objectivec
 // MASConstraint.h
 
 - (MASConstraint * (^)(id attr))equalTo;
 - (MASConstraint * (^)(id attr))greaterThanOrEqualTo;
 - (MASConstraint * (^)(id attr))lessThanOrEqualTo;
-```
+~~~
 
 这三个方法是在 `MASViewConstraint` 的父类, `MASConstraint` 中定义的.
 
@@ -158,7 +158,7 @@ make.height.equalTo(@38);
 
 先来看一下这三个方法是怎么实现的:
 
-```objectivec
+~~~objectivec
 // MASConstraint.m
 
 - (MASConstraint * (^)(id))equalTo {
@@ -166,19 +166,19 @@ make.height.equalTo(@38);
         return self.equalToWithRelation(attribute, NSLayoutRelationEqual);
     };
 }
-```
+~~~
 
 该方法会导致 `self.equalToWithRelation` 的执行, 而这个方法是定义在子类中的, 因为父类作为抽象类没有提供这个方法的具体实现.
 
-```objectivec
+~~~objectivec
 // MASConstraint.m
 
 - (MASConstraint * (^)(id, NSLayoutRelation))equalToWithRelation { MASMethodNotImplemented(); }
-```
+~~~
 
 `MASMethodNotImplemented` 也是一个宏定义, 用于在**子类未继承这个方法**或者**直接使用这个类**时抛出异常.
 
-```c
+~~~c
 // MASConstraint.m
 
 #define MASMethodNotImplemented() \
@@ -186,11 +186,11 @@ make.height.equalTo(@38);
                                    reason:[NSString stringWithFormat:@"You must override %@ in a subclass.", NSStringFromSelector(_cmd)] \
                                  userInfo:nil]
 
-```
+~~~
 
 因为我们为 `equalTo` 提供了参数 `attribute` 和布局关系 `NSLayoutRelationEqual`, 这两个参数会传递到 `equalToWithRelation` 中, 设置 `constraint` 的布局关系和 `secondViewAttribute` 属性, 为即将 maker 的 `install` 做准备.
 
-```objectivec
+~~~objectivec
 // MASViewConstraint.m
 
 - (MASConstraint * (^)(id, NSLayoutRelation))equalToWithRelation {
@@ -204,11 +204,11 @@ make.height.equalTo(@38);
         }
     };
 }
-```
+~~~
 
 我们不得不提一下 `setSecondViewAttribute:` 方法, 它并不只是一个简单的 setter 方法, 它会根据你传入的值的种类赋值.
 
-```objectivec
+~~~objectivec
 // MASConstraintMaker.m
 
 - (void)setSecondViewAttribute:(id)secondViewAttribute {
@@ -222,29 +222,29 @@ make.height.equalTo(@38);
         NSAssert(NO, @"attempting to add unsupported attribute: %@", secondViewAttribute);
     }
 }
-```
+~~~
 
 第一种情况对应的就是:
 
-```objectivec
+~~~objectivec
 make.left.equalTo(@40);
-```
+~~~
 
 传入 `NSValue` 的时, 会直接设置 `constraint` 的 `offset`, `centerOffset`, `sizeOffset`, 或者 `insets`
 
 第二种情况一般会直接传入一个视图:
 
-```objectivec
+~~~objectivec
 make.left.equalTo(view);
-```
+~~~
 
 这时, 就会初始化一个 `layoutAttribute` 属性与 `firstViewArribute` 相同的 `MASViewAttribute`, 上面的代码就会使视图与 `view` 左对齐.
 
 第三种情况会传入一个视图的 `MASViewAttribute`:
 
-```objectivec
+~~~objectivec
 make.left.equalTo(view.mas_right);
-```
+~~~
 
 使用这种写法时, 一般是因为约束的方向不同. 这行代码会使视图的左侧与 `view` 的右侧对齐.
 
@@ -254,7 +254,7 @@ make.left.equalTo(view.mas_right);
 
 我们会在 `mas_makeConstraints:` 方法的最后调用 `[constraintMaker install]` 方法来安装所有存储在 `self.constraints` 数组中的所有约束.
 
-```objectivec
+~~~objectivec
 // MASConstraintMaker.m
 
 - (NSArray *)install {
@@ -272,7 +272,7 @@ make.left.equalTo(view.mas_right);
     [self.constraints removeAllObjects];
     return constraints;
 }
-```
+~~~
 
 在这个方法会先判断当前的视图的约束是否应该要被 `uninstall`, 如果我们在最开始调用 `mas_remakeConstraints:` 方法时, 视图中原来的约束就会全部被 `uninstall`.
 
@@ -282,35 +282,35 @@ make.left.equalTo(view.mas_right);
 
 MASViewConstraint 的 `install` 方法就是最后为当前视图添加约束的最后的方法, 首先这个方法会先获取即将用于初始化 `NSLayoutConstraint` 的子类的几个属性.
 
-```objectivec
+~~~objectivec
 // MASViewConstraint.m
 
 MAS_VIEW *firstLayoutItem = self.firstViewAttribute.view;
 NSLayoutAttribute firstLayoutAttribute = self.firstViewAttribute.layoutAttribute;
 MAS_VIEW *secondLayoutItem = self.secondViewAttribute.view;
 NSLayoutAttribute secondLayoutAttribute = self.secondViewAttribute.layoutAttribute;
-```
+~~~
 
 Masonry 之后会判断当前即将添加的约束是否是 size 类型的约束
 
-```objectivec
+~~~objectivec
 // MASViewConstraint.m
 
 if (!self.firstViewAttribute.isSizeAttribute && !self.secondViewAttribute) {
    secondLayoutItem = firstLayoutItem.superview;
    secondLayoutAttribute = firstLayoutAttribute;
 }
-```
+~~~
 
 如果不是 size 类型并且没有提供第二个 `viewAttribute`, (e.g. `make.left.equalTo(@10);`) 会自动将约束添加到 `superview` 上. 它等价于:
 
-```objectivec
+~~~objectivec
 make.left.equalTo(superView.mas_left).with.offset(10);
-```
+~~~
 
 然后就会初始化 `NSLayoutConstraint` 的子类 `MASLayoutConstraint`:
 
-```objectivec
+~~~objectivec
 // MASViewConstraint.m
 
 MASLayoutConstraint *layoutConstraint
@@ -322,11 +322,11 @@ MASLayoutConstraint *layoutConstraint
                                   multiplier:self.layoutMultiplier
                                     constant:self.layoutConstant];
 layoutConstraint.priority = self.layoutPriority;                                    
-```
+~~~
 
 接下来它会寻找 `firstLayoutItem` 和 `secondLayoutItem` 两个视图的公共 `superview`, 相当于求两个数的最小公倍数.
 
-```objectivec
+~~~objectivec
 // View+MASAdditions.m
 
 - (instancetype)mas_closestCommonSuperview:(MAS_VIEW *)view {
@@ -345,11 +345,11 @@ layoutConstraint.priority = self.layoutPriority;
     }
     return closestCommonSuperview;
 }
-```
+~~~
 
 如果需要升级当前的约束就会获取原有的约束, 并替换为新的约束, 这样就不需要再次为 `view` 安装约束.
 
-```objectivec
+~~~objectivec
 // MASViewConstraint.m
 
 MASLayoutConstraint *existingConstraint = nil;
@@ -366,13 +366,13 @@ if (existingConstraint) {
 }
 
 [firstLayoutItem.mas_installedConstraints addObject:self];
-```
+~~~
 
 如果原来的 `view` 中不存在可以升级的约束, 或者没有调用 `mas_updateConstraint:` 方法, 那么就会在上一步寻找到的 `installedView` 上面添加约束.
 
-```objectivec
+~~~objectivec
 [self.installedView addConstraint:layoutConstraint];
-```
+~~~
 
 ## 其他问题
 
@@ -386,7 +386,7 @@ if (existingConstraint) {
 
 > Optional semantic property which has no effect but improves the readability of constraint
 
-```objectivec
+~~~objectivec
 // MASConstraint.m
 - (MASConstraint *)with {
     return self;
@@ -395,19 +395,19 @@ if (existingConstraint) {
 - (MASConstraint *)and {
     return self;
 }
-```
+~~~
 
 与 `with` 有着相同作用的还有 `and`, 这两个方法都会直接返回 `MASConstraint`, 方法本身不做任何的修改.
 
 而 `offset` 方法其实是修改 `layoutConstraint` 中的常量, 因为 `self.layoutConstant` 在初始化时会被设置为 0, 我们可以通过修改 `offset` 属性来改变它.
 
-```objectivec
+~~~objectivec
 // MASViewConstraint.m
 
 - (void)setOffset:(CGFloat)offset {
     self.layoutConstant = offset;
 }
-```
+~~~
 
 ### MASCompositeConstraint
 
@@ -417,7 +417,7 @@ if (existingConstraint) {
 
 通过 `make` 直接调用 `edges` `size` `center` 时, 就会产生一个 `MASCompositeConstraint` 的实例, 而这个实例会初始化所有对应的单独的约束.
 
-```objectivec
+~~~objectivec
 // MASConstraintMaker.m
 
 - (MASConstraint *)edges {
@@ -431,11 +431,11 @@ if (existingConstraint) {
 - (MASConstraint *)center {
     return [self addConstraintWithAttributes:MASAttributeCenterX | MASAttributeCenterY];
 }
-```
+~~~
 
 这些属性都会调用 `addConstraintWithAttributes:` 方法, 生成多个属于 `MASCompositeConstraint` 的实例.
 
-```objectivec
+~~~objectivec
 // MASConstraintMaker.m
 
 NSMutableArray *children = [NSMutableArray arrayWithCapacity:attributes.count];
@@ -448,7 +448,7 @@ MASCompositeConstraint *constraint = [[MASCompositeConstraint alloc] initWithChi
 constraint.delegate = self;
 [self.constraints addObject:constraint];
 return constraint;
-```
+~~~
 
 ### mas_equalTo
 

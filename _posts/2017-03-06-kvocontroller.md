@@ -20,7 +20,7 @@ KVO 作为 iOS 中一种强大并且有效的机制，为 iOS 开发者们提供
 
 首先，我们有一个 `Fizz` 类，其中包含一个 `number` 属性，它在初始化时会自动被赋值为 `@0`：
 
-```objectivec
+~~~objectivec
 // Fizz.h
 @interface Fizz : NSObject
 
@@ -39,34 +39,34 @@ KVO 作为 iOS 中一种强大并且有效的机制，为 iOS 开发者们提供
 }
 
 @end
-```
+~~~
 
 我们想在 `Fizz` 对象中的 `number` 对象发生改变时获得通知得到**新**的和**旧**的值，这时我们就要祭出 `-addObserver:forKeyPath:options:context` 方法来监控 `number` 属性的变化：
 
-```objectivec
+~~~objectivec
 Fizz *fizz = [[Fizz alloc] init];
 [fizz addObserver:self
        forKeyPath:@"number"
           options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld
           context:nil];
 fizz.number = @2;
-```
+~~~
 
 在将当前对象 `self `注册成为 `fizz` 的观察者之后，我们需要在当前对象中覆写 `-observeValueForKeyPath:ofObject:change:context:` 方法：
 
-```objectivec
+~~~objectivec
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSKeyValueChangeKey,id> *)change context:(void *)context {
     if ([keyPath isEqualToString:@"number"]) {
         NSLog(@"%@", change);
     }
 }
-```
+~~~
 
 在大多数情况下我们只需要对比 `keyPath` 的值，就可以知道我们到底监控的是哪个对象，但是在更复杂的业务场景下，使用 `context` 上下文以及其它辅助手段才能够帮助我们更加精准地确定被观测的对象。
 
 但是当上述代码运行时，虽然可以成功打印出 `change` 字典，但是却会发生崩溃，你会在控制台中看到下面的内容：
 
-```objectivec
+~~~objectivec
 2017-02-26 23:44:19.666 KVOTest[15888:513229] {
     kind = 1;
     new = 2;
@@ -75,13 +75,13 @@ fizz.number = @2;
 2017-02-26 23:44:19.720 KVOTest[15888:513229] *** Terminating app due to uncaught exception 'NSInternalInconsistencyException', reason: 'An instance 0x60800001dd20 of class Fizz was deallocated while key value observers were still registered with it. Current observation info: <NSKeyValueObservationInfo 0x60800003d320> (
 <NSKeyValueObservance 0x608000057310: Observer: 0x7fa098f07590, Key path: number, Options: <New: YES, Old: YES, Prior: NO> Context: 0x0, Property: 0x608000057400>
 )'
-```
+~~~
 
 这是因为 `fizz` 对象没有被其它对象引用，在脱离 `viewDidLoad` 作用于之后就被回收了，然而在 `-dealloc` 时，并没有移除观察者，所以会造成崩溃。
 
 我们可以使用下面的代码来验证上面的结论是否正确：
 
-```objectivec
+~~~objectivec
 // Fizz.h
 @interface Fizz : NSObject
 
@@ -105,7 +105,7 @@ fizz.number = @2;
 }
 
 @end
-```
+~~~
 
 在 `Fizz` 类的接口中添加一个 `observer` 弱引用来持有对象的观察者，并在对象 `-dealloc` 时将它移除，重新运行这段代码，就不会发生崩溃了。
 
@@ -113,7 +113,7 @@ fizz.number = @2;
 
 由于没有移除观察者导致崩溃使用 KVO 时经常会遇到的问题之一，解决办法其实有很多，我们在这里简单介绍一个，使用当前对象持有被观测的对象，并在当前对象 `-dealloc` 时，移除观察者：
 
-```objectivec
+~~~objectivec
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.fizz = [[Fizz alloc] init];
@@ -127,7 +127,7 @@ fizz.number = @2;
 - (void)dealloc {
     [self.fizz removeObserver:self forKeyPath:@"number"];
 }
-```
+~~~
 
 这也是我们经常使用来避免崩溃的办法，但是在笔者看来也是非常的不优雅，除了上述的崩溃问题，使用 KVO 的过程也非常的别扭和痛苦：
 
@@ -144,14 +144,14 @@ fizz.number = @2;
 
 如果想要实现同样的业务需求，当使用 KVOController 解决上述问题时，只需要以下代码就可以达到与上一节中**完全相同**的效果：
 
-```objectivec
+~~~objectivec
 [self.KVOController observe:self.fizz
                     keyPath:@"number"
                     options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld
                       block:^(id  _Nullable observer, id  _Nonnull object, NSDictionary<NSString    *,id> * _Nonnull change) {
                           NSLog(@"%@", change);
                       }];
-```
+~~~
 
 我们可以在任意对象上**获得** `KVOController` 对象，然后调用它的实例方法 `-observer:keyPath:options:block:` 就可以检测某个对象对应的属性了，该方法传入的参数还是非常容易理解的，在 block 中也可以获得所有与 KVO 有关的参数。
 
@@ -170,20 +170,20 @@ KVOController 其实是对 Cocoa 中 KVO 的封装，它的实现其实也很简
 
 KVOController 不止为 Cocoa Touch 中所有的对象提供了 `-KVOController` 属性还提供了另一个 `KVOControllerNonRetaining` 属性，实现方法就是分类和 ObjC Runtime。
 
-```objectivec
+~~~objectivec
 @interface NSObject (FBKVOController)
 
 @property (nonatomic, strong) FBKVOController *KVOController;
 @property (nonatomic, strong) FBKVOController *KVOControllerNonRetaining;
 
 @end
-```
+~~~
 
 从名字可以看出 `KVOControllerNonRetaining` 在使用时并不会**持有**被观察的对象，与它相比 `KVOController` 就会持有该对象了。
 
 对于 `KVOController` 和 `KVOControllerNonRetaining` 属性来说，其实现都非常简单，对运行时非常熟悉的读者都应该知道使用关联对象就可以轻松实现这一需求。
 
-```objectivec
+~~~objectivec
 - (FBKVOController *)KVOController {
   id controller = objc_getAssociatedObject(self, NSObjectKVOControllerKey);
   if (nil == controller) {
@@ -209,7 +209,7 @@ KVOController 不止为 Cocoa Touch 中所有的对象提供了 `-KVOController`
 - (void)setKVOControllerNonRetaining:(FBKVOController *)KVOControllerNonRetaining {
   objc_setAssociatedObject(self, NSObjectKVOControllerNonRetainingKey, KVOControllerNonRetaining, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
-```
+~~~
 
 两者的 `setter` 方法都只是使用 `objc_setAssociatedObject` 按照键值简单地存一下，而 `getter` 中不同的其实也就是对于 `FBKVOController` 的初始化了。
 
@@ -227,7 +227,7 @@ KVOController 不止为 Cocoa Touch 中所有的对象提供了 `-KVOController`
 
 再回到上一节提到的初始化问题，`NSObject` 的属性 `FBKVOController` 和 `KVOControllerNonRetaining` 的区别在于前者会持有观察者，使其引用计数加一。
 
-```objectivec
+~~~objectivec
 - (instancetype)initWithObserver:(nullable id)observer retainObserved:(BOOL)retainObserved {
   self = [super init];
   if (nil != self) {
@@ -238,7 +238,7 @@ KVOController 不止为 Cocoa Touch 中所有的对象提供了 `-KVOController`
   }
   return self;
 }
-```
+~~~
 
 在初始化方法中使用各自的方法对 `KVOController` 对象持有的所有实例变量进行初始化，`KVOController` 和 `KVOControllerNonRetaining` 的区别就体现在生成的 `NSMapTable` 实例时传入的是 `NSPointerFunctionsStrongMemory` 还是 `NSPointerFunctionsWeakMemory` 选项。
 
@@ -246,13 +246,13 @@ KVOController 不止为 Cocoa Touch 中所有的对象提供了 `-KVOController`
 
 使用 `KVOController` 实现键值观测时，大都会调用实例方法 `-observe:keyPath:options:block` 来注册成为某个对象的观察者，监控属性的变化：
 
-```objectivec
+~~~objectivec
 - (void)observe:(nullable id)object keyPath:(NSString *)keyPath options:(NSKeyValueObservingOptions)options block:(FBKVONotificationBlock)block {
   _FBKVOInfo *info = [[_FBKVOInfo alloc] initWithController:self keyPath:keyPath options:options block:block];
 
   [self _observe:object info:info];
 }
-```
+~~~
 
 #### 数据结构 _FBKVOInfo
 
@@ -264,13 +264,13 @@ KVOController 不止为 Cocoa Touch 中所有的对象提供了 `-KVOController`
 
 如果再有点别的什么特别作用的就是，其中的 `state` 表示当前的 KVO 状态，不过在本文中不会具体介绍。
 
-```objectivec
+~~~objectivec
 typedef NS_ENUM(uint8_t, _FBKVOInfoState) {
   _FBKVOInfoStateInitial = 0,
   _FBKVOInfoStateObserving,
   _FBKVOInfoStateNotObserving,
 };
-```
+~~~
 
 #### observe 的过程
 
@@ -280,16 +280,16 @@ typedef NS_ENUM(uint8_t, _FBKVOInfoState) {
 
 我们从栈底开始简单分析一下整个封装 KVO 的过程，其中栈底的方法，也就是我们上面提到的 `-observer:keyPath:options:block:` 初始化了一个名为 `_FBKVOInfo` 的对象：
 
-```objectivec
+~~~objectivec
 - (void)observe:(nullable id)object keyPath:(NSString *)keyPath options:(NSKeyValueObservingOptions)options block:(FBKVONotificationBlock)block {
   _FBKVOInfo *info = [[_FBKVOInfo alloc] initWithController:self keyPath:keyPath options:options block:block];
   [self _observe:object info:info];
 }
-```
+~~~
 
 在创建了 `_FBKVOInfo` 之后执行了另一个私有方法 `-_observe:info:`：
 
-```objectivec
+~~~objectivec
 - (void)_observe:(id)object info:(_FBKVOInfo *)info {
   pthread_mutex_lock(&_lock);
   NSMutableSet *infos = [_objectInfosMap objectForKey:object];
@@ -309,7 +309,7 @@ typedef NS_ENUM(uint8_t, _FBKVOInfoState) {
 
   [[_FBKVOSharedController sharedController] observe:object info:info];
 }
-```
+~~~
 
 这个私有方法通过自身持有的 `_objectInfosMap` 来判断当前对象、属性以及各种上下文是否已经注册在表中存在了，在这个 `_objectInfosMap` 中保存着对象以及与对象有关的 `_FBKVOInfo` 集合：
 
@@ -317,7 +317,7 @@ typedef NS_ENUM(uint8_t, _FBKVOInfoState) {
 
 在操作了当前 `KVOController` 持有的 `_objectInfosMap` 之后，才会执行私有的 `_FBKVOSharedController` 类的实例方法 `-observe:info:`：
 
-```objectivec
+~~~objectivec
 - (void)observe:(id)object info:(nullable _FBKVOInfo *)info {
   pthread_mutex_lock(&_mutex);
   [_infos addObject:info];
@@ -331,11 +331,11 @@ typedef NS_ENUM(uint8_t, _FBKVOInfoState) {
     [object removeObserver:self forKeyPath:info->_keyPath context:(void *)info];
   }
 }
-```
+~~~
 
 `_FBKVOSharedController` 才是最终调用 Cocoa 中的 `-observe:forKeyPath:options:context:` 方法开始对属性的监听的地方；同时，在整个应用运行时，只会存在一个 `_FBKVOSharedController` 实例：
 
-```objectivec
+~~~objectivec
 + (instancetype)sharedController {
   static _FBKVOSharedController *_controller = nil;
   static dispatch_once_t onceToken;
@@ -344,11 +344,11 @@ typedef NS_ENUM(uint8_t, _FBKVOInfoState) {
   });
   return _controller;
 }
-```
+~~~
 
 这个唯一的 `_FBKVOSharedController` 实例会在 KVO 的回调方法中将事件分发给 KVO 的观察者。
 
-```objectivec
+~~~objectivec
 - (void)observeValueForKeyPath:(nullable NSString *)keyPath
                       ofObject:(nullable id)object
                         change:(nullable NSDictionary<NSString *, id> *)change
@@ -375,7 +375,7 @@ typedef NS_ENUM(uint8_t, _FBKVOInfoState) {
         [observer observeValueForKeyPath:keyPath ofObject:object change:change context:info->_context];
     }
 }
-```
+~~~
 
 在这个 `-observeValueForKeyPath:ofObject:change:context:` 回调方法中，`_FBKVOSharedController` 会根据 KVO 的信息 `_KVOInfo` 选择不同的方式分发事件，如果观察者没有传入 block 或者选择子，就会调用观察者 KVO 回调方法。
 
@@ -391,7 +391,7 @@ typedef NS_ENUM(uint8_t, _FBKVOInfoState) {
 
 当每一个 `KVOController` 对象被释放时，都会将它自己持有的所有 KVO 的观察者交由 `_KVOSharedController` 的 `-unobserve:infos:` 方法处理：
 
-```objectivec
+~~~objectivec
 - (void)unobserve:(id)object infos:(nullable NSSet<_FBKVOInfo *> *)infos {
   pthread_mutex_lock(&_mutex);
   for (_FBKVOInfo *info in infos) {
@@ -406,7 +406,7 @@ typedef NS_ENUM(uint8_t, _FBKVOInfoState) {
     info->_state = _FBKVOInfoStateNotObserving;
   }
 }
-```
+~~~
 
 该方法会遍历所有传入的 `_FBKVOInfo`，从其中取出 `keyPath` 并将 `_KVOSharedController` 移除观察者。
 
@@ -416,7 +416,7 @@ typedef NS_ENUM(uint8_t, _FBKVOInfoState) {
 
 功能的实现过程其实都是类似的，都是通过 `-removeObserver:forKeyPath:context:` 方法移除观察者：
 
-```objectivec
+~~~objectivec
 - (void)unobserve:(id)object info:(nullable _FBKVOInfo *)info {
   pthread_mutex_lock(&_mutex);
   [_infos removeObject:info];
@@ -427,7 +427,7 @@ typedef NS_ENUM(uint8_t, _FBKVOInfoState) {
   }
   info->_state = _FBKVOInfoStateNotObserving;
 }
-```
+~~~
 
 不过由于这个方法的参数并不是一个数组，所以并不需要使用 `for` 循环，而是只需要将该 `_FBKVOInfo` 对应的 KVO 事件移除就可以了。
 
@@ -437,9 +437,9 @@ KVOController 对于 Cocoa 中 KVO 的封装非常的简洁和优秀，我们只
 
 在笔者看来 KVOController 中唯一不是很优雅的地方就是，需要写出 `object.KVOController` 才可以执行 KVO，如果能将 `KVOController` 换成更短的形式可能看起来更舒服一些：
 
-```objectivec
+~~~objectivec
 [self.kvo observer:keyPath:options:block:];
-```
+~~~
 
 不过这并不是一个比较大的问题，同时也只是笔者自己的看法，况且不影响 KVOController 的使用，所以各位读者也无须太过介意。
 

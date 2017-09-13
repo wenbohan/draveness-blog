@@ -39,37 +39,37 @@ Prolog 中有三种不同的 term, 分别的 `constants`, `variables` 和 `compl
 
 匹配有什么作用呢? 我们可以使用匹配来为我们提供更强大的抽象能力:
 
-```
+~~~
 vertical(line(point(X,Y),point(X,Z))).
 horizontal(line(point(X,Y),point(Z,Y))).
-```
+~~~
 
 这两行 Prolog 代码并不是规则, 而是事实, 我们可以使用匹配的能力, 写出这两个规则, 这样我们就可以轻易地判断一条直线是否是垂直的或是水平的.
 
-```
+~~~
 ?- vertical(line(point(1,1),point(1,3))).
 true
-```
+~~~
 
 同样我们也可以利用匹配来寻找与某一点构成垂线的点.
 
-```
+~~~
 ?- vertical(line(point(1,1),point(X,4))).
 X = 1.
-```
+~~~
 
 同样我们也可以利用 Prolog 的匹配解决更加复杂更加困难的问题.
 
 现在我们有 6 个单词, 我们需要将它们填入下面的拼图里:
 
-```
+~~~
 word(abalone,a,b,a,l,o,n,e). 
 word(abandon,a,b,a,n,d,o,n). 
 word(enhance,e,n,h,a,n,c,e). 
 word(anagram,a,n,a,g,r,a,m). 
 word(connect,c,o,n,n,e,c,t). 
 word(elegant,e,l,e,g,a,n,t).
-```
+~~~
 
 ![](/content/images/2015/04/grid.png)
 
@@ -77,7 +77,7 @@ word(elegant,e,l,e,g,a,n,t).
 
 我们可以通过 Prolog 得出答案, 只需要将需要满足的条件写在 predicate 里:
 
-```
+~~~
 crosswd(V1,V2,V3,H1,H2,H3):-
     word(V1,_,A,_,B,_,C,_),
     word(V2,_,D,_,E,_,F,_),
@@ -85,11 +85,11 @@ crosswd(V1,V2,V3,H1,H2,H3):-
     word(H1,_,A,_,D,_,G,_),
     word(H2,_,B,_,E,_,H,_),
     word(H3,_,C,_,F,_,I,_),
-```
+~~~
 
 这样我们就可以得到结果:
 
-```
+~~~
 ?- crosswd(H1,H2,H3,V1,V2,V3).
 H1 = abalone,
 H2 = anagram,
@@ -104,6 +104,6 @@ V1 = abalone,
 V2 = anagram,
 V3 = connect ;
 false.
-```
+~~~
 
 Prolog 中匹配的能力非常强大, 其实它就是对已经有的条件和数据进行搜索, 尝试所有的答案, 最后给出满足条件的所有结果, 能够极大的降低我们的计算量.

@@ -19,7 +19,7 @@ tags: iOS
 
 `MBProgressHUD` 提供了一对类方法 `+ showHUDAddedTo:animated:` 和 `+ hideHUDForView:animated:` 来创建和隐藏 `HUD`, 这是创建和隐藏 `HUD` 最简单的一组方法
 
-```objectivec
+~~~objectivec
 + (MB_INSTANCETYPE)showHUDAddedTo:(UIView *)view animated:(BOOL)animated {
 	MBProgressHUD *hud = [[self alloc] initWithView:view];
 	hud.removeFromSuperViewOnHide = YES;
@@ -27,7 +27,7 @@ tags: iOS
 	[hud show:animated];
 	return MB_AUTORELEASE(hud);
 }
-```
+~~~
 
 ### `- initWithView:`
 
@@ -35,7 +35,7 @@ tags: iOS
 
 通过 `- initWithFrame:` 方法的执行, 会为 `MBProgressHUD` 的一些属性设置一系列的默认值.
 
-```objectivec
+~~~objectivec
 - (id)initWithFrame:(CGRect)frame {
 	self = [super initWithFrame:frame];
 	if (self) {
@@ -51,7 +51,7 @@ tags: iOS
 	}
 	return self;
 }
-```
+~~~
 
 在 `MBProgressHUD` 初始化的过程中, 有一个需要注意的方法 `- registerForKVO`, 我们会在之后查看该方法的实现.
 
@@ -59,7 +59,7 @@ tags: iOS
 
 在初始化一个 `HUD` 并添加到 `view` 上之后, 这时 `HUD` 并没有显示出来, 因为在初始化时, `view.alpha` 被设置为 0. 所以我们接下来会调用 `- show:` 方法使 `HUD` 显示到屏幕上.
 
-```objectivec
+~~~objectivec
 - (void)show:(BOOL)animated {
     NSAssert([NSThread isMainThread], @"MBProgressHUD needs to be accessed on the main thread.");
 	useAnimation = animated;
@@ -74,7 +74,7 @@ tags: iOS
 		[self showUsingAnimation:useAnimation];
 	}
 }
-```
+~~~
 
 因为在 iOS 开发中, 对于 `UIView` 的处理必须在主线程中, 所以在这里我们要先用 `[NSThread isMainThread]` 来确认当前前程为主线程.
 
@@ -82,7 +82,7 @@ tags: iOS
 
 ### `- showUsingAnimation:`
 
-```objectivec
+~~~objectivec
 - (void)showUsingAnimation:(BOOL)animated {
     // Cancel any scheduled hideDelayed: calls
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
@@ -108,11 +108,11 @@ tags: iOS
 		self.alpha = 1.0f;
 	}
 }
-```
+~~~
 
 这个方法的核心功能就是根据 `animationType` 为 `HUD` 的出现添加合适的动画.
 
-```objectivec
+~~~objectivec
 typedef NS_ENUM(NSInteger, MBProgressHUDAnimation) {
 	/** Opacity animation */
 	MBProgressHUDAnimationFade,
@@ -121,19 +121,19 @@ typedef NS_ENUM(NSInteger, MBProgressHUDAnimation) {
 	MBProgressHUDAnimationZoomOut = MBProgressHUDAnimationZoom,
 	MBProgressHUDAnimationZoomIn
 };
-```
+~~~
 
 它在方法刚调用时会通过 `- cancelPreviousPerformRequestsWithTarget:` 移除附加在 `HUD` 上的所有 `selector`, 这样可以保证该方法不会多次调用.
 
 同时也会保存 `HUD` 的出现时间.
 
-```objectivec
+~~~objectivec
 self.showStarted = [NSDate date]
-```
+~~~
 
 ### `+ hideHUDForView:animated:`
 
-```objectivec
+~~~objectivec
 + (BOOL)hideHUDForView:(UIView *)view animated:(BOOL)animated {
 	MBProgressHUD *hud = [self HUDForView:view];
 	if (hud != nil) {
@@ -143,11 +143,11 @@ self.showStarted = [NSDate date]
 	}
 	return NO;
 }
-```
+~~~
 
 `+ hideHUDForView:animated:` 方法的实现和 `+ showHUDAddedTo:animated:` 差不多, `+ HUDForView:` 方法会返回对应 `view` 最上层的 `MBProgressHUD` 的实例.
 
-```objectivec
+~~~objectivec
 + (MB_INSTANCETYPE)HUDForView:(UIView *)view {
 	NSEnumerator *subviewsEnum = [view.subviews reverseObjectEnumerator];
 	for (UIView *subview in subviewsEnum) {
@@ -157,11 +157,11 @@ self.showStarted = [NSDate date]
 	}
 	return nil;
 }
-```
+~~~
 
 然后调用的 `- hide:` 方法和 `- hideUsingAnimation:` 方法也没有什么特别的, 只有在 `HUD` 隐藏之后 `- done` 负责隐藏执行 `completionBlock` 和 `delegate` 回调.
 
-```objectivec
+~~~objectivec
 - (void)done {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
 	isFinished = YES;
@@ -179,7 +179,7 @@ self.showStarted = [NSDate date]
 		[delegate performSelector:@selector(hudWasHidden:) withObject:self];
 	}
 }
-```
+~~~
 
 ### `- showAnimated:whileExecutingBlock:onQueue:completionBlock:`
 
@@ -187,15 +187,15 @@ self.showStarted = [NSDate date]
 
 同时 `MBProgressHUD` 也提供一些其他的便利方法实现这一功能:
 
-```objectivec
+~~~objectivec
 - (void)showAnimated:(BOOL)animated whileExecutingBlock:(dispatch_block_t)block;
 - (void)showAnimated:(BOOL)animated whileExecutingBlock:(dispatch_block_t)block completionBlock:(MBProgressHUDCompletionBlock)completion;
 - (void)showAnimated:(BOOL)animated whileExecutingBlock:(dispatch_block_t)block onQueue:(dispatch_queue_t)queue;
-```
+~~~
 
 该方法会**异步**在指定 `queue` 上运行 `block` 并在 `block` 执行结束调用 `- cleanUp`.
 
-```
+~~~
 - (void)showAnimated:(BOOL)animated whileExecutingBlock:(dispatch_block_t)block onQueue:(dispatch_queue_t)queue
 	 completionBlock:(MBProgressHUDCompletionBlock)completion {
 	self.taskInProgress = YES;
@@ -208,7 +208,7 @@ self.showStarted = [NSDate date]
 	});
 	[self show:animated];
 }
-```
+~~~
 
 关于 `- cleanUp` 我们会在下一段中介绍.
 
@@ -216,7 +216,7 @@ self.showStarted = [NSDate date]
 
 > 当一个后台任务在新线程中执行时, 显示 `HUD`.
 
-```objectivec
+~~~objectivec
 - (void)showWhileExecuting:(SEL)method onTarget:(id)target withObject:(id)object animated:(BOOL)animated {
 	methodForExecution = method;
 	targetForExecution = MB_RETAIN(target);
@@ -227,11 +227,11 @@ self.showStarted = [NSDate date]
 	// Show HUD view
 	[self show:animated];
 }
-```
+~~~
 
 在保存 `methodForExecution` `targetForExecution` 和 `objectForExecution` 之后, 会在新的线程中调用方法.
 
-```objectivec
+~~~objectivec
 - (void)launchExecution {
 	@autoreleasepool {
 #pragma clang diagnostic push
@@ -244,7 +244,7 @@ self.showStarted = [NSDate date]
 		[self performSelectorOnMainThread:@selector(cleanUp) withObject:nil waitUntilDone:NO];
 	}
 }
-```
+~~~
 
 `- launchExecution` 会创建一个自动释放池, 然后再这个自动释放池中调用方法, 并在方法调用结束之后在主线程执行 `- cleanUp`.
 
@@ -256,7 +256,7 @@ self.showStarted = [NSDate date]
 
 `MBProgressHUD` 使用了一系列神奇的宏定义来兼容 `MRC`.
 
-```objectivec
+~~~objectivec
 #ifndef MB_INSTANCETYPE
 #if __has_feature(objc_instancetype)
 	#define MB_INSTANCETYPE instancetype
@@ -282,7 +282,7 @@ self.showStarted = [NSDate date]
 	#define MB_WEAK assign
 #endif
 #endif
-```
+~~~
 
 通过宏定义 `__has_feature` 来判断当前环境是否启用了 ARC, 使得不同环境下宏不会出错.
 
@@ -290,16 +290,16 @@ self.showStarted = [NSDate date]
 
 `MBProgressHUD` 通过 `@property` 生成了一系列的属性.
 
-```objectivec
+~~~objectivec
 - (NSArray *)observableKeypaths {
 	return [NSArray arrayWithObjects:@"mode", @"customView", @"labelText", @"labelFont", @"labelColor",
 			@"detailsLabelText", @"detailsLabelFont", @"detailsLabelColor", @"progress", @"activityIndicatorColor", nil];
 }
-```
+~~~
 
 这些属性在改变的时候不会, 重新渲染整个 `view`,  我们在一般情况下覆写 `setter` 方法, 然后再 `setter` 方法中刷新对应的属性, 在 `MBProgressHUD` 中使用 KVO 来解决这个问题.
 
-```objectivec
+~~~objectivec
 - (void)registerForKVO {
 	for (NSString *keyPath in [self observableKeypaths]) {
 		[self addObserver:self forKeyPath:keyPath options:NSKeyValueObservingOptionNew context:NULL];
@@ -339,7 +339,7 @@ self.showStarted = [NSDate date]
 	[self setNeedsLayout];
 	[self setNeedsDisplay];
 }
-```
+~~~
 
 `- observeValueForKeyPath:ofObject:change:context:` 方法中的代码是为了保证 UI 的更新一定是在主线程中, 而 `- updateUIForKeypath:` 方法负责 UI 的更新.
 
