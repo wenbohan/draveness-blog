@@ -1066,15 +1066,17 @@ body:not(.post-template) .post-title {
 /* ==========================================================================
    5. Single Post - When you click on an individual post
    ========================================================================== */
-
 #markdown-toc {
-  /*left: 60px;*/
-  position: absolute;
   transform: translateX(-110%);
 }
 
 #markdown-toc a {
   text-decoration: none;
+  font-size: 16px;
+}
+
+.markdown-toc-relative {
+  position: absolute;
 }
 
 .markdown-toc-fixed {
