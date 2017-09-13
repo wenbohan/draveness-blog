@@ -6,6 +6,10 @@ cover: http://img.draveness.me/kvoobserver-cover.jpg
 permalink: /:title
 tags: iOS KVO
 ---
+
++ TOC
+{:toc}
+
 KVO 作为 iOS 中一种强大并且有效的机制，为 iOS 开发者们提供了很多的便利；我们可以使用 KVO 来检测对象属性的变化、快速做出响应，这能够为我们在开发强交互、响应式应用以及实现视图和模型的双向绑定时提供大量的帮助。
 
 但是在大多数情况下，除非遇到不用 KVO 无法解决的问题，笔者都会尽量避免它的使用，这并不是因为 KVO 有性能问题或者使用场景不多，总重要的原因是 KVO 的使用是在是太 ** **麻烦**了。

@@ -5,6 +5,10 @@ date: 2017-02-04 22:15:57.000000000 +08:00
 permalink: /:title
 tags: iOS RAC
 ---
+
++ TOC
+{:toc}
+
 ReactiveCocoa 在设计上很大程度借鉴了 Reactive Extension 中的概念，可以说 ReactiveCocoa 是 Rx 在 Objective-C 语言中的实现。
 
 在 Rx 中主要的两个概念*信号*和*序列*都在 ReactiveCocoa 中有着相对应的组件 `RACSignal` 和 `RACSequence`，上一篇文章已经对前者有一个简单的介绍，而这篇文章主要会介绍后者，也就是 `RACSequence`。

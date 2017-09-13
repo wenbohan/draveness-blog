@@ -5,6 +5,10 @@ date: 2015-04-09 02:22:14.000000000 +08:00
 permalink: /:title
 ---
 
++ TOC
+{:toc}
+
+
 
 在这一次的 post 中, 我们将要介绍 Prolog 中的递归定义, 也就是说, 一个 predicate 如果它定义了一个或多个引用自己的规则, 那么这个 predicate 就是递归的.
 

@@ -5,6 +5,10 @@ date: 2017-02-15 15:21:01.000000000 +08:00
 permalink: /:title
 tags: iOS RAC
 ---
+
++ TOC
+{:toc}
+
 ReactiveCocoa 中的信号信号在默认情况下都是冷的，每次有新的订阅者订阅信号时都会执行信号创建时传入的 block；这意味着对于任意一个订阅者，所需要的数据都会**重新计算**，这在大多数情况下都是开发者想看到的情况，但是这在信号中的 block 有副作用或者较为昂贵时就会有很多问题。
 
 ![RACMulticastConnection](http://img.draveness.me/2017-02-15-RACMulticastConnection.png)

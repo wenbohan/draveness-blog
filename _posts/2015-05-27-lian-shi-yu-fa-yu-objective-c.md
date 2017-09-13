@@ -5,6 +5,10 @@ date: 2015-05-27 15:44:22.000000000 +08:00
 permalink: /:title
 tags: iOS
 ---
+
++ TOC
+{:toc}
+
 作为一个 Objective-C 语言的使用者已经有近两年的时间了. 在逐渐熟悉手中的工具, Objective-C 语言的同时, 我也开始从更高的角度来观察这一门语言.
 
 虽然至今我也不敢说我精通 Objective-C 和 Cocoa Touch, 但是我对它们也有了一些自己的见解.

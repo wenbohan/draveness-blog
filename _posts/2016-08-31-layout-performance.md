@@ -5,6 +5,10 @@ date: 2016-08-31 21:52:25.000000000 +08:00
 permalink: /:title
 tags: iOS ASDK
 ---
+
++ TOC
+{:toc}
+
 > 这是使用 ASDK 性能调优系列的第二篇文章，前一篇文章中讲到了如何提升 iOS 应用的渲染性能，你可以点击 [这里](https://github.com/Draveness/iOS-Source-Code-Analyze/blob/master/contents/AsyncDisplayKit/提升%20iOS%20界面的渲染性能.md) 了解这部分的内容。
 
 在上一篇文章中，我们提到了 iOS 界面的渲染过程以及如何对渲染过程进行优化。ASDK 的做法是将渲染绘制的工作抛到后台线程进行，并在每次 Runloop 结束时，将绘制结果交给 `CALayer` 进行展示。

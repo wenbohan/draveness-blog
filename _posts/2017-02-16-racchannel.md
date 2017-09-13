@@ -5,6 +5,10 @@ date: 2017-02-16 19:59:14.000000000 +08:00
 permalink: /:title
 tags: iOS RAC
 ---
+
++ TOC
+{:toc}
+
 之前讲过了 ReactiveCocoa 中的一对一的单向数据流 `RACSignal` 和一对多的单向数据流 `RACMulticastConnection`，这一篇文章分析的是一对一的双向数据流 `RACChannel`。
 
 ![What-is-RACChanne](http://img.draveness.me/2017-02-16-What-is-RACChannel.png)

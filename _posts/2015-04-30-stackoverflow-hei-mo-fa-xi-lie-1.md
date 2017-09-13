@@ -5,6 +5,10 @@ date: 2015-04-30 21:52:25.000000000 +08:00
 permalink: /:title
 tags: iOS
 ---
+
++ TOC
+{:toc}
+
 最近看到了很多关于 iOS 开发的黑魔法, 发现最终的链接都是来自与 [stackoverflow](http://stackoverflow.com/), 我感觉需要在 stackoverflow 上这个社区逛一逛, 找一些比较~~屌~~神奇的黑魔法来分享一下, 也能够~~多两篇水文~~提高一下自己的水平, 当然我会在每一条"咒语"的后面加上原文的链接.
 
 ## 原子(atomic)和非原子(nonatomic)的区别是什么?

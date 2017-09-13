@@ -6,6 +6,10 @@ tags: Server MySQL InnoDB Database
 cover: http://img.draveness.me/2017-08-06-mysql-cover.jpg
 ---
 
++ TOC
+{:toc}
+
+
 作为一名开发人员，在日常的工作中会难以避免地接触到数据库，无论是基于文件的 sqlite 还是工程上使用非常广泛的 MySQL、PostgreSQL，但是一直以来也没有对数据库有一个非常清晰并且成体系的认知，所以最近两个月的时间看了几本数据库相关的书籍并且阅读了 MySQL 的官方文档，希望对各位了解数据库的、不了解数据库的有所帮助。
 
 ![mysql](https://raw.githubusercontent.com/Draveness/Analyze/master/contents/Database/images/mysql/mysql.png)

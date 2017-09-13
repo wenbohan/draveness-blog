@@ -5,6 +5,10 @@ date: 2016-08-13 13:33:58.000000000 +08:00
 permalink: /:title
 tags: iOS
 ---
+
++ TOC
+{:toc}
+
 ![](http://img.draveness.me/2016-08-13-protocol-recordings.jpeg)
 
 Swift 中的协议扩展为 iOS 开发带来了非常多的可能性，它为我们提供了一种类似多重继承的功能，帮助我们减少一切可能导致重复代码的地方。
