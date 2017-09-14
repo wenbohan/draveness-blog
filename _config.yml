@@ -76,8 +76,8 @@ sass:
 # or "master" otherwise
 safe: false
 lsi: false
-username: biomadeira
-repo: jasper
+username: draveness
+repo: jekyll-blog
 branch: master
 relative_source: ../jasper/
 destination: ../jasper-pages/
