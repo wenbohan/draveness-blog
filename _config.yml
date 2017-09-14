@@ -44,7 +44,12 @@ permalink: pretty
 # permalink: /tag/:tag
 
 # gems and other configs
-gems: [jekyll-paginate]
+plugins:
+  - jekyll-paginate
+  - jekyll-redirect-from
+whitelist:
+  - jekyll-redirect-from
+
 exclude: [vendor]
 
 sass:
