@@ -8,6 +8,9 @@ desc: 上一篇文章 MySQL 索引设计概要介绍了影响索引设计的几�
 
 ---
 
++ TOC
+{:toc}
+
 上一篇文章 [MySQL 索引设计概要](http://draveness.me/sql-index-intro.html) 介绍了影响索引设计的几大因素，包括过滤因子、索引片的宽窄与大小以及匹配列和过滤列。在文章的后半部分介绍了 [数据库索引设计与优化](https://www.amazon.cn/图书/dp/B00ZH27RH0) 一书中，理想的三星索引的设计流程和套路，到目前为止虽然我们掌握了单表索引的设计方法，但是却没有分析预估索引耗时的能力。
 
 ![Proactive-Index-Design](http://img.draveness.me/2017-09-16-Proactive-Index-Design.jpg)
