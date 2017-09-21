@@ -10,4 +10,3 @@ gem "rake", "~> 12.1.0"
 gem 'jekyll-compose', group: [:jekyll_plugins]
 gem 'jekyll-redirect-from', group: [:jekyll_plugins]
 gem 'jekyll-admin', group: :jekyll_plugins
-
