@@ -6,6 +6,17 @@
   margin: 0em;
   min-width: 160px;
 
+  &::before {
+    visibility: visible;
+    opacity: 0;
+    content: 'Contents';
+    font-size: 18px;
+    color: #3a3a3a;
+    margin-left: 0px;
+    -webkit-transition: all .3s ease;
+    transition: all .3s ease;
+  }
+
   a {
     text-decoration: none;
     font-size: 17px;
@@ -23,7 +34,7 @@
   ol ol,
   ul ul,
   ol ol {
-    margin: 0.4em;
+    margin: 0.3em;
     list-style-type: none;
   }
 
