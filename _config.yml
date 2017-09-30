@@ -28,8 +28,8 @@ author: 'Draveness'
 nickname: draveness
 bio: 'Rails / Elixir / iOS'
 location: 'Maine, USA'
-url: 'http://draveness.me'
-img_url: 'http://img.draveness.me'
+url: 'https://draveness.me'
+img_url: 'https://img.draveness.me'
 image: 'assets/images/draven.png'
 
 short_url: 'draveness.me'
