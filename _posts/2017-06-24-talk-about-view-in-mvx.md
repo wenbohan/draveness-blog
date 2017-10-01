@@ -4,7 +4,7 @@ title: 谈谈 MVX 中的 View
 date: 2017-06-23 01:34:44.000000000 +08:00
 permalink: /mvx-view.html
 desc: 这是谈谈 MVX 系列的第二篇文章，上一篇文章中对 iOS 中 Model 层的设计进行了简要的分析；而在这里，我们会对 MVC 中的视图层进行讨论，谈一谈现有的视图层有着什么样的问题，如何在框架的层面上去改进，同时与服务端的视图层进行对比，分析它们的差异。
-cover: http://img.draveness.me/Frame-And-Components.jpg-800width
+cover: http://img.draveness.me/Frame-And-Components.jpg-900width
 tags: iOS MVC
 ---
 
@@ -27,7 +27,7 @@ UIKit 是 Cocoa Touch 中用于构建和管理应用的用户界面的框架，�
 
 `UIView` 可以说是 iOS 中用于渲染和展示内容的最小单元，作为开发者能够接触到的大多数属性和方法也都由 `UIView` 所提供，比如最基本的布局方式 frame 就是通过 `UIView` 的属性所控制，在 Cocoa Touch 中的所有布局系统最终都会转化为 CFRect 并通过 frame 的方式完成最终的布局。
 
-![Frame-And-Components](http://img.draveness.me/Frame-And-Components.jpg-800width)
+![Frame-And-Components](http://img.draveness.me/Frame-And-Components.jpg-900width)
 
 `UIView` 作为 UIKit 中极为重要的类，它的 API 以及设计理念决定了整个 iOS 的视图层该如何工作，这也是理解视图层之前必须要先理解 `UIView` 的原因。
 
@@ -35,7 +35,7 @@ UIKit 是 Cocoa Touch 中用于构建和管理应用的用户界面的框架，�
 
 在 UIKit 中，除了极少数用于展示的类不继承自 `UIView` 之外，几乎所有类的父类或者或者祖先链中一定会存在 `UIView`。
 
-![UIView-And-Subclasses](http://img.draveness.me/UIView-And-Subclasses.jpg-800width)
+![UIView-And-Subclasses](http://img.draveness.me/UIView-And-Subclasses.jpg-900width)
 
 我们暂且抛开不继承自 `UIView` 的 `UIBarItem` 类簇不提，先通过一段代码分析一下 `UIView` 具有哪些特性。
 
@@ -88,7 +88,7 @@ UIButton *loginButton = [[UIButton alloc] init];
 
 但是在目前各种屏幕尺寸的种类暴增的情况下，就很难使用 `frame` 对所有的屏幕进行适配，在这时苹果就引入了 Auto Layout 采用相对距离为视图层的元素进行布局。
 
-![AutoLayout](http://img.draveness.me/AutoLayout.jpg-800width)
+![AutoLayout](http://img.draveness.me/AutoLayout.jpg-900width)
 
 不过，这算是苹果比较失败的一次性尝试，主要是因为使用 Auto Layout 对视图进行布局实在太过复杂，所以刚出来的时候也不温不火，很少有人使用，直到 Masonry 的出现使得编写 Auto Layout 代码没有那么麻烦和痛苦才普及起来。
 
@@ -108,7 +108,7 @@ UIButton *loginButton = [[UIButton alloc] init];
 
 虽然 `UIStackView` 可以起到一定的作用，但是由于大多数 iOS 应用都要求对设计稿进行严格还原并且其 API 设计相对啰嗦，开发者同时也习惯了使用 Auto Layout 的开发方式，在惯性的驱动下，`UIStackView` 应用的也不是非常广泛。
 
-![UIStackVie](http://img.draveness.me/UIStackView.jpg-800width)
+![UIStackVie](http://img.draveness.me/UIStackView.jpg-900width)
 
 不过现在很多跨平台的框架都是用类似 `UIStackView` 的方式进行布局，比如 React Native、Weex 等，其内部都使用 Facebook 开源的 Yoga。
 
@@ -152,7 +152,7 @@ UIView.animate(withDuration: 1.0) {
 
 我们需要对视图上的约束对象一一修改并在最后调用 `layoutIfNeeded` 方法才可以完成相同的动画。由于 Auto Layout 对动画的支持并不是特别的优秀，所以在很多时候笔者在使用 Auto Layout 的视图上，都会使用 `transform` 属性来改变视图的位置，这样虽然也没有那么的优雅，不过也是一个比较方便的解决方案。
 
-![lottie](http://img.draveness.me/lottie.jpg-800width)
+![lottie](http://img.draveness.me/lottie.jpg-900width)
 
 ### frame 的问题
 
@@ -203,7 +203,7 @@ redView.frame = CGRectMake(0, 0, 100, 100);
 
 关于视图大小的确认，其实也是有一些问题的，因为视图在布局时确实可能依赖于父视图的大小，或者更确切的说是需要父视图提供一个可供布局的大小，然后让子视图通过这个 `CGSize` 返回一个自己需要的大小给父视图。
 
-![texture](http://img.draveness.me/texture.png-800width)
+![texture](http://img.draveness.me/texture.png-900width)
 
 这种计算视图大小的方式，其实比较像 [Texture](https://github.com/TextureGroup/Texture) 也就是原来的 AsyncDisplayKit 中对于布局系统的实现。
 
@@ -285,7 +285,7 @@ redView.frame = CGRectMake(0, 0, 100, 100);
 
 上面的 XML 代码描述了一个更加复杂的视图树，这里通过一张图更清晰地展示该视图表示的结构：
 
-![Android-View-Tree](http://img.draveness.me/Android-View-Tree.jpg-800width)
+![Android-View-Tree](http://img.draveness.me/Android-View-Tree.jpg-900width)
 
 我们可以发现，Android 的视图其实分为两类：
 
@@ -308,7 +308,7 @@ redView.frame = CGRectMake(0, 0, 100, 100);
 
 随着 Web 前端应用变得越来越复杂，在目前的大多数 Web 前端项目的实践中，我们已经会使用前后端分离方式开发 Web 应用，而 Web 前端也同时包含 Model、View 以及 Controller 三部分，不再通过服务端直接生成前端的 HTML 代码了。
 
-![html-css](http://img.draveness.me/html-css.jpg-800width)
+![html-css](http://img.draveness.me/html-css.jpg-900width)
 
 现在最流行的 Web 前端框架有三个，分别是 React、Vue 和 Angular。不过，这篇文章会以最根本的 HTML 和 CSS 为例，简单介绍 Web 前端中的视图层是如何工作的。
 
@@ -375,7 +375,7 @@ iOS 中理想的视图层需要解决两个最关键的问题：
 
 解决上述两个问题的办法就是封装原有的 `UIView` 类，使用组合模式为外界提供合适的接口。
 
-![Node-Delegate-UIVie](http://img.draveness.me/Node-Delegate-UIView.jpg-800width)
+![Node-Delegate-UIVie](http://img.draveness.me/Node-Delegate-UIView.jpg-900width)
 
 ### 细分 UIView 的职责
 
@@ -396,7 +396,7 @@ public class Node: Buildable {
 
 上面的代码简单说明了这一设计的实现原理，我们可以理解为 `Node` 作为 `UIView` 的透明代理，它不提供任何与视图层级相关的方法以及 `frame` 属性。
 
-![Node-Delegate-Filte](http://img.draveness.me/Node-Delegate-Filter.jpg-800width)
+![Node-Delegate-Filte](http://img.draveness.me/Node-Delegate-Filter.jpg-900width)
 
 ### 容器的实现
 

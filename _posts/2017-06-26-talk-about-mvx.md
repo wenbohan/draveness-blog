@@ -6,7 +6,7 @@ date: 2017-07-12 09:00:00.000000000 +08:00
 desc: 这是 MVX 系列的第四篇文章，在前面的文章中，我们先后介绍了 iOS 中的 Model、View 和 Controller 的现状，对比了其他平台中的设计，最后给出了作者理想中的结构。而这一篇文章，作者会依次介绍 MVC、MVP 以及 MVVM 架构模式以及不同平台对它们的使用，虽然参考了很多资料，不过文中观点难免掺入作者的主观意见，作者也希望文中的错误与不足之处能被各位读者指出。
 cover: https://raw.githubusercontent.com/Draveness/analyze/master/contents/architecture/images/mvx/MVC-MVVM-MVP.jpg
 tags: MVC iOS
-cover: http://img.draveness.me/MVC-MVVM-MVP.jpg-800width
+cover: http://img.draveness.me/MVC-MVVM-MVP.jpg-900width
 ---
 
 + TOC

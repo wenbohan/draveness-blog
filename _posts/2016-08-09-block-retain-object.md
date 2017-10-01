@@ -97,7 +97,7 @@ Objective-C 中的三种 block `__NSMallocBlock__`、`__NSStackBlock__` 和 `__N
 
 如果我们不断打印一个 block 的 `superclass` 的话最后就会在继承链中找到 `NSBlock` 的身影：
 
-![block-superclass](http://img.draveness.me/2016-08-05-block-superclass.png-800width)
+![block-superclass](http://img.draveness.me/2016-08-05-block-superclass.png-900width)
 
 然后可以通过这种办法来判断当前对象是不是 block：
 
@@ -202,7 +202,7 @@ __unused void (^block)() = ^{
 
 然后在代码中打一个断点：
 
-![block-capture-var-layout](http://img.draveness.me/2016-08-05-block-capture-var-layout.png-800width)
+![block-capture-var-layout](http://img.draveness.me/2016-08-05-block-capture-var-layout.png-900width)
 
 
 > 上面代码中 block 由于被变量引用，执行了 `_Block_copy`，所以其类型为 `__NSMallocBlock__`，没有被变量引用的 block 都是 `__NSStackBlock__`。
@@ -213,7 +213,7 @@ __unused void (^block)() = ^{
 
 这可以得出一个结论：block 将其捕获的引用存放在结构体的下面，但是为什么这里的顺序并不是按照引用的顺序呢？接下来增加几个变量，再做另一次实验：
 
-![block-capture-strong-weak-orde](http://img.draveness.me/2016-08-05-block-capture-strong-weak-order.png-800width)
+![block-capture-strong-weak-orde](http://img.draveness.me/2016-08-05-block-capture-strong-weak-order.png-900width)
 
 在代码中多加入了几个对象之后，block 对持有的对象的布局的顺序依然是**强引用在前、弱引用在后**，我们不妨做一个假设：**block 会将强引用的对象排放在弱引用对象的前面**。但是这个假设能够帮助我们在**只有 block 但是没有上下文信息的情况下**区分哪些是强引用么？我觉得并不能，因为我们没有办法知道它们之间的分界线到底在哪里。
 
@@ -383,7 +383,7 @@ FBRetainCycleDetector *detector = [FBRetainCycleDetector new];
 
 `obj` 数组中的每一个位置都存储了 `FBBlockStrongRelationDetector` 的实例，但是在 `dispose_helper` 调用之后：
 
-![after-dispose-helpe](http://img.draveness.me/2016-08-05-after-dispose-helper.png-800width)
+![after-dispose-helpe](http://img.draveness.me/2016-08-05-after-dispose-helper.png-900width)
 
 索引为 4 和 5 处的实例已经被清空了，这里对应的 `FBBlockStrongRelationDetector` 实例的 `strong` 已经被标记为 `YES`、加入到数组中并返回；最后也就获取了所有强引用的索引，同时得到了 block 强引用的对象。
 

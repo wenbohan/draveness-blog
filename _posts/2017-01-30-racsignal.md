@@ -15,7 +15,7 @@ tags: iOS RAC
 
 2015 年的夏天的时候，做了几个简单的开源框架，想做点其它更有意思的框架却没什么思路，就开始看一些跟编程没有太大关系的书籍。
 
-![out-of-contro](http://img.draveness.me/2017-01-30-out-of-control.jpg-800width)
+![out-of-contro](http://img.draveness.me/2017-01-30-out-of-control.jpg-900width)
 
 其中一本叫做《失控》给了我很大的启发，其中有一则故事是这样的：
 
@@ -74,11 +74,11 @@ dispose
 
 `RACSignal` 其实是抽象类 `RACStream` 的子类，在整个 ReactiveObjc 工程中有另一个类 `RACSequence` 也继承自抽象类 `RACStream`：
 
-![RACSignal-Hierachy](http://img.draveness.me/2017-01-30-RACSignal-Hierachy.png-800width)
+![RACSignal-Hierachy](http://img.draveness.me/2017-01-30-RACSignal-Hierachy.png-900width)
 
 `RACSignal` 可以说是 ReactiveCocoa 中的核心类，也是最重要的概念，整个框架围绕着 `RACSignal` 的概念进行组织，对 `RACSignal` 最简单的理解就是它表示一连串的状态：
 
-![What-is-RACSigna](http://img.draveness.me/2017-01-30-What-is-RACSignal.png-800width)
+![What-is-RACSigna](http://img.draveness.me/2017-01-30-What-is-RACSignal.png-900width)
 
 在状态改变时，对应的订阅者 `RACSubscriber` 就会收到通知执行相应的指令，在 ReactiveCocoa 的世界中所有的消息都是通过信号的方式来传递的，原有的设计模式都会简化为一种模型，这篇文章作为 ReactiveCocoa 系列的第一篇文章并不会对这些问题进行详细的展开和介绍，只会对 `RACSignal` 使用过程的原理进行简单的分析。
 
@@ -100,7 +100,7 @@ dispose
 - (__kindof RACStream *)zipWith:(RACStream *)stream;
 ~~~
 
-![RACStream-AbstractMethod](http://img.draveness.me/2017-01-30-RACStream-AbstractMethod.png-800width)
+![RACStream-AbstractMethod](http://img.draveness.me/2017-01-30-RACStream-AbstractMethod.png-900width)
 
 上面的这些抽象方法都需要子类覆写，不过 `RACStream` 在 `Operations` 分类中使用上面的抽象方法提供了丰富的内容，比如说 `-flattenMap:` 方法：
 
@@ -121,7 +121,7 @@ dispose
 
 其他方法比如 `-skip:`、`-take:`、`-ignore：` 等等实例方法都构建在这些抽象方法之上，只要子类覆写了所有抽象方法就能自动获得所有的 `Operation` 分类中的方法。
 
-![RACStream-Operation](http://img.draveness.me/2017-01-30-RACStream-Operation.png-800width)
+![RACStream-Operation](http://img.draveness.me/2017-01-30-RACStream-Operation.png-900width)
 
 ### RACSignal 与 Monad
 
@@ -141,7 +141,7 @@ ReactiveCocoa 框架中借鉴了很多其他平台甚至语言中的概念，包
 
 该方法接受一个 `NSObject` 对象，并返回一个 `RACSignal` 的实例，它会将一个 UIKit 世界的对象 `NSObject` 转换成 ReactiveCocoa 中的 `RACSignal`：
 
-![RACSignal-Return](http://img.draveness.me/2017-01-30-RACSignal-Return.png-800width)
+![RACSignal-Return](http://img.draveness.me/2017-01-30-RACSignal-Return.png-900width)
 
 而 `RACReturnSignal` 也仅仅是把 `NSObject` 对象包装一下，并没有做什么复杂的事情：
 
@@ -188,7 +188,7 @@ ReactiveCocoa 框架中借鉴了很多其他平台甚至语言中的概念，包
 
 `-bind:` 方法会在原信号每次发出消息时，都执行 `RACSignalBindBlock` 对原有的信号中的消息进行**变换**生成一个新的信号：
 
-![RACSignal-Bind](http://img.draveness.me/2017-01-30-RACSignal-Bind.png-800width)
+![RACSignal-Bind](http://img.draveness.me/2017-01-30-RACSignal-Bind.png-900width)
 
 > 在原有的 `RACSignal` 对象上调用 `-bind:` 方法传入 `RACSignalBindBlock`，图示中的右侧就是具体的执行过程，原信号在变换之后变成了新的蓝色的 `RACSignal` 对象。
 
@@ -248,7 +248,7 @@ RACSignal *bindSignal = [signal bind:^RACSignalBindBlock _Nonnull{
 
 上面的代码中直接使用了 `+return:` 方法将 `value` 打包成了 `RACSignal *` 对象：
 
-![Before-After-Bind-RACSigna](http://img.draveness.me/2017-01-30-Before-After-Bind-RACSignal.png-800width)
+![Before-After-Bind-RACSigna](http://img.draveness.me/2017-01-30-Before-After-Bind-RACSignal.png-900width)
 
 > 在 BindSignal 中的每一个数字其实都是由一个 `RACSignal` 包裹的，这里没有画出，在下一个例子中，读者可以清晰地看到其中的区别。
 
@@ -291,7 +291,7 @@ RACSignal *bindSignal = [signal bind:^RACSignalBindBlock _Nonnull{
 
 下图相比上面例子中的图片更能精确的表现出 `-bind:` 方法都做了什么：
 
-![Before-After-Bind-RACSignal-Complicated](http://img.draveness.me/2017-01-30-Before-After-Bind-RACSignal-Complicated.png-800width)
+![Before-After-Bind-RACSignal-Complicated](http://img.draveness.me/2017-01-30-Before-After-Bind-RACSignal-Complicated.png-900width)
 
 信号中原有的状态经过 `-bind:` 方法中传入 `RACSignalBindBlock` 的处理实际上返回了**多个** `RACSignal`。
 
@@ -330,11 +330,11 @@ RACSignal *bindSignal = [signal bind:^RACSignalBindBlock _Nonnull{
 
 使用类簇的方式设计的 `RACSignal` 在创建实例时可能会返回 `RACDynamicSignal`、`RACEmptySignal`、`RACErrorSignal` 和 `RACReturnSignal` 对象：
 
-![RACSignal-Subclasses](http://img.draveness.me/2017-01-30-RACSignal-Subclasses.png-800width)
+![RACSignal-Subclasses](http://img.draveness.me/2017-01-30-RACSignal-Subclasses.png-900width)
 
 其实这几种子类并没有对原有的 `RACSignal` 做出太大的改变，它们的创建过程也不是特别的复杂，只需要调用 `RACSignal` 不同的类方法：
 
-![RACSignal-Instantiate-Object](http://img.draveness.me/2017-01-30-RACSignal-Instantiate-Object.png-800width)
+![RACSignal-Instantiate-Object](http://img.draveness.me/2017-01-30-RACSignal-Instantiate-Object.png-900width)
 
 `RACSignal` 只是起到了一个代理的作用，最后的实现过程还是会指向对应的子类：
 
@@ -407,7 +407,7 @@ RACSignal *bindSignal = [signal bind:^RACSignalBindBlock _Nonnull{
 
 ReactiveCocoa 中信号的订阅与信息的发送过程主要是由 `RACSubscriber` 类来处理的，而这也是信号的处理过程中最重要的一部分，这一小节会先分析整个工作流程，之后会深入代码的实现。
 
-![RACSignal-Subcribe-Process](http://img.draveness.me/2017-01-30-RACSignal-Subcribe-Process.png-800width)
+![RACSignal-Subcribe-Process](http://img.draveness.me/2017-01-30-RACSignal-Subcribe-Process.png-900width)
 
 在信号创建之后调用 `-subscribeNext:` 方法返回一个 `RACDisposable`，然而这不是这一流程关心的重点，在订阅过程中生成了一个 `RACSubscriber` 对象，向这个对象发送消息 `-sendNext:` 时，就会向所有的订阅者发送消息。
 
@@ -415,7 +415,7 @@ ReactiveCocoa 中信号的订阅与信息的发送过程主要是由 `RACSubscri
 
 信号的订阅与 `-subscribe:` 开头的一系列方法有关：
 
-![RACSignal-Subscribe-Methods](http://img.draveness.me/2017-01-30-RACSignal-Subscribe-Methods.png-800width)
+![RACSignal-Subscribe-Methods](http://img.draveness.me/2017-01-30-RACSignal-Subscribe-Methods.png-900width)
 
 订阅者可以选择自己想要感兴趣的信息类型 `next/error/completed` 进行关注，并在对应的信息发生时调用 block 进行处理回调。
 
@@ -511,13 +511,13 @@ ReactiveCocoa 中信号的订阅与信息的发送过程主要是由 `RACSubscri
 
 总而言之，信号的订阅过程就是初始化 `RACSubscriber` 对象，然后执行 `didSubscribe` 代码块的过程。
 
-![Principle-of-Subscribing-Signals](http://img.draveness.me/2017-01-30-Principle-of-Subscribing-Signals.png-800width)
+![Principle-of-Subscribing-Signals](http://img.draveness.me/2017-01-30-Principle-of-Subscribing-Signals.png-900width)
 
 ### 信息的发送
 
 在 `RACSignalBindBlock` 中，订阅者可以根据自己的兴趣选择自己想要订阅哪种消息；我们也可以按需发送三种消息：
 
-![RACSignal-Subcription-Messages-Sending](http://img.draveness.me/2017-01-30-RACSignal-Subcription-Messages-Sending.png-800width)
+![RACSignal-Subcription-Messages-Sending](http://img.draveness.me/2017-01-30-RACSignal-Subcription-Messages-Sending.png-900width)
 
 而现在只需要简单看一下这三个方法的实现，就能够明白信息的发送过程了（真是没啥好说的，不过为了~~凑字数~~完整性）：
 
@@ -540,7 +540,7 @@ ReactiveCocoa 中信号的订阅与信息的发送过程主要是由 `RACSubscri
 
 而处理这些事情的核心类就是 `RACDisposable` 以及它的子类：
 
-![RACDisposable-And-Subclasses](http://img.draveness.me/2017-01-30-RACDisposable-And-Subclasses.png-800width)
+![RACDisposable-And-Subclasses](http://img.draveness.me/2017-01-30-RACDisposable-And-Subclasses.png-900width)
 
 > 这篇文章中主要关注的是左侧的三个子类，当然 `RACDisposable` 的子类不止这三个，还有用于处理 KVO 的 `RACKVOTrampoline`，不过在这里我们不会讨论这个类的实现。
 
@@ -548,7 +548,7 @@ ReactiveCocoa 中信号的订阅与信息的发送过程主要是由 `RACSubscri
 
 在继续分析讨论订阅的回收过程之前，笔者想先对 `RACDisposable` 进行简要的剖析和介绍：
 
-![RACDisposable](http://img.draveness.me/2017-01-30-RACDisposable.png-800width)
+![RACDisposable](http://img.draveness.me/2017-01-30-RACDisposable.png-900width)
 
 类 `RACDisposable` 是以 `_disposeBlock` 为核心进行组织的，几乎所有的方法以及属性其实都是对 `_disposeBlock` 进行的操作。
 
@@ -700,7 +700,7 @@ ReactiveCocoa 中信号的订阅与信息的发送过程主要是由 `RACSubscri
 
 在对象持有的 `RACDisposable` 不超过 `RACCompoundDisposableInlineCount` 时，都会存储在 `_inlineDisposables` 数组中，而更多的实例都会存储在 `_disposables` 中：
 
-![RACCompoundDisposable](http://img.draveness.me/2017-01-30-RACCompoundDisposable.png-800width)
+![RACCompoundDisposable](http://img.draveness.me/2017-01-30-RACCompoundDisposable.png-900width)
 
 `RACCompoundDisposable` 在使用 `-initWithDisposables:`初始化时，会初始化两个 `RACDisposable` 的位置用于加速销毁订阅的过程，同时为了不浪费内存空间，在默认情况下只占用两个位置：
 
@@ -858,7 +858,7 @@ Original Signal Dispose.
 
 原订阅的销毁时间以及绑定信号的控制是由 `SignalCount` 控制的，其表示 `RACCompoundDisposable` 中的 `RACSerialDisposable` 实例的个数，在每次有新的订阅被创建时都会向 `RACCompoundDisposable` 加入一个新的 `RACSerialDisposable`，并在订阅发送结束时从数组中移除，整个过程用图示来表示比较清晰：
 
-![RACSignal-Bind-Disposable](http://img.draveness.me/2017-01-30-RACSignal-Bind-Disposable.png-800width)
+![RACSignal-Bind-Disposable](http://img.draveness.me/2017-01-30-RACSignal-Bind-Disposable.png-900width)
 
 > 紫色的 `RACSerialDisposable` 为原订阅创建的对象，灰色的为新信号订阅的对象。
 

@@ -19,7 +19,7 @@ ReactiveCocoa 在设计上很大程度借鉴了 Reactive Extension 中的概念�
 
 `RACSignal` 和 `RACSequence` 都是 `RACStream` 的子类，它们不仅共享了来自父类的很多方法，也都表示数据流。
 
-![RACSignal - RACSequence](http://img.draveness.me/2017-02-04-RACSignal - RACSequence.png-800width)
+![RACSignal - RACSequence](http://img.draveness.me/2017-02-04-RACSignal - RACSequence.png-900width)
 
 `RACSignal` 和 `RACSequence` 最大区别就是：
 
@@ -28,7 +28,7 @@ ReactiveCocoa 在设计上很大程度借鉴了 Reactive Extension 中的概念�
 
 由于拉驱动在数据改变时，并不会主动推送给『订阅者』，所以往往适用于简化集合类对象等操作，相比于推驱动，它的适应场合较少。
 
-![Usage for RACSignal - RACSequence Copy](http://img.draveness.me/2017-02-04-Usage for RACSignal - RACSequence Copy.png-800width)
+![Usage for RACSignal - RACSequence Copy](http://img.draveness.me/2017-02-04-Usage for RACSignal - RACSequence Copy.png-900width)
 
 > 图片中的内容来自 [Reactive​Cocoa · NSHipster](http://nshipster.com/reactivecocoa/) 中。
 
@@ -36,7 +36,7 @@ ReactiveCocoa 在设计上很大程度借鉴了 Reactive Extension 中的概念�
 
 在 `RACSequence` 中还涉及到另外一对概念，也就是预加载和延迟加载（也叫懒加载）；如果你之前学习过 Lisp 这门编程语言，那么你一定知道 Lisp 中有两种列表，一种是正常的列表 List，另一种叫做流 Stream，这两者的主要区别就是**流的加载是延迟加载的**，只有在真正使用数据时才会计算数据的内容。
 
-![List-and-Strea](http://img.draveness.me/2017-02-04-List-and-Stream.png-800width)
+![List-and-Strea](http://img.draveness.me/2017-02-04-List-and-Stream.png-900width)
 
 > 由于流是懒加载的，这也就是说它可以**表示无穷长度的列表**。
 
@@ -57,7 +57,7 @@ Stream 由两部分组成，分别是 `head` 和 `tail`，两者都是在访问�
 
 了解了几个比较重要的概念之后，就可以进入正题了，先看一下在 ReactiveCocoa 中，`RACSequence` 都有哪些子类：
 
-![RACSequence - Subclasses](http://img.draveness.me/2017-02-04-RACSequence - Subclasses.png-800width)
+![RACSequence - Subclasses](http://img.draveness.me/2017-02-04-RACSequence - Subclasses.png-900width)
 
 `RACSequence` 总共有九个子类，这篇文章不会覆盖其中所有的内容，只会简单介绍其中的几个；不过，我们先从父类 `RACSequence` 开始。
 
@@ -91,7 +91,7 @@ Stream 由两部分组成，分别是 `head` 和 `tail`，两者都是在访问�
 
 整个 `RACUnarySequence` 也只是对 `value` 简单封装成一个 `RACSequence` 对象而已：
 
-![RACUnarySequence](http://img.draveness.me/2017-02-04-RACUnarySequence.png-800width)
+![RACUnarySequence](http://img.draveness.me/2017-02-04-RACUnarySequence.png-900width)
 
 相比于 `+return:` 方法的简单实现，`-bind:` 的实现就复杂多了：
 
@@ -215,7 +215,7 @@ NSLog(@"BindSequence: head = (%@), tail=(%@)", bindSequence.head, bindSequence.t
 
 在上面的代码中，我们使用 `+sequenceWithHeadBlock:tailBlock:` 这个唯一暴露出来的初始化方法创建了一个如下图所示的 `RACSequence`：
 
-![RACSequence-Instance](http://img.draveness.me/2017-02-04-RACSequence-Instance.png-800width)
+![RACSequence-Instance](http://img.draveness.me/2017-02-04-RACSequence-Instance.png-900width)
 
 > 图中展示了完整的 `RACSequence` 对象的值，其中的内容暂时都是 `unresolved` 的。
 
@@ -229,7 +229,7 @@ BindSequence: head = (2), tail=(<RACDynamicSequence: 0x608000282940>{ name = , h
 
 无论是 `sequence` 还是 `bindSequence`，其中的 `tail` 部分都是一个 `RACDynamicSequence` 对象，并且其中的 `head` 和 `tail` 部分都是 `unresolved`。
 
-![Unsolved-RACSequence-Instance](http://img.draveness.me/2017-02-04-Unsolved-RACSequence-Instance.png-800width)
+![Unsolved-RACSequence-Instance](http://img.draveness.me/2017-02-04-Unsolved-RACSequence-Instance.png-900width)
 
 在上面的代码中 `RACSequenceBindBlock` 的执行也是惰性的，只有在获取 `bindSequence.head` 时，才会执行将数字转换成 `RACUnarySequence` 对象，最后通过 `head` 属性取出来。
 
@@ -285,11 +285,11 @@ Lazy:  <RACDynamicSequence: 0x608000097160>
 
 在第一调用 `sequence.lazySequence` 时，因为元素没有被使用，惰性序列的 `head` 和 `tail` 都为 unresolved；而在 `sequence.eagerSequence` 调用后，访问了序列中的所有元素，在这之后再打印 `sequence.lazySequence` 中的值就都不是 unresolved 的了。
 
-![RACSequence-Status-Before-And-After-Executed](http://img.draveness.me/2017-02-04-RACSequence-Status-Before-And-After-Executed.png-800width)
+![RACSequence-Status-Before-And-After-Executed](http://img.draveness.me/2017-02-04-RACSequence-Status-Before-And-After-Executed.png-900width)
 
 这种情况的出现不难理解，不过因为 `lazySequence` 和 `eagerSequence` 是 `RACSequence` 的方法，所以我们可以在任意子类的实例包括 `RACEagerSequence` 和非惰性序列上调用它们，这就会出现以下的多种情况：
 
-![EagerSequence - LazySequence](http://img.draveness.me/2017-02-04-EagerSequence - LazySequence.png-800width)
+![EagerSequence - LazySequence](http://img.draveness.me/2017-02-04-EagerSequence - LazySequence.png-900width)
 
 总而言之，调用过 `eagerSequence` 的序列的元素已经不再是 `unresolved` 了，哪怕再调用 `lazySequence` 方法，读者可以自行实验验证这里的结论。
 
@@ -331,11 +331,11 @@ NSLog(@"%@", sum);
 
 与上面方法相似的是 `-foldRightWithStart:reduce:` 方法，从右侧开始向左折叠整个序列，虽然过程有一些不同，但是结果还是一样的。
 
-![FoldLeft - FoldRight](http://img.draveness.me/2017-02-04-FoldLeft - FoldRight.png-800width)
+![FoldLeft - FoldRight](http://img.draveness.me/2017-02-04-FoldLeft - FoldRight.png-900width)
 
 从两次方法的调用栈上来看，就能看出两者实现过程的明显区别：
 
-![Call-Stacks-of-FoldLeft-FoldRight](http://img.draveness.me/2017-02-04-Call-Stacks-of-FoldLeft-FoldRight.png-800width)
+![Call-Stacks-of-FoldLeft-FoldRight](http://img.draveness.me/2017-02-04-Call-Stacks-of-FoldLeft-FoldRight.png-900width)
 
 + `foldLeft` 由于其实现是通过 `for` 循环遍历序列，所以调用栈不会展开，在循环结束之后就返回了，调用栈中只有当前方法；
 + `foldRight` 的调用栈**递归**的调用自己，直到出现了边界条件 `self.tail == nil` 后停止，左侧的调用栈也是其调用栈最深的时候，在这时调用栈的规模开始按照箭头方向缩小，直到方法返回。
@@ -362,13 +362,13 @@ NSLog(@"%@", sum);
 
 虽然 `RACSequence` 与 `RACSignal` 有很多不同，但是在 ReactiveCocoa 中 `RACSequence` 与 `RACSignal` 却可以双向转换。
 
-![Transform Between RACSequence - RACSigna](http://img.draveness.me/2017-02-04-Transform Between RACSequence - RACSignal.png-800width)
+![Transform Between RACSequence - RACSigna](http://img.draveness.me/2017-02-04-Transform Between RACSequence - RACSignal.png-900width)
 
 #### 将 RACSequence 转换成 RACSignal
 
 将 `RACSequence` 转换成 `RACSignal` 对象只需要调用一个方法。
 
-![Transform-RACSequence-To-RACSigna](http://img.draveness.me/2017-02-04-Transform-RACSequence-To-RACSignal.png-800width)
+![Transform-RACSequence-To-RACSigna](http://img.draveness.me/2017-02-04-Transform-RACSequence-To-RACSignal.png-900width)
 
 分析其实现之前先看一下如何使用 `-signal` 方法将 `RACSequence` 转换成 `RACSignal` 对象的：
 
@@ -425,7 +425,7 @@ RACSignal *signal = [RACSignal createSignal:^RACDisposable * _Nullable(id<RACSub
 
 反向转换 `RACSignal` 的过程相比之下就稍微复杂一点了，我们需要连续调用两个方法，才能将它转换成 `RACSequence`。
 
-![Transform RACSignal to RACSequence](http://img.draveness.me/2017-02-04-Transform RACSignal to RACSequence.png-800width)
+![Transform RACSignal to RACSequence](http://img.draveness.me/2017-02-04-Transform RACSignal to RACSequence.png-900width)
 
 通过一段代码来看转换过程是如何进行的：
 

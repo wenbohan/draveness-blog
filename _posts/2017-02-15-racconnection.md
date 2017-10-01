@@ -11,7 +11,7 @@ tags: iOS RAC
 
 ReactiveCocoa 中的信号信号在默认情况下都是冷的，每次有新的订阅者订阅信号时都会执行信号创建时传入的 block；这意味着对于任意一个订阅者，所需要的数据都会**重新计算**，这在大多数情况下都是开发者想看到的情况，但是这在信号中的 block 有副作用或者较为昂贵时就会有很多问题。
 
-![RACMulticastConnection](http://img.draveness.me/2017-02-15-RACMulticastConnection.png-800width)
+![RACMulticastConnection](http://img.draveness.me/2017-02-15-RACMulticastConnection.png-900width)
 
 我们希望有一种模型能够将冷信号转变成热信号，并在合适的时间触发，向所有的订阅者发送消息；而今天要介绍的 `RACMulticastConnection` 就是用于解决上述问题的。
 
@@ -19,7 +19,7 @@ ReactiveCocoa 中的信号信号在默认情况下都是冷的，每次有新的
 
 `RACMulticastConnection` 封装了将一个信号的订阅分享给多个订阅者的思想，它的每一个对象都持有两个 `RACSignal`：
 
-![RACMulticastConnection-Interface](http://img.draveness.me/2017-02-15-RACMulticastConnection-Interface.png-800width)
+![RACMulticastConnection-Interface](http://img.draveness.me/2017-02-15-RACMulticastConnection-Interface.png-900width)
 
 一个是私有的源信号 `sourceSignal`，另一个是用于广播的信号 `signal`，其实是一个 `RACSubject` 对象，不过对外只提供 `RACSignal` 接口，用于使用者通过 `-subscribeNext:` 等方法进行订阅。
 
@@ -94,7 +94,7 @@ RACSignal *requestSignal = [RACSignal createSignal:^RACDisposable * _Nullable(id
 
 通过订阅发出网络请求的信号经常会被多次订阅，以满足不同 UI 组件更新的需求，但是以上代码却有非常严重的问题。
 
-![RACSignal-And-Subscribe](http://img.draveness.me/2017-02-15-RACSignal-And-Subscribe.png-800width)
+![RACSignal-And-Subscribe](http://img.draveness.me/2017-02-15-RACSignal-And-Subscribe.png-900width)
 
 每一次在 `RACSignal` 上执行 `-subscribeNext:` 以及类似方法时，都会发起一次新的网络请求，我们希望避免这种情况的发生。
 
@@ -119,7 +119,7 @@ RACMulticastConnection *connection = [[RACSignal createSignal:^RACDisposable * _
 
 在这个例子中，我们使用 `-publish` 方法生成实例，订阅者不再订阅源信号，而是订阅 `RACMulticastConnection` 中的 `RACSubject` 热信号，最后通过 `-connect` 方法触发源信号中的任务。
 
-![RACSignal-RACMulticastConnection-Connect](http://img.draveness.me/2017-02-15-RACSignal-RACMulticastConnection-Connect.png-800width)
+![RACSignal-RACMulticastConnection-Connect](http://img.draveness.me/2017-02-15-RACSignal-RACMulticastConnection-Connect.png-900width)
 
 > 对于热信号不了解的读者，可以阅读这篇文章 [『可变』的热信号 RACSubject](https://github.com/Draveness/iOS-Source-Code-Analyze/blob/master/contents/ReactiveObjC/RACSubject.md)。
 
@@ -142,13 +142,13 @@ RACMulticastConnection *connection = [[RACSignal createSignal:^RACDisposable * _
 
 当 `-publish` 方法调用时相当于向 `-multicast:` 传入了 `RACSubject`。
 
-![publish-and-multicast](http://img.draveness.me/2017-02-15-publish-and-multicast.png-800width)
+![publish-and-multicast](http://img.draveness.me/2017-02-15-publish-and-multicast.png-900width)
 
 `-publish` 只是对 `-multicast:` 方法的简单封装，它们都是通过 `RACMulticastConnection` 私有的初始化方法 `-initWithSourceSignal:subject:` 创建一个新的实例。
 
 在使用 `-multicast:` 方法时，传入的信号其实就是用于广播的信号；这个信号必须是一个 `RACSubject` 本身或者它的子类：
 
-![RACSubject - Subclasses](http://img.draveness.me/2017-02-15-RACSubject - Subclasses.png-800width)
+![RACSubject - Subclasses](http://img.draveness.me/2017-02-15-RACSubject - Subclasses.png-900width)
 
 传入 `-multicast:` 方法的一般都是 `RACSubject` 或者 `RACReplaySubject` 对象。
 
@@ -156,7 +156,7 @@ RACMulticastConnection *connection = [[RACSignal createSignal:^RACDisposable * _
 
 订阅 `connection.signal` 中的数据流时，其实只是向多播对象中的热信号 `RACSubject` 持有的数组中加入订阅者，而这时刚刚创建的 `RACSubject` 中并没有任何的消息。
 
-![SubscribeNext-To-RACSubject-Before-Connect](http://img.draveness.me/2017-02-15-SubscribeNext-To-RACSubject-Before-Connect.png-800width)
+![SubscribeNext-To-RACSubject-Before-Connect](http://img.draveness.me/2017-02-15-SubscribeNext-To-RACSubject-Before-Connect.png-900width)
 
 只有在调用 `-connect` 方法之后，`RACSubject` 才会**订阅**源信号 `sourceSignal`。
 
@@ -169,7 +169,7 @@ RACMulticastConnection *connection = [[RACSignal createSignal:^RACDisposable * _
 
 这时源信号的 `didSubscribe` 代码块才会执行，向 `RACSubject` 推送消息，消息向下继续传递到 `RACSubject` 所有的订阅者中。
 
-![Values-From-RACSignal-To-Subscribers](http://img.draveness.me/2017-02-15-Values-From-RACSignal-To-Subscribers.png-800width)
+![Values-From-RACSignal-To-Subscribers](http://img.draveness.me/2017-02-15-Values-From-RACSignal-To-Subscribers.png-900width)
 
 `-connect` 方法通过 `-subscribe:` 实际上建立了 `RACSignal` 和 `RACSubject` 之间的连接，这种方式保证了 `RACSignal` 中的 `didSubscribe` 代码块只执行了一次。
 
@@ -251,7 +251,7 @@ RACSignal *signal = [[RACSignal createSignal:...] replay];
 
 三个方法都会在 `RACMulticastConnection` 初始化时传入一个 `RACReplaySubject` 对象，不过却有一点细微的差别：
 
-![Difference-Between-Replay-Methods](http://img.draveness.me/2017-02-15-Difference-Between-Replay-Methods.png-800width)
+![Difference-Between-Replay-Methods](http://img.draveness.me/2017-02-15-Difference-Between-Replay-Methods.png-900width)
 
 相比于 `-replay` 方法，`-replayLast` 方法生成的 `RACMulticastConnection` 中热信号的容量为 `1`：
 
@@ -281,7 +281,7 @@ RACSignal *signal = [[RACSignal createSignal:...] replay];
 
 `RACMulticastConnection` 在处理冷热信号相互转换时非常好用，在 `RACSignal` 中也提供了很多将原有的冷信号通过 `RACMulticastConnection` 转换成热信号的方法。
 
-![RACMulticastConnection](http://img.draveness.me/2017-02-15-RACMulticastConnection.png-800width)
+![RACMulticastConnection](http://img.draveness.me/2017-02-15-RACMulticastConnection.png-900width)
 
 在遇到冷信号中的行为有副作用后者非常昂贵时，我们就可以使用这些方法将单播变成多播，提高执行效率，减少副作用。
 
