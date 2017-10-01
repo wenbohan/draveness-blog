@@ -17,7 +17,7 @@ tags: Redis Server Database NoSQL
 
 在分析具体代码之前，先了解一下在事件处理中处于核心部分的 `aeEventLoop` 到底是什么：
 
-![reids-eventloop](http://img.draveness.me/2016-12-09-reids-eventloop.png)
+![reids-eventloop](http://img.draveness.me/2016-12-09-reids-eventloop.png-1000width)
 
 `aeEventLoop` 在 Redis 就是负责保存待处理文件事件和时间事件的结构体，其中保存大量事件执行的上下文信息，同时持有三个事件数组：
 
@@ -257,7 +257,7 @@ int showThroughput(struct aeEventLoop *eventLoop, long long id, void *clientData
 
 我们对 Redis 中对时间事件的处理以流程图的形式简单总结一下：
 
-![process-time-event](http://img.draveness.me/2016-12-09-process-time-event.png)
+![process-time-event](http://img.draveness.me/2016-12-09-process-time-event.png-1000width)
 
 创建时间事件的方法实现其实非常简单，在这里不想过多分析这个方法，唯一需要注意的就是时间事件的 `id` 跟数据库中的大多数主键都是递增的：
 
@@ -291,7 +291,7 @@ long long aeCreateTimeEvent(aeEventLoop *eventLoop, long long milliseconds,
 
 当文件事件触发时会被标记为 “红色” 交由 `processEvents` 方法处理，而时间事件的处理都会交给 `processTimeEvents` 这一子方法：
 
-![redis-eventloop-proces-event](http://img.draveness.me/2016-12-09-redis-eventloop-proces-event.png)
+![redis-eventloop-proces-event](http://img.draveness.me/2016-12-09-redis-eventloop-proces-event.png-1000width)
 
 在每个事件循环中 Redis 都会先处理文件事件，然后再处理时间事件直到整个循环停止，`processEvents` 和 `processTimeEvents` 作为 Redis 中发生事件的消费者，每次都会从“事件池”中拉去待处理的事件进行消费。
 
@@ -301,7 +301,7 @@ long long aeCreateTimeEvent(aeEventLoop *eventLoop, long long milliseconds,
 
 整个 I/O 多路复用模块在事件循环看来就是一个输入事件、输出 `aeFiredEvent` 数组的一个黑箱：
 
-![eventloop-file-event-in-redis](http://img.draveness.me/2016-12-09-eventloop-file-event-in-redis.png)
+![eventloop-file-event-in-redis](http://img.draveness.me/2016-12-09-eventloop-file-event-in-redis.png-1000width)
 
 在这个黑箱中，我们使用 `aeCreateFileEvent`、 `aeDeleteFileEvent` 来添加删除需要监听的文件描述符以及事件。
 
@@ -311,7 +311,7 @@ long long aeCreateTimeEvent(aeEventLoop *eventLoop, long long milliseconds,
 
 时间事件的处理相比文件事件就容易多了，每次 `processTimeEvents` 方法调用时都会对整个 `timeEventHead` 数组进行遍历：
 
-![process-time-events-in-redis](http://img.draveness.me/2016-12-09-process-time-events-in-redis.png)
+![process-time-events-in-redis](http://img.draveness.me/2016-12-09-process-time-events-in-redis.png-1000width)
 
 遍历的过程中会将时间的触发时间与当前时间比较，然后执行时间对应的 `timeProc`，并根据 `timeProc` 的返回值修改当前事件的参数，并在下一个循环的遍历中移除不再执行的时间事件。
 

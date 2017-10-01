@@ -4,7 +4,7 @@ title: 谈谈 MVX 中的 Controller
 date: 2017-06-23 02:34:44.000000000 +08:00
 permalink: /mvx-controller.html
 desc: 在前两篇文章中，我们已经对 iOS 中的 Model 层以及 View 层进行了分析，划分出了它们的具体职责，其中 Model 层除了负责数据的持久存储、缓存工作，还要负责所有 HTTP 请求的发出等工作；而对于 View 层的职责，我们并没有做出太多的改变，有的只是细分其内部的视图种类，以及分离 UIView 不应该具有的属性和功能。
-cover: http://img.draveness.me/MVC-MVVM-MVP.jpg
+cover: http://img.draveness.me/MVC-MVVM-MVP.jpg-1000width
 tags: iOS MVC
 ---
 
@@ -29,7 +29,7 @@ tags: iOS MVC
 
 在进入正题之前，我们首先要知道这里的 X 到底是什么？无论是在 iOS 开发领域还是其它的领域，造出了一堆又一堆的名词，除了我们最常见的 MVC 和 MVVM 以及 Android 中的 MVP 还有一些其他的奇奇怪怪的名词。
 
-![MVC-MVVM-MVP](http://img.draveness.me/MVC-MVVM-MVP.jpg)
+![MVC-MVVM-MVP](http://img.draveness.me/MVC-MVVM-MVP.jpg-1000width)
 
 模型层和视图层是整个客户端应用不可分割的一部分，它们的职责非常清楚，一个用于处理本地数据的获取以及存储，另一个用于展示内容、接受用户的操作与事件；在这种情况下，整个应用中的其它功能和逻辑就会被自然而然的扔到 X 层中。
 
@@ -39,7 +39,7 @@ tags: iOS MVC
 
 从 Cocoa Touch 框架使用十年以来，iOS 开发者就一直遵循框架中的设计，使用 Model-View-Controller 的架构模式开发 iOS 应用程序，下面也是对 iOS 中 MVC 的各层交互的最简单的说明。
 
-![Model-View-Controlle](http://img.draveness.me/Model-View-Controller.jpg)
+![Model-View-Controlle](http://img.draveness.me/Model-View-Controller.jpg-1000width)
 
 iOS 中的 Model 层大多为 `NSObject` 的子类，也就是一个简单的对象；所有的 View 层对象都是 `UIView` 的子类；而 Controller 层的对象都是 `UIViewController` 的实例。
 
@@ -88,7 +88,7 @@ Controller 层作为整个 MVC 架构模式的中枢，承担着非常重要的�
 
 由于每一个 `UIViewController` 都持有一个 `UIView` 的对象，所以视图层的对象想要出现在屏幕上，必须成为这个根视图的子视图，也就是说视图层完全没有办法脱离 `UIViewController` 而单独存在，其一方面是因为 `UIViewController` 隐式的承担了应用中路由的工作，处理界面之间的跳转，另一方面就是 `UIViewController` 的设计导致了所有的视图必须加在其根视图上才能工作。
 
-![Controller-RootVie](http://img.draveness.me/Controller-RootView.jpg)
+![Controller-RootVie](http://img.draveness.me/Controller-RootView.jpg-1000width)
 
 我们来看一段 `UIViewController` 中关于视图层的简单代码：
 
@@ -122,7 +122,7 @@ Controller 层作为整个 MVC 架构模式的中枢，承担着非常重要的�
 
 在这个欢迎界面以及大多数界面中，由于视图层的代码非常简单，我们很多情况下并不会去写一个单独的 `UIView` 类，而是将全部的视图层代码丢到了 `UIViewController` 中，这种情况下甚至也没有 Model 层，Controller 承担了全部的工作。
 
-![Controller-Only](http://img.draveness.me/Controller-Only.jpg)
+![Controller-Only](http://img.draveness.me/Controller-Only.jpg-1000width)
 
 上述的代码对视图进行了初始化，将需要展示的视图加到了自己持有的根视图中，然后对这些视图进行简单的布局。
 
@@ -223,7 +223,7 @@ Controller 层作为整个 MVC 架构模式的中枢，承担着非常重要的�
 
 由于 Cocoa Touch 提供了 `UINavigationController` 和 `UITabBarController` 这两种容器 Controller，所以 iOS 中界面跳转的这一职责大部分都落到了 Controller 上。
 
-![UINavigationController-UITabBarControlle](http://img.draveness.me/UINavigationController-UITabBarController.jpg)
+![UINavigationController-UITabBarControlle](http://img.draveness.me/UINavigationController-UITabBarController.jpg-1000width)
 
 iOS 中总共有三种界面跳转的方式：
 
@@ -346,7 +346,7 @@ self.tableView.dataSource = photosArrayDataSource;
 
 做出这种建议的理由是：单独的 `ArrayDataSource` 类可以更方便的进行测试，同时，展示一个数组的对象是表视图中非常常见的需求，而 `ArrayDataSource` 能够将这种需求抽象出来并进行重用，也可以达到减轻视图控制器负担的最终目的，但是在笔者看来，上述做法并没有起到**实质性**效果，只是简单的将视图控制器中的一部分代码*移到了*别的位置而已，还会因为增加了额外的类使 Controller 的维护变得更加的复杂。
 
-![UITableView-DataSource](http://img.draveness.me/UITableView-DataSource.jpg)
+![UITableView-DataSource](http://img.draveness.me/UITableView-DataSource.jpg-1000width)
 
 让每一个 Controller 作为 `UITableView` 对象的代理和数据源其实是没有任何问题的，将这些方法移出 Controller 并不能解决实际的问题。
 
@@ -356,7 +356,7 @@ self.tableView.dataSource = photosArrayDataSource;
 
 在对视图进行初始化和布局时，我们有两种选择，一种是使用实例变量的方式主动对视图对象进行初始化，另一种是使用属性 `@property` 对视图对象进行惰性初始化。
 
-![Eager-Lazy-Initialization](http://img.draveness.me/Eager-Lazy-Initialization.jpg)
+![Eager-Lazy-Initialization](http://img.draveness.me/Eager-Lazy-Initialization.jpg-1000width)
 
 虽然上述两种代码在结果上几乎是等价的，但是笔者更加偏好两者之中的后者，它将各个视图属性的初始化放到了各个属性的 getter 方法中，能够将代码在逻辑上分块还是比较清晰的。这两种方法其实只是不同的 taste，有些人会坚持将不需要暴露的变量都写成 `_xxx` 的形式，有些人更喜欢后者这种分散的写法，这些都不是什么太大的问题，而且很多人担心的性能问题其实也根本不是问题，重要的是我们要在同一个项目中坚持同一种写法，并且保证只有同一个风格的代码合入主分支。
 
@@ -396,7 +396,7 @@ self.tableView.dataSource = photosArrayDataSource;
 
 因为 UIKit 框架设计的原因，Controller 和 View 层是强耦合的，每一个 `UIViewController` 都会持有一个 `UIView` 视图对象，这也是导致我们将很多的视图层代码直接放在 Controller 层的原因。
 
-![MVC-in-iOS](http://img.draveness.me/MVC-in-iOS.jpg)
+![MVC-in-iOS](http://img.draveness.me/MVC-in-iOS.jpg-1000width)
 
 这种做法在当前模块的视图层比较简单时，笔者觉得没有任何的问题，虽然破坏了经典的 MVC 的架构图，但是也不是什么问题；不过，当视图层的视图对象非常多的时候，大量的配置和布局代码就会在控制器中占据大量的位置，我们可以将整个视图层的代码都移到一个单独的 `UIView` 子类中。
 
@@ -586,7 +586,7 @@ extension ViewController {}
 
 这种做法其实是将原本 Controller 做的事情放到了 View 中，由视图层来负责如何展示模型对象；虽然它能够减少 Controller 中的代码，但是也导致了 View 和 Model 的耦合。
 
-![Coupling-View-And-Mode](http://img.draveness.me/Coupling-View-And-Model.jpg)
+![Coupling-View-And-Mode](http://img.draveness.me/Coupling-View-And-Model.jpg-1000width)
 
 对于 MVC 架构模式中，Model、View 和 Controller 之间的交互没有明确的规则，但是视图和模型之间的耦合会导致视图层代码很难复用；因为这样设计的视图层都依赖于外部的模型对象，所以**如果同一个视图需要显示多种类型的模型时就会遇到问题**。
 

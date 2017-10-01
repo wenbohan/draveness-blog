@@ -23,7 +23,7 @@ tags: Redis Server Database NoSQL
 
 这也就是传统意义上的，也就是我们在编程中使用最多的阻塞模型：
 
-![blocking-io](http://img.draveness.me/2016-11-26-blocking-io.png)
+![blocking-io](http://img.draveness.me/2016-11-26-blocking-io.png-1000width)
 
 阻塞模型虽然开发中非常常见也非常易于理解，但是由于它会影响其他 FD 对应的服务，所以在需要处理多个客户端任务的时候，往往都不会使用阻塞模型。
 
@@ -33,7 +33,7 @@ tags: Redis Server Database NoSQL
 
 阻塞式的 I/O 模型并不能满足这里的需求，我们需要一种效率更高的 I/O 模型来支撑 Redis 的多个客户（redis-cli），这里涉及的就是 I/O 多路复用模型了：
 
-![I:O-Multiplexing-Mode](http://img.draveness.me/2016-11-26-I:O-Multiplexing-Model.png)
+![I:O-Multiplexing-Mode](http://img.draveness.me/2016-11-26-I:O-Multiplexing-Model.png-1000width)
 
 在 I/O 多路复用模型中，最重要的函数调用就是 `select`，该方法的能够同时监控多个文件描述符的可读可写情况，当其中的某些文件描述符可读或者可写时，`select` 方法就会返回可读以及可写的文件描述符个数。
 
@@ -45,7 +45,7 @@ tags: Redis Server Database NoSQL
 
 Redis 服务采用 Reactor 的方式来实现文件事件处理器（每一个网络连接其实都对应一个文件描述符）
 
-![redis-reactor-pattern](http://img.draveness.me/2016-11-26-redis-reactor-pattern.png)
+![redis-reactor-pattern](http://img.draveness.me/2016-11-26-redis-reactor-pattern.png-1000width)
 
 文件事件处理器使用 I/O 多路复用模块同时监听多个 FD，当 `accept`、`read`、`write` 和 `close` 文件事件产生时，文件事件处理器就会回调 FD 绑定的事件处理器。
 
@@ -55,7 +55,7 @@ Redis 服务采用 Reactor 的方式来实现文件事件处理器（每一个�
 
 I/O 多路复用模块封装了底层的 `select`、`epoll`、`avport` 以及 `kqueue` 这些 I/O 多路复用函数，为上层提供了相同的接口。
 
-![ae-module](http://img.draveness.me/2016-11-26-ae-module.jpg)
+![ae-module](http://img.draveness.me/2016-11-26-ae-module.jpg-1000width)
 
 在这里我们简单介绍 Redis 是如何包装 `select` 和 `epoll` 的，简要了解该模块的功能，整个 I/O 多路复用模块抹平了不同平台上 I/O 多路复用函数的差异性，提供了相同的接口：
 
@@ -280,7 +280,7 @@ static int aeApiPoll(aeEventLoop *eventLoop, struct timeval *tvp) {
 
 因为 `select` 函数是作为 POSIX 标准中的系统调用，在不同版本的操作系统上都会实现，所以将其作为保底方案：
 
-![redis-choose-io-function](http://img.draveness.me/2016-11-26-redis-choose-io-function.jpg)
+![redis-choose-io-function](http://img.draveness.me/2016-11-26-redis-choose-io-function.jpg-1000width)
 
 Redis 会优先选择时间复杂度为 $O(1)$ 的 I/O 多路复用函数作为底层实现，包括 Solaries 10 中的 `evport`、Linux 中的 `epoll` 和 macOS/FreeBSD 中的 `kqueue`，上述的这些函数都使用了内核内部的结构，并且能够服务几十万的文件描述符。
 

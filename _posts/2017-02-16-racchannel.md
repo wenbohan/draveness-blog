@@ -11,7 +11,7 @@ tags: iOS RAC
 
 之前讲过了 ReactiveCocoa 中的一对一的单向数据流 `RACSignal` 和一对多的单向数据流 `RACMulticastConnection`，这一篇文章分析的是一对一的双向数据流 `RACChannel`。
 
-![What-is-RACChanne](http://img.draveness.me/2017-02-16-What-is-RACChannel.png)
+![What-is-RACChanne](http://img.draveness.me/2017-02-16-What-is-RACChannel.png-1000width)
 
 `RACChannel` 其实是一个相对比较复杂的类，但是，对其有一定了解之后合理运用的话，会在合适的业务中提供非常强大的支持能够极大的简化业务代码。
 
@@ -19,21 +19,21 @@ tags: iOS RAC
 
 `RACChannel` 可以被理解为一个双向的连接，这个连接的两端都是 `RACSignal` 实例，它们可以向彼此发送消息，如果我们在视图和模型之间通过 `RACChannel` 建立这样的连接：
 
-![Connection-Between-View-Mode](http://img.draveness.me/2017-02-16-Connection-Between-View-Model.png)
+![Connection-Between-View-Mode](http://img.draveness.me/2017-02-16-Connection-Between-View-Model.png-1000width)
 
 那么从模型发出的消息，最后会发送到视图上；反之，用户对视图进行的操作最后也会体现在模型上。这种通信方式的实现是基于信号的，`RACChannel` 内部封装了两个 `RACChannelTerminal` 对象，它们都是 `RACSignal` 的子类：
 
-![RACChannel-Interface](http://img.draveness.me/2017-02-16-RACChannel-Interface.png)
+![RACChannel-Interface](http://img.draveness.me/2017-02-16-RACChannel-Interface.png-1000width)
 
 对模型进行的操作最后都会发送给 `leadingTerminal` 再通过内部的实现发送给 `followingTerminal`，由于视图是 `followingTerminal` 的订阅者，所以消息最终会发送到视图上。
 
-![Messages-Send-From-Mode](http://img.draveness.me/2017-02-16-Messages-Send-From-Model.png)
+![Messages-Send-From-Mode](http://img.draveness.me/2017-02-16-Messages-Send-From-Model.png-1000width)
 
 在上述情况下，`leadingTerminal` 的订阅者（模型）并不会收到消息，它的订阅者（视图）只会在 `followingTerminal` 收到消息时才会接受到新的值。
 
 同时，`RACChannel` 的绑定都是双向的，视图收到用户的动作，例如点击等事件时，会将消息发送给 `followingTerminal`，而 `followingTerminal` 并**不会**将消息发送给自己的订阅者（视图），而是会发送给 `leadingTerminal`，并通过 `leadingTerminal` 发送给其订阅者，即模型。
 
-![Terminals-Between-View-Mode](http://img.draveness.me/2017-02-16-Terminals-Between-View-Model.png)
+![Terminals-Between-View-Mode](http://img.draveness.me/2017-02-16-Terminals-Between-View-Model.png-1000width)
 
 上图描述了信息在 `RACChannel` 之间的传递过程，无论是模型属性的改变还是用户对视图进行的操作都会通过这两个 `RACChannelTerminal` 传递到另一端；同时，由于消息不会发送给自己的订阅者，所以不会造成信息的循环发送。
 
@@ -41,7 +41,7 @@ tags: iOS RAC
 
 `RACChannel` 和 `RACChannelTerminal` 的关系非常密切，前者可以理解为一个网络连接，后者可以理解为 `socket`，表示网络连接的一端，下图描述了 `RACChannel` 与网络连接中概念的一一对应关系。
 
-![Channel-And-Network-Connection](http://img.draveness.me/2017-02-16-Channel-And-Network-Connection.png)
+![Channel-And-Network-Connection](http://img.draveness.me/2017-02-16-Channel-And-Network-Connection.png-1000width)
 
 + 在客户端使用 `write` 向 `socket` 中发送消息时，`socket` 的持有者客户端不会收到消息，只有在 `socket` 上调用 `read` 的服务端才会收到消息；反之亦然。
 + 在模型使用 `sendNext` 向`leadingTerminal` 中发送消息时，`leadingTerminal` 的订阅者模型不会收到消息，只有在 `followingTerminal` 上调用 `subscribe` 的视图才会收到消息；反之亦然。
@@ -57,7 +57,7 @@ tags: iOS RAC
 
 `RACChannelTerminal` 是一个信号的子类，同时它还遵循了 `RACSubscriber` 协议，也就是可以向它调用 `-sendNext:` 等方法；`RAChannelTerminal` 中持有了两个对象：
 
-![RACChannelTerminal-Interface](http://img.draveness.me/2017-02-16-RACChannelTerminal-Interface.png)
+![RACChannelTerminal-Interface](http://img.draveness.me/2017-02-16-RACChannelTerminal-Interface.png-1000width)
 
 在初始化时，需要传入 `values` 和 `otherTerminal` 这两个属性，其中 `values` 表示当前断点，`otherTerminal` 表示远程端点：
 
@@ -115,7 +115,7 @@ tags: iOS RAC
 
 两个 `RACChannelTerminal` 中包装的其实是两个 `RACSubject` 热信号，它们既可以作为订阅者，也可以接收其他对象发送的消息；我们并不希望 `leadingSubject` 有任何的初始值，但是我们需要 `error` 和 `completed` 信息可以被重播。
 
-![Sending-Errors-And-Completed-Messages](http://img.draveness.me/2017-02-16-Sending-Errors-And-Completed-Messages.png)
+![Sending-Errors-And-Completed-Messages](http://img.draveness.me/2017-02-16-Sending-Errors-And-Completed-Messages.png-1000width)
 
 通过 `-ignoreValues` 和 `-subscribe:` 方法，`leadingSubject` 和 `followingSubject` 两个热信号中产生的错误会互相发送，这是为了防止连接的两端一边发生了错误，另一边还继续工作的情况的出现。
 
@@ -125,7 +125,7 @@ tags: iOS RAC
 
 如果在整个 ReactiveCocoa 工程中搜索 `RACChannel`，你会发现以下的 UIKit 组件都与 `RACChannel` 有着非常密切的关系：
 
-![RACChannel-Hierachy](http://img.draveness.me/2017-02-16-RACChannel-Hierachy.png)
+![RACChannel-Hierachy](http://img.draveness.me/2017-02-16-RACChannel-Hierachy.png-1000width)
 
 UIKit 中的这些组件都提供了使用 `RACChannel` 的接口，用以降低数据双向绑定的复杂度，我们以 `UITextField` 为例，它在分类的接口中提供了 `rac_newTextChannel` 方法：
 
@@ -137,7 +137,7 @@ UIKit 中的这些组件都提供了使用 `RACChannel` 的接口，用以降低
 
 上述方法用于返回一个一端绑定 `UIControlEventAllEditingEvents` 事件的 `RACChannelTerminal` 对象。
 
-![UITextField-RACChannel-Interface](http://img.draveness.me/2017-02-16-UITextField-RACChannel-Interface.png)
+![UITextField-RACChannel-Interface](http://img.draveness.me/2017-02-16-UITextField-RACChannel-Interface.png-1000width)
 
 `UIControlEventAllEditingEvents` 事件发生时，它会将自己的 `text` 属性作为信号发送到 `followingTerminal -> leadingTerminal` 管道中，最后发送给 `leadingTerminal` 的订阅者。
 
@@ -200,7 +200,7 @@ RACSignal *valuesSignal = [channel.followingTerminal
 
 `RACChannel` 不仅为 UIKit 组件提供了接口，还为键值观测提供了 `RACKVOChannel` 来高效地完成双向绑定；`RACKVOChannel` 是 `RACChannel` 的子类：
 
-![RACKVOChanne](http://img.draveness.me/2017-02-16-RACKVOChannel.png)
+![RACKVOChanne](http://img.draveness.me/2017-02-16-RACKVOChannel.png-1000width)
 
 在 `RACKVOChannel` 提供的接口中，我们一般都会使用 `RACChannelTo` 来观测某一个对象的对应属性，三个参数依次为对象、属性和默认值：
 
@@ -239,11 +239,11 @@ RACChannelTo(view, property) = RACChannelTo(model, property);
 
 以上的两种方式是完全等价的，它们都会在对方的属性更新时更新自己的属性。
 
-![RACChannelTo-Model-Vie](http://img.draveness.me/2017-02-16-RACChannelTo-Model-View.png)
+![RACChannelTo-Model-Vie](http://img.draveness.me/2017-02-16-RACChannelTo-Model-View.png-1000width)
 
 实现的方式其实与 `RACChannel` 差不多，这里不会深入到代码中进行介绍，与 `RACChannel` 的区别是，`RACKVOChannel` 并没有暴露出 `leadingTerminal` 而是 `followingTerminal`：
 
-![RACChannelTo-And-Property](http://img.draveness.me/2017-02-16-RACChannelTo-And-Property.png)
+![RACChannelTo-And-Property](http://img.draveness.me/2017-02-16-RACChannelTo-And-Property.png-1000width)
 
 ## RACChannel 实战
 
@@ -267,7 +267,7 @@ RACChannelTo(view, property) = RACChannelTo(model, property);
 
 这样在使用两个文本输入框时就能达到预期的效果了，这是一个非常简单的例子，可以得到如下的结构图。
 
-![Two-UITextField-With-RACChanne](http://img.draveness.me/2017-02-16-Two-UITextField-With-RACChannel.png)
+![Two-UITextField-With-RACChanne](http://img.draveness.me/2017-02-16-Two-UITextField-With-RACChannel.png-1000width)
 
 两个 `UITextField` 通过 `RACChannel` 互相影响，在对方属性更新时同时更新自己的属性。
 
