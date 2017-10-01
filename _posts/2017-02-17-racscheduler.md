@@ -15,15 +15,15 @@ tags: iOS RAC
 
 `RACScheduler` 作为 ReactiveCocoa 中唯一的用于调度的模块，它包含很多个性化的子类：
 
-![RACScheduler-Subclasses](http://img.draveness.me/2017-02-17-RACScheduler-Subclasses.png-1000width)
+![RACScheduler-Subclasses](http://img.draveness.me/2017-02-17-RACScheduler-Subclasses.png-800width)
 
 `RACScheduler` 类的内部只有一个用于追踪标记和 debug 的属性 `name`，头文件和实现文件中的其它内容都是各种各样的方法；我们可以把其中的方法分为两类，一类是用于初始化 `RACScheduler` 实例的初始化方法：
 
-![RACScheduler-Initializers](http://img.draveness.me/2017-02-17-RACScheduler-Initializers.png-1000width)
+![RACScheduler-Initializers](http://img.draveness.me/2017-02-17-RACScheduler-Initializers.png-800width)
 
 另一类就是用于调度、执行任务的 `+schedule:` 等方法：
 
-![RACScheduler-Schedule](http://img.draveness.me/2017-02-17-RACScheduler-Schedule.png-1000width)
+![RACScheduler-Schedule](http://img.draveness.me/2017-02-17-RACScheduler-Schedule.png-800width)
 
 在图中都省略了一些参数缺省的方法，以及一些调用其他方法的调度方法或者初始化方法，用以减少我们分析和理解整个 `RACScheduler` 类的难度。
 
@@ -144,7 +144,7 @@ tags: iOS RAC
 
 `RACTargetQueueScheduler` 继承自 `RACQueueScheduler`，但是由于后者是抽象类，我们并不会直接使用它，它只是为前者提供必要的方法支持，将一部分逻辑抽离出来：
 
-![RACTargetQueueSchedule](http://img.draveness.me/2017-02-17-RACTargetQueueScheduler.png-1000width)
+![RACTargetQueueSchedule](http://img.draveness.me/2017-02-17-RACTargetQueueScheduler.png-800width)
 
 这里我们先简单看一下 `RACTargetQueueScheduler` 的实现，整个 `RACTargetQueueScheduler` 类中只有一个初始化方法：
 
@@ -160,7 +160,7 @@ tags: iOS RAC
 
 `RACTargetQueueScheduler` 在使用时，将待执行的任务加入一个私有的串行队列中，其优先级与传入的 targetQueue 完全相同；不过提到 `RACTargetQueueScheduler` 中队列的优先级，对 GCD 稍有了解的人应该都知道在 GCD 中有着四种不同优先级的全局并行队列，而在 `RACScheduler` 中也有一一对应的枚举类型：
 
-![RACScheduler-Priority](http://img.draveness.me/2017-02-17-RACScheduler-Priority.png-1000width)
+![RACScheduler-Priority](http://img.draveness.me/2017-02-17-RACScheduler-Priority.png-800width)
 
 在使用 `+schedulerWithPriority:` 方法创建 `RACTargetQueueScheduler` 时，就需要传入上面的优先级，方法会通过 GCD 的内置方法 `dispatch_get_global_queue` 获取全局的并行队列，最终返回一个新的实例。
 
@@ -244,7 +244,7 @@ tags: iOS RAC
 
 最后的 `RACSubscriptionScheduler` 是 ReactiveCocoa 中一个比较特殊的调度器，所有 ReactiveCocoa 中的订阅事件都会在 `RACSubscriptionScheduler` 调度器上进行；而它是通过封装两个调度器实现的：
 
-![RACSubscriptionSchedule](http://img.draveness.me/2017-02-17-RACSubscriptionScheduler.png-1000width)
+![RACSubscriptionSchedule](http://img.draveness.me/2017-02-17-RACSubscriptionScheduler.png-800width)
 
 > `backgroundScheduler` 是一个优先级为 `RACSchedulerPriorityDefault` 的串行队列。
 

@@ -218,7 +218,7 @@ typedef NS_ENUM(NSUInteger, FBType) {
 
 当代码即将从 `FBGetClassReferences` 方法中返回时，使用 lldb 打印 `result` 中的所有元素：
 
-![get-ivars](http://img.draveness.me/2016-08-01-get-ivars.png-1000width)
+![get-ivars](http://img.draveness.me/2016-08-01-get-ivars.png-800width)
 
 上述方法成功地从 `XXObject` 类中获得了正确的属性数组，不过这些数组中不止包含了强引用，还有被 `weak` 标记的弱引用：
 
@@ -239,7 +239,7 @@ typedef NS_ENUM(NSUInteger, FBType) {
 
 它是如何工作的呢，我们先继续执行 `FBGetStrongReferencesForClass` 方法：
 
-![get-ivar-layout](http://img.draveness.me/2016-08-01-get-ivar-layout.png-1000width)
+![get-ivar-layout](http://img.draveness.me/2016-08-01-get-ivar-layout.png-800width)
 
 在 ObjC 运行时中的 `class_getIvarLayout` 可以获取某一个类的 Ivar Layout，而 `XXObject` 的 Ivar Layout 是什么样的呢？
 
@@ -323,7 +323,7 @@ NSArray<id<FBObjectReference>> *filteredIvars =
 }]];
 ~~~
 
-![filtered-ivars](http://img.draveness.me/2016-08-01-filtered-ivars.png-1000width)
+![filtered-ivars](http://img.draveness.me/2016-08-01-filtered-ivars.png-800width)
 
 ====
 
