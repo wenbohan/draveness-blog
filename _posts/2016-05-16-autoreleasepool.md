@@ -22,7 +22,7 @@ tags: iOS Runtime
 ## 从 main 函数开始
 
 `main` 函数可以说是在整个 iOS 开发中非常不起眼的一个函数，它很好地隐藏在 `Supporting Files` 文件夹中，却是整个 iOS 应用的入口。
-![objc-autorelease-main](http://img.draveness.me/2016-05-16-objc-autorelease-main.png-900width)
+![objc-autorelease-main](http://img.draveness.me/2016-05-16-objc-autorelease-main.png-1000width)
 
 `main.m` 文件中的内容是这样的：
 
@@ -48,7 +48,7 @@ $ clang -rewrite-objc main.m
 
 在生成了一大堆警告之后，当前目录下多了一个 `main.cpp` 文件
 
-![objc-autorelease-main-cpp](http://img.draveness.me/2016-05-16-objc-autorelease-main-cpp.png-900width)
+![objc-autorelease-main-cpp](http://img.draveness.me/2016-05-16-objc-autorelease-main-cpp.png-1000width)
 
 > 这里删除了 `main` 函数中其他无用的代码。
 
@@ -62,7 +62,7 @@ $ clang -rewrite-objc main.m
 
 想要弄清楚这行代码的意义，我们要在 `main.cpp` 中查找名为 `__AtAutoreleasePool` 的结构体：
 
-![objc-autorelease-main-cpp-struct](http://img.draveness.me/2016-05-16-objc-autorelease-main-cpp-struct.png-900width)
+![objc-autorelease-main-cpp-struct](http://img.draveness.me/2016-05-16-objc-autorelease-main-cpp-struct.png-1000width)
 
 ~~~objectivec
 struct __AtAutoreleasePool {
@@ -117,7 +117,7 @@ void objc_autoreleasePoolPop(void *ctxt) {
 
 `AutoreleasePoolPage` 是一个 C++ 中的类：
 
-![objc-autorelease-AutoreleasePoolPage](http://img.draveness.me/2016-05-16-objc-autorelease-AutoreleasePoolPage.png-900width)
+![objc-autorelease-AutoreleasePoolPage](http://img.draveness.me/2016-05-16-objc-autorelease-AutoreleasePoolPage.png-1000width)
 
 它在 `NSObject.mm` 中的定义是这样的：
 
@@ -147,7 +147,7 @@ class AutoreleasePoolPage {
 
 自动释放池中的 `AutoreleasePoolPage` 是以**双向链表**的形式连接起来的：
 
-![objc-autorelease-AutoreleasePoolPage-linked-list](http://img.draveness.me/2016-05-16-objc-autorelease-AutoreleasePoolPage-linked-list.png-900width)
+![objc-autorelease-AutoreleasePoolPage-linked-list](http://img.draveness.me/2016-05-16-objc-autorelease-AutoreleasePoolPage-linked-list.png-1000width)
 
 > `parent` 和 `child` 就是用来构造双向链表的指针。
 
@@ -155,7 +155,7 @@ class AutoreleasePoolPage {
 
 如果我们的一个 `AutoreleasePoolPage` 被初始化在内存的 `0x100816000 ~ 0x100817000` 中，它在内存中的结构如下：
 
-![objc-autorelease-page-in-memory](http://img.draveness.me/2016-05-16-objc-autorelease-page-in-memory.png-900width)
+![objc-autorelease-page-in-memory](http://img.draveness.me/2016-05-16-objc-autorelease-page-in-memory.png-1000width)
 
 其中有 56 bit 用于存储 `AutoreleasePoolPage` 的成员变量，剩下的 `0x100816038 ~ 0x100817000` 都是用来存储**加入到自动释放池中的对象**。
 
@@ -163,7 +163,7 @@ class AutoreleasePoolPage {
 
 `next` 指向了下一个为空的内存地址，如果 `next` 指向的地址加入一个 `object`，它就会如下图所示**移动到下一个为空的内存地址中**：
 
-![objc-autorelease-after-insert-to-page](http://img.draveness.me/2016-05-16-objc-autorelease-after-insert-to-page.png-900width)
+![objc-autorelease-after-insert-to-page](http://img.draveness.me/2016-05-16-objc-autorelease-after-insert-to-page.png-1000width)
 
 > 关于 `hiwat` 和 `depth` 在文章中并不会进行介绍，因为它们并不影响整个自动释放池的实现，也不在关键方法的调用栈中。
 
@@ -196,7 +196,7 @@ int main(int argc, const char * argv[]) {
 
 而当方法 `objc_autoreleasePoolPop` 调用时，就会向自动释放池中的对象发送 `release` 消息，直到第一个 `POOL_SENTINEL`：
 
-![objc-autorelease-pop-stack](http://img.draveness.me/2016-05-16-objc-autorelease-pop-stack.png-900width)
+![objc-autorelease-pop-stack](http://img.draveness.me/2016-05-16-objc-autorelease-pop-stack.png-1000width)
 
 ### <a id='objc_autoreleasePoolPush'></a>objc_autoreleasePoolPush 方法
 
@@ -324,7 +324,7 @@ void objc_autoreleasePoolPop(void *ctxt) {
 
 我们一般都会在这个方法中传入一个哨兵对象 `POOL_SENTINEL`，如下图一样释放对象：
 
-![objc-autorelease-pop-stack](http://img.draveness.me/2016-05-16-objc-autorelease-pop-stack.png-900width)
+![objc-autorelease-pop-stack](http://img.draveness.me/2016-05-16-objc-autorelease-pop-stack.png-1000width)
 
 #### 对 objc_autoreleasePoolPop 行为的测试
 
@@ -348,11 +348,11 @@ int main(int argc, const char * argv[]) {
 
 在代码的这一行打一个断点，因为这里会调用 `autorelease` 方法，将字符串加入自动释放池：
 
-![objc-autorelease-breakpoint-main](http://img.draveness.me/2016-05-16-objc-autorelease-breakpoint-main.png-900width)
+![objc-autorelease-breakpoint-main](http://img.draveness.me/2016-05-16-objc-autorelease-breakpoint-main.png-1000width)
 
 当代码运行到这里时，通过 lldb 打印出当前 `hotPage` 中的栈内容：
 
-![objc-autorelease-print-pool-content](http://img.draveness.me/2016-05-16-objc-autorelease-print-pool-content.png-900width)
+![objc-autorelease-print-pool-content](http://img.draveness.me/2016-05-16-objc-autorelease-print-pool-content.png-1000width)
 
 1. 通过 `static` 方法获取当前 `hotPage`
 2. 打印 `AutoreleasePoolPage` 中的内容
@@ -361,7 +361,7 @@ int main(int argc, const char * argv[]) {
 
 然后将字符串 `@"Draveness-Suffix"` 的指针传入 `pop` 方法，测试 `pop` 方法能否传入非哨兵参数。
 
-![objc-autorelease-pop-string](http://img.draveness.me/2016-05-16-objc-autorelease-pop-string.png-900width)
+![objc-autorelease-pop-string](http://img.draveness.me/2016-05-16-objc-autorelease-pop-string.png-1000width)
 
 再次打印当前 `AutoreleasePoolPage` 的内容时，字符串已经不存在了，这说明**向 `pop` 方法传入非哨兵参数是可行的**，只是我们一般不会传入非哨兵对象。
 

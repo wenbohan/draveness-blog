@@ -4,7 +4,7 @@ title: 谈谈 MVX 中的 Model
 date: 2017-06-23 00:34:44.000000000 +08:00
 permalink: /mvx-model.html
 desc: 在大多数 iOS 的项目中，Model 层只是一个单纯的数据结构，你可以看到的绝大部分模型都是这样的；模型起到了定义一堆『坑』的作用，只是一个简单的模板，并没有参与到实际的业务逻辑，只是在模型层进行了一层抽象，将服务端发回的 JSON 或者说 Dictionary 对象中的字段一一取出并装填到预先定义好的模型中。
-cover: http://img.draveness.me/JSON-to-Model.jpg-900width
+cover: http://img.draveness.me/JSON-to-Model.jpg-1000width
 tags: iOS MVC
 ---
 
@@ -38,7 +38,7 @@ struct User {
 
 模型起到了定义一堆『坑』的作用，只是一个简单的模板，并没有参与到实际的业务逻辑，只是在模型层进行了一层**抽象**，将服务端发回的 JSON 或者说 `Dictionary` 对象中的字段一一取出并装填到预先定义好的模型中。
 
-![JSON-to-Model](http://img.draveness.me/JSON-to-Model.jpg-900width)
+![JSON-to-Model](http://img.draveness.me/JSON-to-Model.jpg-1000width)
 
 我们可以将这种模型层中提供的对象理解为『即开即用』的 `Dictionary` 实例；在使用时，可以直接从模型中取出属性，省去了从 `Dictionary` 中抽出属性以及验证是否合法的过程。
 
@@ -163,7 +163,7 @@ User *user = [User yy_modelWithJSON:json];
 
 > 其实很多静态编程语言，比如 C、C++ 和 Rust 都通过宏实现了比较强大的元编程能力，虽然 Swift 也通过模板在元编程支持上做了一些微小的努力，不过到目前来看（ 3.0 ）还是远远不够的。
 
-![Dynamic-Stati](http://img.draveness.me/Dynamic-Static.png-900width)
+![Dynamic-Stati](http://img.draveness.me/Dynamic-Static.png-1000width)
 
 OC 中对于 `nil` 的处理能够减少我们在编码时的工作量，不过也对工程师的代码质量提出了考验。我们需要思考 `nil` 的出现会不会带来崩溃，是否会导致行为的异常、增加应用崩溃的风险以及不确定性，而这也是 Swift 引入 Optional 这一概念来避免上述问题的初衷。
 
@@ -173,7 +173,7 @@ OC 中对于 `nil` 的处理能够减少我们在编码时的工作量，不过�
 
 现有的大多数应用都会将网路服务组织成单独的一层，所以有时候你会看到所谓的 MVCS 架构模式，它其实只是在 MVC 的基础上加上了一个服务层（Service），而在 iOS 中常见的 MVC 架构模式也都可以理解为 MVCS 的形式，当引入了 Service 层之后，整个数据的获取以及处理的流程是这样的：
 
-![MVCS-Architecture](http://img.draveness.me/MVCS-Architecture.png-900width)
+![MVCS-Architecture](http://img.draveness.me/MVCS-Architecture.png-1000width)
 
 1. 大多数情况下服务的发起都是在 Controller 中进行的；
 2. 然后会在 HTTP 请求的回调中交给模型层处理 JSON 数据；
@@ -233,7 +233,7 @@ UserManager.user(id: 1) { user in
 
 使用声明式的网络服务层与命令式的方法并没有本质的不同，它们最终都调用了底层的一些网络库的 API，这种网络服务层中的请求都是以配置的形式实现的，需要对原有的命令式的请求进行一层封装，也就是说所有的参数 `requestURL`、`method` 和 `parameters` 都应该以配置的形式声明在每一个 `Request` 类中。
 
-![Abstract-Request](http://img.draveness.me/Abstract-Request.jpg-900width)
+![Abstract-Request](http://img.draveness.me/Abstract-Request.jpg-1000width)
 
 如果是在 Objective-C 中，一般会定义一个抽象的基类，并让所有的 Request 都继承它；但是在 Swift 中，我们可以使用协议以及协议扩展的方式实现这一功能。
 
@@ -292,7 +292,7 @@ FindUserRequest(id: 1).start { json in
 
 现有的 iOS 开发中的网络服务层一般都是使用这两种组织方式，我们一般会按照**资源**或者**功能**来划分命令式中的 `Manager` 类，而声明式的 `Request` 类与实际请求是一对一的关系。
 
-![Manager-And-Request](http://img.draveness.me/Manager-And-Request.jpg-900width)
+![Manager-And-Request](http://img.draveness.me/Manager-And-Request.jpg-1000width)
 
 这两种网络层的组织方法在笔者看来没有高下之分，无论是 `Manager` 还是 `Request` 的方式，尤其是后者由于一个类只对应一个 API 请求，在整个 iOS 项目变得异常复杂时，就会导致**网络层类的数量剧增**。
 
@@ -302,11 +302,11 @@ FindUserRequest(id: 1).start { json in
 
 现有的 MVC 下的 Model 层，其实只起到了对数据结构定义的作用，它将服务端返回的 JSON 数据，以更方便使用的方式包装了一下，这样呈现给上层的就是一些即拆即用的『字典』。
 
-![Model-And-Dictioanry](http://img.draveness.me/Model-And-Dictioanry.jpg-900width)
+![Model-And-Dictioanry](http://img.draveness.me/Model-And-Dictioanry.jpg-1000width)
 
 单独的 Model 层并不能返回什么关键的作用，它只有与网络服务层 Service 结合在一起的时候才能发挥更重要的能力。
 
-![Service-And-API](http://img.draveness.me/Service-And-API.jpg-900width)
+![Service-And-API](http://img.draveness.me/Service-And-API.jpg-1000width)
 
 而网络服务 Service 层是对 HTTP 请求的封装，其实现形式有两种，一种是命令式的，另一种是声明式的，这两种实现的方法并没有绝对的优劣，遵循合适的形式设计或者重构现有的架构，随着应用的开发与迭代，为上层提供相同的接口，保持一致性才是设计 Service 层最重要的事情。
 
@@ -329,7 +329,7 @@ Rails 中的 Model 层主要承担着以下两大职责：
 
 Model 层的两大职责决定了它在整个 MVC 框架的位置：
 
-![Server-MV](http://img.draveness.me/Server-MVC.jpg-900width)
+![Server-MV](http://img.draveness.me/Server-MVC.jpg-1000width)
 
 因为 Model 是对数据库中表的映射，所以当 Controller 向 Model 层请求数据时，它会从数据库中获取相应的数据，然后对数据进行加工最后返回给 Controller 层。
 
@@ -376,7 +376,7 @@ user = User.find(10)
 
 这就是 ActiveRecord 作为 Model 层的 ORM 框架解决两个关键问题的方式，其最终结果都是生成一条 SQL 语句并扔到数据库中执行。
 
-![Relation-Between-Database-And-Mode](http://img.draveness.me/Relation-Between-Database-And-Model.jpg-900width)
+![Relation-Between-Database-And-Mode](http://img.draveness.me/Relation-Between-Database-And-Model.jpg-1000width)
 
 总而言之，Model 层为调用方屏蔽了所有与数据库相关的底层细节，使开发者不需要考虑如何手写 SQL 语句，只需要关心原生的代码，能够极大的降低出错的概率；但是，由于 SQL 语句都由 Model 层负责处理生成，它并不会根据业务帮助我们优化 SQL 查询语句，所以在遇到数据量较大时，其性能难免遇到各种问题，我们仍然需要手动优化查询的 SQL 语句。
 
@@ -406,13 +406,13 @@ Controller 的作用更像是胶水，将 Model 层中获取的模型传入 View
 
 服务端重数据，如果把整个 Web 应用看做一个黑箱，那么它的输入就是用户发送的数据，发送的形式无论是遵循 HTTP 协议也好还是其它协议也好，它们都是数据。
 
-![web-black-box](http://img.draveness.me/web-black-box.jpg-900width)
+![web-black-box](http://img.draveness.me/web-black-box.jpg-1000width)
 
 在服务端拿到数据后对其进行处理、加工以及存储，最后仍然以数据的形式返回给用户。
 
 而客户端重展示，其输入就是用户的行为触发的事件，而输出是用户界面：
 
-![client-black-box](http://img.draveness.me/client-black-box.jpg-900width)
+![client-black-box](http://img.draveness.me/client-black-box.jpg-1000width)
 
 也就是说，用户的行为在客户端应用中得到响应，并更新了用户界面 GUI。总而言之：
 
@@ -439,7 +439,7 @@ Controller 的作用更像是胶水，将 Model 层中获取的模型传入 View
 
 上面的例子主要是为了说明客户端的最重要的职责，将**数据合理地展示给用户**，从这里我们可以领会到，Model 层虽然重要，但是却不是客户端最为复杂的地方，它只是起到了一个将服务端数据『映射』到客户端的作用，这个映射的过程就是获取数据的过程，也决定了 Model 层在 iOS 应用中的位置。
 
-![Model-in-Client](http://img.draveness.me/Model-in-Client.jpg-900width)
+![Model-in-Client](http://img.draveness.me/Model-in-Client.jpg-1000width)
 
 那么这样就产生了几个非常重要的问题和子问题：
 
@@ -570,7 +570,7 @@ class User: Object {
 
 Model 层为上层提供提供的接口其实就是自身的一系列属性，只是将服务器返回的 JSON 经过处理和类型转换，变成了即拆即用的数据。
 
-![JSON-Mode](http://img.draveness.me/JSON-Model.jpg-900width)
+![JSON-Mode](http://img.draveness.me/JSON-Model.jpg-1000width)
 
 上层与 Model 层交互有两种方式，一是通过 Model 层调用 HTTP 请求，异步获取模型数据，另一种就是通过 Model 暴露出来的属性进行存取，而底层数据库会在 Model 属性更改时发出网络请求并且修改对应的字段。
 

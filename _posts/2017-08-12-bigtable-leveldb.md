@@ -3,7 +3,7 @@ layout: post
 title: 浅析 Bigtable 和 LevelDB 的实现
 permalink: /bigtable-leveldb.html
 tags: Server LevelDB Database NoSQL
-cover: http://img.draveness.me/2017-08-12-Bigtable-LevelDB-Cover.jpg-900width
+cover: http://img.draveness.me/2017-08-12-Bigtable-LevelDB-Cover.jpg-1000width
 desc: 在 2006 年的 OSDI 上，Google 发布了名为 Bigtable 的论文，其中描述了一个用于管理结构化数据的分布式存储系统 Bigtable 的数据模型、接口以及实现等内容。本文会先对文中描述的分布式存储系统进行简单的描述，然后对 Google 开源的 KV 存储数据库 LevelDB 进行分析；LevelDB 可以理解为单点的 Bigtable 的系统，虽然其中没有 Bigtable 中与 tablet 管理以及一些分布式相关的逻辑，不过我们可以通过对 LevelDB 源代码的阅读增加对 Bigtable 的理解。
 ---
 
@@ -13,7 +13,7 @@ desc: 在 2006 年的 OSDI 上，Google 发布了名为 Bigtable 的论文，其
 
 在 2006 年的 OSDI 上，Google 发布了名为 [Bigtable: A Distributed Storage System for Structured Data](https://static.googleusercontent.com/media/research.google.com/en//archive/bigtable-osdi06.pdf) 的论文，其中描述了一个用于管理结构化数据的分布式存储系统  - Bigtable 的数据模型、接口以及实现等内容。
 
-![leveldb-logo](http://img.draveness.me/2017-08-12-leveldb-logo.png-900width)
+![leveldb-logo](http://img.draveness.me/2017-08-12-leveldb-logo.png-1000width)
 
 本文会先对 Bigtable 一文中描述的分布式存储系统进行简单的描述，然后对 Google 开源的 KV 存储数据库 [LevelDB](https://github.com/google/leveldb) 进行分析；LevelDB 可以理解为单点的 Bigtable 的系统，虽然其中没有 Bigtable 中与 tablet 管理以及一些分布式相关的逻辑，不过我们可以通过对 LevelDB 源代码的阅读增加对 Bigtable 的理解。
 
@@ -21,7 +21,7 @@ desc: 在 2006 年的 OSDI 上，Google 发布了名为 Bigtable 的论文，其
 
 Bigtable 是一个用于管理**结构化数据**的分布式存储系统，它有非常优秀的扩展性，可以同时处理上千台机器中的 PB 级别的数据；Google 中的很多项目，包括 Web 索引都使用 Bigtable 来存储海量的数据；Bigtable 的论文中声称它实现了四个目标：
 
-![Goals-of-Bigtable](http://img.draveness.me/2017-08-12-Goals-of-Bigtable.jpg-900width)
+![Goals-of-Bigtable](http://img.draveness.me/2017-08-12-Goals-of-Bigtable.jpg-1000width)
 
 在作者看来这些目标看看就好，其实并没有什么太大的意义，所有的项目都会对外宣称它们达到了高性能、高可用性等等特性，我们需要关注的是 Bigtable 到底是如何实现的。
 
@@ -35,7 +35,7 @@ Bigtable 与数据库在很多方面都非常相似，但是它提供了与数�
 
 它的定义其实也就决定了其数据模型非常简单并且易于实现，我们使用 `row`、`column` 和 `timestamp` 三个字段作为这个哈希的键，值就是一个字节数组，也可以理解为字符串。
 
-![Bigtable-DataModel-Row-Column-Timestamp-Value](http://img.draveness.me/2017-08-12-Bigtable-DataModel-Row-Column-Timestamp-Value.jpg-900width)
+![Bigtable-DataModel-Row-Column-Timestamp-Value](http://img.draveness.me/2017-08-12-Bigtable-DataModel-Row-Column-Timestamp-Value.jpg-1000width)
 
 这里最重要的就是 `row` 的值，它的长度最大可以为 64KB，对于同一 `row` 下数据的读写都可以看做是原子的；因为 Bigtable 是按照 `row` 的值使用字典顺序进行排序的，每一段 `row` 的范围都会被 Bigtable 进行分区，并交给一个 tablet 进行处理。
 
@@ -49,7 +49,7 @@ Bigtable 与数据库在很多方面都非常相似，但是它提供了与数�
 
 > Chubby 是一个分布式锁服务，我们可能会在后面的文章中介绍它。
 
-![Tablet-Location-Hierarchy](http://img.draveness.me/2017-08-12-Tablet-Location-Hierarchy.jpg-900width)
+![Tablet-Location-Hierarchy](http://img.draveness.me/2017-08-12-Tablet-Location-Hierarchy.jpg-1000width)
 
 每一个 METADATA tablet 包括根节点上的 tablet 都存储了 tablet 的位置和该 tablet 中 key 的最小值和最大值；每一个 METADATA 行大约在内存中存储了 1KB 的数据，如果每一个 METADATA tablet 的大小都为 128MB，那么整个三层结构可以存储 2^61 字节的数据。
 
@@ -57,7 +57,7 @@ Bigtable 与数据库在很多方面都非常相似，但是它提供了与数�
 
 既然在整个 Bigtable 中有着海量的 tablet 服务器以及数据的分片 tablet，那么 Bigtable 是如何管理海量的数据呢？Bigtable 与很多的分布式系统一样，使用一个主服务器将 tablet 分派给不同的服务器节点。
 
-![Master-Manage-Tablet-Servers-And-Tablets](http://img.draveness.me/2017-08-12-Master-Manage-Tablet-Servers-And-Tablets.jpg-900width)
+![Master-Manage-Tablet-Servers-And-Tablets](http://img.draveness.me/2017-08-12-Master-Manage-Tablet-Servers-And-Tablets.jpg-1000width)
 
 为了减轻主服务器的负载，所有的客户端仅仅通过 Master 获取 tablet 服务器的位置信息，它并不会在每次读写时都请求 Master 节点，而是直接与 tablet 服务器相连，同时客户端本身也会保存一份 tablet 服务器位置的缓存以减少与 Master 通信的次数和频率。
 
@@ -65,7 +65,7 @@ Bigtable 与数据库在很多方面都非常相似，但是它提供了与数�
 
 从读写请求的处理，我们其实可以看出整个 Bigtable 中的各个部分是如何协作的，包括日志、memtable 以及 SSTable 文件。
 
-![Tablet-Serving](http://img.draveness.me/2017-08-12-Tablet-Serving.jpg-900width)
+![Tablet-Serving](http://img.draveness.me/2017-08-12-Tablet-Serving.jpg-1000width)
 
 当有客户端向 tablet 服务器发送写操作时，它会先向 tablet 服务器中的日志追加一条记录，在日志成功追加之后再向 memtable 中插入该条记录；这与现在大多的数据库的实现完全相同，通过顺序写向日志追加记录，然后再向数据库随机写，因为随机写的耗时远远大于追加内容，如果直接进行随机写，可能由于发生设备故障造成数据丢失。
 
@@ -75,11 +75,11 @@ Bigtable 与数据库在很多方面都非常相似，但是它提供了与数�
 
 随着写操作的进行，memtable 会随着事件的推移逐渐增大，当 memtable 的大小超过一定的阈值时，就会将当前的 memtable 冻结，并且创建一个新的 memtable，被冻结的 memtable 会被转换为一个 SSTable 并且写入到 GFS 系统中，这种压缩方式也被称作 *Minor Compaction*。
 
-![Minor-Compaction](http://img.draveness.me/2017-08-12-Minor-Compaction.jpg-900width)
+![Minor-Compaction](http://img.draveness.me/2017-08-12-Minor-Compaction.jpg-1000width)
 
 每一个 Minor Compaction 都能够创建一个新的 SSTable，它能够有效地降低内存的占用并且降低服务进程异常退出后，过大的日志导致的过长的恢复时间。既然有用于压缩 memtable 中数据的 Minor Compaction，那么就一定有一个对应的 Major Compaction 操作。
 
-![Major-Compaction](http://img.draveness.me/2017-08-12-Major-Compaction.jpg-900width)
+![Major-Compaction](http://img.draveness.me/2017-08-12-Major-Compaction.jpg-1000width)
 
 Bigtable 会在**后台周期性**地进行 *Major Compaction*，将 memtable 中的数据和一部分的 SSTable 作为输入，将其中的键值进行归并排序，生成新的 SSTable 并移除原有的 memtable 和 SSTable，新生成的 SSTable 中包含前两者的全部数据和信息，并且将其中一部分标记未删除的信息彻底清除。
 
@@ -131,7 +131,7 @@ Status DBImpl::Write(const WriteOptions& options, WriteBatch* my_batch) {
 
 正如上面所介绍的，`DB::Put` 方法将传入的参数封装成了一个 `WritaBatch`，然后仍然会执行 `DBImpl::Write` 方法向数据库中写入数据；写入方法 `DBImpl::Write` 其实是一个是非常复杂的过程，包含了很多对上下文状态的判断，我们先来看一个写操作的整体逻辑：
 
-![LevelDB-Put](http://img.draveness.me/2017-08-12-LevelDB-Put.jpg-900width)
+![LevelDB-Put](http://img.draveness.me/2017-08-12-LevelDB-Put.jpg-1000width)
 
 从总体上看，LevelDB 在对数据库执行写操作时，会有三个步骤：
 
@@ -190,11 +190,11 @@ Status DBImpl::MakeRoomForWrite(bool force) {
 
 当 LevelDB 中的 memtable 已经被数据填满导致内存已经快不够用的时候，我们会开始对 memtable 中的数据进行冻结并创建一个新的 `MemTable` 对象。
 
-![Immutable-MemTable](http://img.draveness.me/2017-08-12-Immutable-MemTable.jpg-900width)
+![Immutable-MemTable](http://img.draveness.me/2017-08-12-Immutable-MemTable.jpg-1000width)
 
 你可以看到，与 Bigtable 中论文不同的是，LevelDB 中引入了一个不可变的 memtable 结构 imm，它的结构与 memtable 完全相同，只是其中的所有数据都是不可变的。
 
-![LevelDB-Serving](http://img.draveness.me/2017-08-12-LevelDB-Serving.jpg-900width)
+![LevelDB-Serving](http://img.draveness.me/2017-08-12-LevelDB-Serving.jpg-1000width)
 
 在切换到新的 memtable 之后，还可能会执行 `MaybeScheduleCompaction` 来触发一次 Minor Compaction 将 imm 中数据固化成数据库中的 SSTable；imm 的引入能够解决由于 memtable 中数据过大导致压缩时不可写入数据的问题。
 
@@ -220,7 +220,7 @@ enum RecordType {
 
 日志记录的类型存储在该条记录的头部，其中还存储了 4 字节日志的 CRC 校验、记录的长度等信息：
 
-![LevelDB-log-format-and-recordtype](http://img.draveness.me/2017-08-12-LevelDB-log-format-and-recordtype.jpg-900width)
+![LevelDB-log-format-and-recordtype](http://img.draveness.me/2017-08-12-LevelDB-log-format-and-recordtype.jpg-1000width)
 
 上图中一共包含 4 个块，其中存储着 6 条日志记录，我们可以通过 `RecordType` 对每一条日志记录或者日志记录的一部分进行标记，并在日志需要使用时通过该信息重新构造出这条日志记录。
 
@@ -241,7 +241,7 @@ virtual Status Sync() {
 
 当一条数据的记录写入日志时，这条记录仍然无法被查询，只有当该数据写入 memtable 后才可以被查询，而这也是这一节将要介绍的内容，无论是数据的插入还是数据的删除都会向 memtable 中添加一条记录。
 
-![LevelDB-Memtable-Key-Value-Format](http://img.draveness.me/2017-08-12-LevelDB-Memtable-Key-Value-Format.jpg-900width)
+![LevelDB-Memtable-Key-Value-Format](http://img.draveness.me/2017-08-12-LevelDB-Memtable-Key-Value-Format.jpg-1000width)
 
 添加和删除的记录的区别就是它们使用了不用的 `ValueType` 标记，插入的数据会将其设置为 `kTypeValue`，删除的操作会标记为 `kTypeDeletion`；但是它们实际上都向 memtable 中插入了一条数据。
 
@@ -278,7 +278,7 @@ int InternalKeyComparator::Compare(const Slice& akey, const Slice& bkey) const {
 
 该方法分别从两个不同的 key 中取出键和序列号，然后对它们进行比较；比较的过程就是使用 `InternalKeyComparator` 比较器，它通过 `user_key` 和 `sequence_number` 进行排序，其中 `user_key` 按照递增的顺序排序、`sequence_number` 按照递减的顺序排序，因为随着数据的插入序列号是不断递增的，所以我们可以保证先取到的都是最新的数据或者删除信息。
 
-![LevelDB-MemTable-SkipList](http://img.draveness.me/2017-08-12-LevelDB-MemTable-SkipList.jpg-900width)
+![LevelDB-MemTable-SkipList](http://img.draveness.me/2017-08-12-LevelDB-MemTable-SkipList.jpg-1000width)
 
 在序列号的帮助下，我们并不需要对历史数据进行删除，同时也能加快写操作的速度，提升 LevelDB 的写性能。
 
@@ -288,7 +288,7 @@ int InternalKeyComparator::Compare(const Slice& akey, const Slice& bkey) const {
 
 > LevelDB 总会将新的键值对写在最前面，并在数据压缩时删除历史数据。
 
-![LevelDB-Read-Processes](http://img.draveness.me/2017-08-12-LevelDB-Read-Processes.jpg-900width)
+![LevelDB-Read-Processes](http://img.draveness.me/2017-08-12-LevelDB-Read-Processes.jpg-1000width)
 
 数据的读取是按照 MemTable、Immutable MemTable 以及不同层级的 SSTable 的顺序进行的，前两者都是在内存中，后面不同层级的 SSTable 都是以 `*.ldb` 文件的形式持久存储在磁盘上，而正是因为有着不同层级的 SSTable，所以我们的数据库的名字叫做 LevelDB。
 
@@ -316,15 +316,15 @@ Status DBImpl::Get(const ReadOptions& options, const Slice& key, std::string* va
 
 当 LevelDB 在内存中没有找到对应的数据时，它才会到磁盘中多个层级的 SSTable 中进行查找，这个过程就稍微有一点复杂了，LevelDB 会在多个层级中逐级进行查找，并且不会跳过其中的任何层级；在查找的过程就涉及到一个非常重要的数据结构 `FileMetaData`：
 
-![FileMetaData](http://img.draveness.me/2017-08-12-FileMetaData.jpg-900width)
+![FileMetaData](http://img.draveness.me/2017-08-12-FileMetaData.jpg-1000width)
 
 `FileMetaData` 中包含了整个文件的全部信息，其中包括键的最大值和最小值、允许查找的次数、文件被引用的次数、文件的大小以及文件号，因为所有的 `SSTable` 都是以固定的形式存储在同一目录下的，所以我们可以通过文件号轻松查找到对应的文件。
 
-![LevelDB-Level0-Laye](http://img.draveness.me/2017-08-12-LevelDB-Level0-Layer.jpg-900width)
+![LevelDB-Level0-Laye](http://img.draveness.me/2017-08-12-LevelDB-Level0-Layer.jpg-1000width)
 
 查找的顺序就是从低到高了，LevelDB 首先会在 Level0 中查找对应的键。但是，与其他层级不同，Level0 中多个 SSTable 的键的范围有重合部分的，在查找对应值的过程中，会依次查找 Level0 中固定的 4 个 SSTable。
 
-![LevelDB-LevelN-Layers](http://img.draveness.me/2017-08-12-LevelDB-LevelN-Layers.jpg-900width)
+![LevelDB-LevelN-Layers](http://img.draveness.me/2017-08-12-LevelDB-LevelN-Layers.jpg-1000width)
 
 但是当涉及到更高层级的 SSTable 时，因为同一层级的 SSTable 都是没有重叠部分的，所以我们在查找时可以利用已知的 SSTable 中的极值信息 `smallest/largest` 快速查找到对应的 SSTable，再判断当前的 SSTable 是否包含查询的 key，如果不存在，就继续查找下一个层级直到最后的一个层级 `kNumLevels`（默认为 7 级）或者查询到了对应的值。
 
@@ -334,7 +334,7 @@ Status DBImpl::Get(const ReadOptions& options, const Slice& key, std::string* va
 
 无论是读操作还是写操作，在执行的过程中都可能调用 `MaybeScheduleCompaction` 来尝试对数据库中的 SSTable 进行合并，当合并的条件满足时，最终都会执行 `BackgroundCompaction` 方法在后台完成这个步骤。
 
-![LevelDB-BackgroundCompaction-Processes](http://img.draveness.me/2017-08-12-LevelDB-BackgroundCompaction-Processes.jpg-900width)
+![LevelDB-BackgroundCompaction-Processes](http://img.draveness.me/2017-08-12-LevelDB-BackgroundCompaction-Processes.jpg-1000width)
 
 这种合并分为两种情况，一种是 Minor Compaction，即内存中的数据超过了 memtable 大小的最大限制，改 memtable 被冻结为不可变的 imm，然后执行方法 `CompactMemTable()` 对内存表进行压缩。
 
@@ -388,11 +388,11 @@ void DBImpl::BackgroundCompaction() {
 
 > 查询次数太多的意思就是，当客户端调用多次 `Get` 方法时，如果这次 `Get` 方法在某个层级的 SSTable 中找到了对应的键，那么就算做上一层级中包含该键的 SSTable 的一次查找，也就是这次查找由于不同层级键的覆盖范围造成了更多的耗时，每个 SSTable 在创建之后的 `allowed_seeks` 都为 100 次，当 `allowed_seeks < 0` 时就会触发该文件的与更高层级和合并，以减少以后查询的查找次数。
 
-![LevelDB-Pick-Compactions](http://img.draveness.me/2017-08-12-LevelDB-Pick-Compactions.jpg-900width)
+![LevelDB-Pick-Compactions](http://img.draveness.me/2017-08-12-LevelDB-Pick-Compactions.jpg-1000width)
 
 LevelDB 中的 `DoCompactionWork` 方法会对所有传入的 SSTable 中的键值使用归并排序进行合并，最后会在高高层级（图中为 Level2）中生成一个新的 SSTable。
 
-![LevelDB-After-Compactions](http://img.draveness.me/2017-08-12-LevelDB-After-Compactions.jpg-900width)
+![LevelDB-After-Compactions](http://img.draveness.me/2017-08-12-LevelDB-After-Compactions.jpg-1000width)
 
 这样下一次查询 17~40 之间的值时就可以减少一次对 SSTable 中数据的二分查找以及读取文件的时间，提升读写的性能。
 
@@ -400,7 +400,7 @@ LevelDB 中的 `DoCompactionWork` 方法会对所有传入的 SSTable 中的键�
 
 LevelDB 中的所有状态其实都是被一个 `VersionSet` 结构所存储的，一个 `VersionSet` 包含一组 `Version` 结构体，所有的 `Version` 包括历史版本都是通过双向链表连接起来的，但是只有一个版本是当前版本。
 
-![VersionSet-Version-And-VersionEdit](http://img.draveness.me/2017-08-12-VersionSet-Version-And-VersionEdit.jpg-900width)
+![VersionSet-Version-And-VersionEdit](http://img.draveness.me/2017-08-12-VersionSet-Version-And-VersionEdit.jpg-1000width)
 
 当 LevelDB 中的 SSTable 发生变动时，它会生成一个 `VersionEdit` 结构，最终执行 `LogAndApply` 方法：
 
@@ -435,11 +435,11 @@ Status VersionSet::LogAndApply(VersionEdit* edit, port::Mutex* mu) {
 
 SSTable 中其实存储的不只是数据，其中还保存了一些元数据、索引等信息，用于加速读写操作的速度，虽然在 Bigtable 的论文中并没有给出 SSTable 的数据格式，不过在 LevelDB 的实现中，我们可以发现 SSTable 是以这种格式存储数据的：
 
-![SSTable-Format](http://img.draveness.me/2017-08-12-SSTable-Format.jpg-900width)
+![SSTable-Format](http://img.draveness.me/2017-08-12-SSTable-Format.jpg-1000width)
 
 当 LevelDB 读取 SSTable 存在的 `ldb` 文件时，会先读取文件中的 `Footer` 信息。
 
-![SSTable-Foote](http://img.draveness.me/2017-08-12-SSTable-Footer.jpg-900width)
+![SSTable-Foote](http://img.draveness.me/2017-08-12-SSTable-Footer.jpg-1000width)
 
 整个 `Footer` 在文件中占用 48 个字节，我们能在其中拿到 MetaIndex 块和 Index 块的位置，再通过其中的索引继而找到对应值存在的位置。
 

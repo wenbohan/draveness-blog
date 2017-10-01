@@ -13,7 +13,7 @@ tags: iOS RAC
 
 在很多情况下，虽然使用 `RACSignal` 和 `RACSubject` 就能解决绝大部分问题，但是 `RACCommand` 的使用会为我们带来巨大的便利，尤其是在与副作用相关的操作中。
 
-![What-is-RACCommand](http://img.draveness.me/2017-02-10-What-is-RACCommand.png-900width)
+![What-is-RACCommand](http://img.draveness.me/2017-02-10-What-is-RACCommand.png-1000width)
 
 > 文章中不会讨论 `RACCommand` 中的并行执行问题，也就是忽略了 `allowsConcurrentExecution` 以及 `allowsConcurrentExecutionSubject` 的存在，不过它们确实在 `RACCommand` 中非常重要，这里只是为了减少不必要的干扰因素。
 
@@ -51,7 +51,7 @@ tags: iOS RAC
 
 这也就是 `RACCommand` 将外部变量（或『副作用』）传入 ReactiveCocoa 内部的方法，你可以理解为 `RACCommand` 将外部的变量 `InputType` 转换成了使用 `RACSignal` 包裹的 `ValueType` 对象。
 
-![Execute-For-RACCommand](http://img.draveness.me/2017-02-10-Execute-For-RACCommand.png-900width)
+![Execute-For-RACCommand](http://img.draveness.me/2017-02-10-Execute-For-RACCommand.png-1000width)
 
 我们以下面的代码为例，先来看一下 `RACCommand` 是如何工作的：
 
@@ -96,7 +96,7 @@ RACCommand *command = [[RACCommand alloc] initWithSignalBlock:^RACSignal * _Nonn
 
 每次 `executionSignals` 中发送了新的信号时，`switchToLatest` 方法返回的信号都会订阅这个最新的信号，这里也就保证了每次都会打印出最新的信号中的值。
 
-![Multiple-Executes](http://img.draveness.me/2017-02-10-Multiple-Executes.png-900width)
+![Multiple-Executes](http://img.draveness.me/2017-02-10-Multiple-Executes.png-1000width)
 
 在上面代码中还有最后一个问题需要回答，为什么要使用 `RACScheduler.mainThreadScheduler` 延迟调用之后的 `-execute:` 方法？由于在默认情况下 `RACCommand` 都是不支持并发操作的，需要在上一次命令执行之后才可以发送下一次操作，否则就会返回错误信号 `RACErrorSignal`，这些错误可以通过订阅 `command.errors` 获得。
 
@@ -148,7 +148,7 @@ RACCommand *command = [[RACCommand alloc] initWithSignalBlock:^RACSignal * _Nonn
 
 在方法中这里你也能看到连续几次执行 `-execute:` 方法不能成功的原因：每次执行这个方法时，都会从另一个信号 `immediateEnabled` 中读取是否能执行当前命令的 `BOOL` 值，如果不可以执行的话，就直接返回 `RACErrorSignal`。
 
-![Execute-on-RACCommand](http://img.draveness.me/2017-02-10-Execute-on-RACCommand.png-900width)
+![Execute-on-RACCommand](http://img.draveness.me/2017-02-10-Execute-on-RACCommand.png-1000width)
 
 > `-execute:` 方法是唯一一个为 `addedExecutionSignalsSubject` 生产信息的方法。
 
@@ -228,7 +228,7 @@ RACSignal *immediateExecuting = [[[[self.addedExecutionSignalsSubject
 
 那么，最后生成的高阶信号 `immediateExecuting` 如下：
 
-![immediateExecuting-Signal-in-RACCommand](http://img.draveness.me/2017-02-10-immediateExecuting-Signal-in-RACCommand.png-900width)
+![immediateExecuting-Signal-in-RACCommand](http://img.draveness.me/2017-02-10-immediateExecuting-Signal-in-RACCommand.png-1000width)
 
 1. `-catchTo:` 将所有的错误转换成 `RACEmptySignal` 信号；
 2. `-flattenMap:` 将每一个信号的开始和结束的时间点转换成 `1` 和 `-1` 两个信号；
@@ -251,7 +251,7 @@ RACSignal *moreExecutionsAllowed = [RACSignal
 
 因为文章中不准备介绍与并发执行有关的内容，所以这里的 `then` 语句永远不会执行，既然 `RACCommand` 不支持并行操作，那么这段代码就非常好理解了，当前 `RACCommand` 能否执行操作就是 `immediateExecuting` 取反：
 
-![MoreExecutionAllowed-Signa](http://img.draveness.me/2017-02-10-MoreExecutionAllowed-Signal.png-900width)
+![MoreExecutionAllowed-Signa](http://img.draveness.me/2017-02-10-MoreExecutionAllowed-Signal.png-1000width)
 
 到这里所有初始化方法中的临时信号就介绍完了，在下一节中会继续介绍初始化方法中的其它高阶信号。
 
@@ -259,7 +259,7 @@ RACSignal *moreExecutionsAllowed = [RACSignal
 
 每一个 `RACCommand` 对象中都管理着多个信号，它在接口中暴露出的四个信号是这一节关注的重点：
 
-![RACCommand-Interface](http://img.draveness.me/2017-02-10-RACCommand-Interface.png-900width)
+![RACCommand-Interface](http://img.draveness.me/2017-02-10-RACCommand-Interface.png-1000width)
 
 这一小节会按照顺序图中从上到下的顺序介绍 `RACCommand` 接口中暴露出来的信号，同时会涉及一些为了生成这些信号的中间产物。
 
@@ -280,7 +280,7 @@ _executionSignals = [[[self.addedExecutionSignalsSubject
 
 它只是将信号中的所有的错误 `NSError` 转换成了 `RACEmptySignal` 对象，并派发到主线程上。
 
-![Execution-Signals](http://img.draveness.me/2017-02-10-Execution-Signals.png-900width)
+![Execution-Signals](http://img.draveness.me/2017-02-10-Execution-Signals.png-1000width)
 
 如果你只订阅了 `executionSignals`，那么其实你不会收到任何的错误，所有的错误都会以 `-sendNext:` 的形式被发送到 `errors` 信号中，这会在后面详细介绍。
 
@@ -299,7 +299,7 @@ _executing = [[[[[immediateExecuting
 
 这里对 `immediateExecuting` 的变换还是非常容易理解的：
 
-![Executing-Signa](http://img.draveness.me/2017-02-10-Executing-Signal.png-900width)
+![Executing-Signa](http://img.draveness.me/2017-02-10-Executing-Signal.png-1000width)
 
 最后的 `replayLast` 方法将原有的信号变成了容量为 `1` 的 `RACReplaySubject` 对象，这样在每次有订阅者订阅 `executing` 信号时，都只会发送最新的状态，因为订阅者并不关心过去的 `executing` 的值。
 
@@ -319,7 +319,7 @@ _immediateEnabled = [[[[RACSignal
 
 虽然这个信号的实现比较简单，不过它同时与三个信号有关，`enabledSignal`、`moreExecutionsAllowed` 以及 `rac_willDeallocSignal`：
 
-![Immediate-Enabled-Signa](http://img.draveness.me/2017-02-10-Immediate-Enabled-Signal.png-900width)
+![Immediate-Enabled-Signa](http://img.draveness.me/2017-02-10-Immediate-Enabled-Signal.png-1000width)
 
 虽然图中没有体现出方法 `-takeUntil:self.rac_willDeallocSignal` 的执行，不过你需要知道，这个信号在当前 `RACCommand` 执行 `dealloc` 之后就不会再发出任何消息了。
 
@@ -370,7 +370,7 @@ _errors = [errorsConnection.signal setNameWithFormat:@"%@ -errors", self];
 
 信号的创建过程是把所有的错误消息重新打包成 `RACErrorSignal` 并在主线程上进行派发：
 
-![Errors-Signals](http://img.draveness.me/2017-02-10-Errors-Signals.png-900width)
+![Errors-Signals](http://img.draveness.me/2017-02-10-Errors-Signals.png-1000width)
 
 使用者只需要调用 `-subscribeNext:` 就可以从这个信号中获取所有执行过程中发生的错误。
 
@@ -416,7 +416,7 @@ RACCommand *command = [[RACCommand alloc] initWithSignalBlock:^RACSignal * _Nonn
 
 使用 `RACCommand` 能够优雅地将包含副作用的操作和与副作用无关的操作分隔起来；整个 `RACCommand` 相当于一个黑箱，从 `-execute:` 方法中获得输入，最后以向信号发送消息的方式，向订阅者推送结果。
 
-![RACCommand-Side-Effect](http://img.draveness.me/2017-02-10-RACCommand-Side-Effect.png-900width)
+![RACCommand-Side-Effect](http://img.draveness.me/2017-02-10-RACCommand-Side-Effect.png-1000width)
 
 这种执行任务的方式就像是一个函数，根据输入的不同，有着不同的输出，非常适合与 UI、网络操作的相关的任务，这也是 `RACCommand` 的设计的优雅之处。
 

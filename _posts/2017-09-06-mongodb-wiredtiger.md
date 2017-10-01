@@ -3,7 +3,7 @@ layout: post
 title: 『浅入浅出』MongoDB 和 WiredTiger
 permalink: /mongodb-wiredtiger.html
 tags: MongoDB WiredTiger Database Server NoSQL
-cover: http://img.draveness.me/2017-09-06-MongoDB-Covers.jpg-900width
+cover: http://img.draveness.me/2017-09-06-MongoDB-Covers.jpg-1000width
 desc: MongoDB 是目前主流的 NoSQL 数据库之一，与关系型数据库和其它的 NoSQL 不同，MongoDB 使用了面向文档的数据存储方式，将数据以类似 JSON 的方式存储在磁盘上，因为项目上的一些历史遗留问题，作者在最近的工作中也不得不经常与 MongoDB 打交道，这也是这篇文章出现的原因。
 ---
 
@@ -13,7 +13,7 @@ desc: MongoDB 是目前主流的 NoSQL 数据库之一，与关系型数据库�
 
 MongoDB 是目前主流的 NoSQL 数据库之一，与关系型数据库和其它的 NoSQL 不同，MongoDB 使用了面向文档的数据存储方式，将数据以类似 JSON 的方式存储在磁盘上，因为项目上的一些历史遗留问题，作者在最近的工作中也不得不经常与 MongoDB 打交道，这也是这篇文章出现的原因。
 
-![logo](http://img.draveness.me/2017-09-06-logo.png-900width)
+![logo](http://img.draveness.me/2017-09-06-logo.png-1000width)
 
 虽然在之前也对 MongoDB 有所了解，但是真正在项目中大规模使用还是第一次，使用过程中也暴露了大量的问题，不过在这里，我们主要对 MongoDB 中的一些重要概念的原理进行介绍，也会与 MySQL 这种传统的关系型数据库做一个对比，让读者自行判断它们之间的优势和劣势。
 
@@ -21,13 +21,13 @@ MongoDB 是目前主流的 NoSQL 数据库之一，与关系型数据库和其�
 
 MongoDB 虽然也是数据库，但是它与传统的 RDBMS 相比有着巨大的不同，很多开发者都认为或者被灌输了一种思想，MongoDB 这种无 Scheme 的数据库相比 RDBMS 有着巨大的性能提升，这个判断其实是一种误解；因为数据库的性能不止与数据库本身的设计有关系，还与开发者对表结构和索引的设计、存储引擎的选择和业务有着巨大的关系，如果认为**仅进行了数据库的替换就能得到数量级的性能提升**，那还是太年轻了。
 
-![its-not-always-simple-banner](http://img.draveness.me/2017-09-06-its-not-always-simple-banner.jpg-900width)
+![its-not-always-simple-banner](http://img.draveness.me/2017-09-06-its-not-always-simple-banner.jpg-1000width)
 
 ### 架构
 
 现有流行的数据库其实都有着非常相似的架构，MongoDB 其实就与 MySQL 中的架构相差不多，底层都使用了『可插拔』的存储引擎以满足用户的不同需要。
 
-![MongoDB-Architecture](http://img.draveness.me/2017-09-06-MongoDB-Architecture.jpg-900width)
+![MongoDB-Architecture](http://img.draveness.me/2017-09-06-MongoDB-Architecture.jpg-1000width)
 
 用户可以根据表中的数据特征选择不同的存储引擎，它们可以在同一个 MongoDB 的实例中使用；在最新版本的 MongoDB 中使用了 WiredTiger 作为默认的存储引擎，WiredTiger 提供了不同粒度的并发控制和压缩机制，能够为不同种类的应用提供了最好的性能和存储效率。
 
@@ -51,7 +51,7 @@ db.collection.updateMany(
 
 MongoDB 使用面向文档的的数据模型，导致很多概念都与 RDBMS 有一些差别，虽然从总体上来看两者都有相对应的概念，不过概念之间细微的差别其实也会影响我们对 MongoDB 的理解：
 
-![Translating-Between-RDBMS-and-MongoDB](http://img.draveness.me/2017-09-06-Translating-Between-RDBMS-and-MongoDB.jpg-900width)
+![Translating-Between-RDBMS-and-MongoDB](http://img.draveness.me/2017-09-06-Translating-Between-RDBMS-and-MongoDB.jpg-1000width)
 
 传统的 RDBMS 其实使用 `Table` 的格式将数据逻辑地存储在一张二维的表中，其中不包括任何复杂的数据结构，但是由于 MongoDB 支持嵌入文档、数组和哈希等多种复杂数据结构的使用，所以它最终将所有的数据以 [BSON](http://bsonspec.org) 的数据格式存储起来。
 
@@ -80,7 +80,7 @@ RDBMS 和 MongoDB 中的概念都有着相互对应的关系，数据库、表�
 
 MongoDB 与 RDBMS 之间最大的不同，就是数据模型的设计有着非常明显的差异，数据模型的不同决定了它有着非常不同的特性，存储在 MongoDB 中的数据有着非常灵活的 Schema，我们不需要像 RDBMS 一样，在插入数据之前就决定并且定义表中的数据结构，MongoDB 的结合不对 Collection 的数据结构进行任何限制，但是在实际使用中，同一个 Collection 中的大多数文档都具有类似的结构。
 
-![Different-Data-Structure](http://img.draveness.me/2017-09-06-Different-Data-Structure.jpg-900width)
+![Different-Data-Structure](http://img.draveness.me/2017-09-06-Different-Data-Structure.jpg-1000width)
 
 在为 MongoDB 应用设计数据模型时，如何表示数据模型之间的关系其实是需要开发者需要仔细考虑的，MongoDB 为表示文档之间的关系提供了两种不同的方法：引用和嵌入。
 
@@ -88,13 +88,13 @@ MongoDB 与 RDBMS 之间最大的不同，就是数据模型的设计有着非�
 
 引用（Reference）在 MongoDB 中被称为标准化的数据模型，它与 MySQL 的外键非常相似，每一个文档都可以通过一个 `xx_id` 的字段『链接』到其他的文档：
 
-![Reference-MongoDB](http://img.draveness.me/2017-09-06-Reference-MongoDB.jpg-900width)
+![Reference-MongoDB](http://img.draveness.me/2017-09-06-Reference-MongoDB.jpg-1000width)
 
 但是 MongoDB 中的这种引用不像 MySQL 中可以直接通过 JOIN 进行查找，我们需要使用额外的查询找到该引用对应的模型，这虽然提供了更多的灵活性，不过由于增加了客户端和 MongoDB 之间的交互次数（Round-Trip）也会导致查询变慢，甚至非常严重的性能问题。
 
 MongoDB 中的引用并不会对引用对应的数据模型是否真正存在做出任何的约束，所以如果在应用层级没有对文档之间的关系有所约束，那么就可能会出现引用了指向不存在的文档的问题：
 
-![Not-Found-Document](http://img.draveness.me/2017-09-06-Not-Found-Document.jpg-900width)
+![Not-Found-Document](http://img.draveness.me/2017-09-06-Not-Found-Document.jpg-1000width)
 
 虽然引用有着比较严重的性能问题并且在数据库层面没有对模型是否被删除加上限制，不过它提供的一些特点是嵌入式的文档无法给予了，当我们需要表示多对多关系或者更加庞大的数据集时，就可以考虑使用标准化的数据模型 — 引用了。
 
@@ -102,7 +102,7 @@ MongoDB 中的引用并不会对引用对应的数据模型是否真正存在做
 
 除了与 MySQL 中非常相似的引用，MongoDB 由于其独特的数据存储方式，还提供了嵌入式的数据模型，嵌入式的数据模型也被认为是不标准的数据模型：
 
-![Embedded-Data-Models-MongoDB](http://img.draveness.me/2017-09-06-Embedded-Data-Models-MongoDB.jpg-900width)
+![Embedded-Data-Models-MongoDB](http://img.draveness.me/2017-09-06-Embedded-Data-Models-MongoDB.jpg-1000width)
 
 因为 MongoDB 使用 BSON 的数据格式对数据进行存储，而嵌入式数据模型中的子文档其实就是父文档中的另一个值，只是其中存储的是一个对象：
 
@@ -132,7 +132,7 @@ MongoDB 中的引用并不会对引用对应的数据模型是否真正存在做
 
 MongoDB 中索引的概念其实与 MySQL 中的索引相差不多，无论是底层的数据结构还是基本的索引类型都几乎完全相同，两者之间的区别就在于因为 MongoDB 支持了不同类型的数据结构，所以也理所应当地提供了更多的索引种类。
 
-![MongoDB-Indexes](http://img.draveness.me/2017-09-06-MongoDB-Indexes.jpg-900width)
+![MongoDB-Indexes](http://img.draveness.me/2017-09-06-MongoDB-Indexes.jpg-1000width)
 
 ### 默认索引
 
@@ -140,7 +140,7 @@ MySQL 中的每一个数据行都具有一个主键，数据库中的数据都�
 
 而 MongoDB 中所有的文档也都有一个唯一的 `_id` 字段，在默认情况下所有的文档都使用一个长 12 字节的 `ObjectId` 作为默认索引：
 
-![MongoDB-ObjectId](http://img.draveness.me/2017-09-06-MongoDB-ObjectId.jpg-900width)
+![MongoDB-ObjectId](http://img.draveness.me/2017-09-06-MongoDB-ObjectId.jpg-1000width)
 
 前四位代表当前 `_id` 生成时的 Unix 时间戳，在这之后是三位的机器标识符和两位的处理器标识符，最后是一个三位的计数器，初始值就是一个随机数；通过这种方式代替递增的 `id` 能够解决分布式的 MongoDB 生成唯一标识符的问题，同时可以在一定程度上保证 `id` 的的增长是递增的。
 
@@ -154,7 +154,7 @@ db.users.createIndex( { age: -1 } )
 
 MySQL8.0 之前的索引都只能是正序排列的，在 8.0 之后才引入了逆序的索引，单一字段索引可以说是 MySQL 中的辅助（Secondary）索引的一个子集，它只是对除了 `_id` 外的任意单一字段建立起正序或者逆序的索引树。
 
-![Single-Field-Index](http://img.draveness.me/2017-09-06-Single-Field-Index.jpg-900width)
+![Single-Field-Index](http://img.draveness.me/2017-09-06-Single-Field-Index.jpg-1000width)
 
 ### 复合索引（Compound）
 
@@ -167,7 +167,7 @@ db.users.createIndex( { username: 1, age: 1 } )
 
 上面的两个索引是完全不同的，在磁盘上的 B+ 树其实也按照了完全不同的顺序进行存储，虽然 `username` 字段都是升序排列的，但是对于 `age` 来说，两个索引的处理是完全相反的：
 
-![Compound-Index](http://img.draveness.me/2017-09-06-Compound-Index.jpg-900width)
+![Compound-Index](http://img.draveness.me/2017-09-06-Compound-Index.jpg-1000width)
 
 这也就造成了在使用查询语句对集合中数据进行查找时，如果约定了正逆序，那么其实是会使用不同的索引的，所以在索引创建时一定要考虑好使用的场景，避免创建无用的索引。
 
@@ -189,13 +189,13 @@ db.collection.createIndex( { address: 1 } )
 
 如何存储数据就是一个比较重要的问题，在前面我们已经提到了 MongoDB 与 MySQL 一样都提供了插件化的存储引擎支持，作为 MongoDB 的主要组件之一，存储引擎全权负责了 MongoDB 对数据的管理。
 
-![Multiple-Storage-Engines](http://img.draveness.me/2017-09-06-Multiple-Storage-Engines.jpg-900width)
+![Multiple-Storage-Engines](http://img.draveness.me/2017-09-06-Multiple-Storage-Engines.jpg-1000width)
 
 ### WiredTiger
 
 MongoDB3.2 之后 WiredTiger 就是默认的存储引擎了，如果对各个存储引擎并不了解，那么还是不要改变 MongoDB 的默认存储引擎；它有着非常多的优点，比如拥有效率非常高的缓存机制：
 
-![WiredTiger-Cache](http://img.draveness.me/2017-09-06-WiredTiger-Cache.jpg-900width)
+![WiredTiger-Cache](http://img.draveness.me/2017-09-06-WiredTiger-Cache.jpg-1000width)
 
 WiredTiger 还支持在内存中和磁盘上对索引进行压缩，在压缩时也使用了前缀压缩的方式以减少 RAM 的使用，在后面的文章中我们会详细介绍和分析 WiredTiger 存储引擎是如何对各种数据进行存储的。
 
@@ -209,7 +209,7 @@ WiredTiger 还支持在内存中和磁盘上对索引进行压缩，在压缩时
 
 MongoDB 会每隔 60s 或者在 journal 数据的写入达到 2GB 时设置一次检查点，当然我们也可以通过在写入时传入 `j: true` 的参数强制 journal 文件的同步。
 
-![Checkpoints-Conditions](http://img.draveness.me/2017-09-06-Checkpoints-Conditions.jpg-900width)
+![Checkpoints-Conditions](http://img.draveness.me/2017-09-06-Checkpoints-Conditions.jpg-1000width)
 
 这篇文章并不会介绍 Journal 文件的格式以及相关的内容，作者可能会在之后介绍分析 WiredTiger 的文章中简单分析其存储格式以及一些其它特性。
 

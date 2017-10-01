@@ -11,7 +11,7 @@ tags: iOS RAC
 
 在 ReactiveCocoa 中除了不可变的信号 `RACSignal`，也有用于桥接非 RAC 代码到 ReactiveCocoa 世界的『可变』信号 `RACSubject`。
 
-![“Mutable” RACSignal — RACSubject](http://img.draveness.me/2017-02-07-“Mutable” RACSignal — RACSubject.png-900width)
+![“Mutable” RACSignal — RACSubject](http://img.draveness.me/2017-02-07-“Mutable” RACSignal — RACSubject.png-1000width)
 
 `RACSubject` 到底是什么？根据其字面意思，可以将它理解为一个可以订阅的主题，我们在订阅主题之后，向主题发送新的消息时，**所有**的订阅者都会接收到最新的消息。
 
@@ -23,7 +23,7 @@ tags: iOS RAC
 
 `RACSubject` 是 `RACSignal` 的子类，与 `RACSignal` 以及 `RACSequence` 有着众多的类簇不同，`RACSubject` 在整个工程中并没有多少子类；不过，在大多数情况下，我们也只会使用 `RACSubject` 自己或者 `RACReplaySubject`。
 
-![RACSubject - Subclasses](http://img.draveness.me/2017-02-07-RACSubject - Subclasses.png-900width)
+![RACSubject - Subclasses](http://img.draveness.me/2017-02-07-RACSubject - Subclasses.png-1000width)
 
 相比于 `RACSignal` 丰富的头文件 ，`RACSubject` 对外的接口并没有提供太多的方法：
 
@@ -59,7 +59,7 @@ tags: iOS RAC
 
 对于冷热信号概念，我们借用 Rx 中的描述：
 
-![Hot-Signal-And-Cold-Signa](http://img.draveness.me/2017-02-07-Hot-Signal-And-Cold-Signal.png-900width)
+![Hot-Signal-And-Cold-Signa](http://img.draveness.me/2017-02-07-Hot-Signal-And-Cold-Signal.png-1000width)
 
 > Cold signal is sequences that are passive and start producing notifications on request (when subscribed to), and hot signal is sequences that are active and produce notifications regardless of subscriptions. ---- [Hot and Cold observables](http://www.introtorx.com/content/v1.0.10621.0/14_HotAndColdObservables.html)
 
@@ -102,7 +102,7 @@ RACSubject *subject = [RACSubject subject];
 
 这里以图的方式来展示整个订阅与订阅者接收消息的过程：
 
-![Track-RACSubject-Subscription-Process](http://img.draveness.me/2017-02-07-Track-RACSubject-Subscription-Process.png-900width)
+![Track-RACSubject-Subscription-Process](http://img.draveness.me/2017-02-07-Track-RACSubject-Subscription-Process.png-1000width)
 
 从图中我们可以清楚的看到，几个订阅者根据**订阅时间**的不同收到了不同的数字序列，`RACSubject` 是**时间相关**的，它在发送消息时只会向已订阅的订阅者推送消息。
 
@@ -140,7 +140,7 @@ RACSubject *subject = [RACSubject subject];
 2. 将 `subscriber` 加入 `RACSubject` 持有的数组中；
 3. 创建一个 `RACDisposable` 对象，在当前 `subscriber` 销毁时，将自身从数组中移除。
 
-![Send-Subscibe-to-RACSubject](http://img.draveness.me/2017-02-07-Send-Subscibe-to-RACSubject.png-900width)
+![Send-Subscibe-to-RACSubject](http://img.draveness.me/2017-02-07-Send-Subscibe-to-RACSubject.png-1000width)
 
 `-subscribe:` 将所有遵循 `RACSubscriber` 协议的对象全部加入当前 `RACSubject` 持有的数组 `subscribers` 中。
 
@@ -172,7 +172,7 @@ RACSubject *subject = [RACSubject subject];
 
 `RACSubject` 会在自身接受到这些方法时，下发给持有的全部的 `subscribers`。
 
-![Send-Messages-to-RACSubject](http://img.draveness.me/2017-02-07-Send-Messages-to-RACSubject.png-900width)
+![Send-Messages-to-RACSubject](http://img.draveness.me/2017-02-07-Send-Messages-to-RACSubject.png-1000width)
 
 代码中的 `-enumerateSubscribersUsingBlock:` 只是一个使用 `for` 循环遍历 `subscribers` 的安全方法：
 
@@ -291,7 +291,7 @@ RACBehaviorSubject *subject = [RACBehaviorSubject subject];
 
 上面的代码其实与 `RACSubject` 一节中的代码差不多，只将 `RACSubject` 转换成了 `RACBehaviorSubject` 对象。
 
-![Track-RACBehaviorSubject-Subscription-Process](http://img.draveness.me/2017-02-07-Track-RACBehaviorSubject-Subscription-Process.png-900width)
+![Track-RACBehaviorSubject-Subscription-Process](http://img.draveness.me/2017-02-07-Track-RACBehaviorSubject-Subscription-Process.png-1000width)
 
 在每次订阅者订阅 `RACBehaviorSubject` 之后，都会向该订阅者发送**最新**的消息，这也就是 `RACBehaviorSubject` 最重要的行为。
 
@@ -303,7 +303,7 @@ RACBehaviorSubject *subject = [RACBehaviorSubject behaviorSubjectWithDefaultValu
 
 那么在第一个订阅者刚订阅 `RACBehaviorSubject` 时就会收到 `@0` 对象。
 
-![Track-RACBehaviorSubject-Subscription-Process-With-Default-Value](http://img.draveness.me/2017-02-07-Track-RACBehaviorSubject-Subscription-Process-With-Default-Value.png-900width)
+![Track-RACBehaviorSubject-Subscription-Process-With-Default-Value](http://img.draveness.me/2017-02-07-Track-RACBehaviorSubject-Subscription-Process-With-Default-Value.png-1000width)
 
 ### RACReplaySubject
 
@@ -358,7 +358,7 @@ const NSUInteger RACReplaySubjectUnlimitedCapacity = NSUIntegerMax;
 
 需要注意的有两点，一是对 `valuesReceived` 的数组的操作必须使用 `@synchronized` 加锁；第二，如果 `value` 为空的话，也需要将其转换成 `RACTupleNil.tupleNil` 对象进行保存。
 
-![Send-Messages-to-RACReplaySubject](http://img.draveness.me/2017-02-07-Send-Messages-to-RACReplaySubject.png-900width)
+![Send-Messages-to-RACReplaySubject](http://img.draveness.me/2017-02-07-Send-Messages-to-RACReplaySubject.png-1000width)
 
 `-sendError:` 和 `-sendCompleted` 方法都会标记对应 `flag`，即 `hasCompleted` 和 `hasError`，这里就不介绍了；同样的，`RACReplaySubject` 也覆写了 `-subscribe:` 方法，在每次有订阅者订阅时重新发送所有的序列：
 
@@ -417,7 +417,7 @@ RACReplaySubject *subject = [RACReplaySubject subject];
 
 运行这段代码之后，会得到如下图的结果：
 
-![Track-RACReplaySubject-Subscription-Process](http://img.draveness.me/2017-02-07-Track-RACReplaySubject-Subscription-Process.png-900width)
+![Track-RACReplaySubject-Subscription-Process](http://img.draveness.me/2017-02-07-Track-RACReplaySubject-Subscription-Process.png-1000width)
 
 所有订阅 `RACReplaySubject` 的对象（默认行为）都能获得完整的序列，而这个特性在与 `RACMulticastConnection` 一起使用也有着巨大威力，我们会在之后的文章中介绍。
 
