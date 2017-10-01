@@ -3,7 +3,7 @@ layout: post
 title: MySQL 索引设计概要
 permalink: /sql-index-intro.html
 tags: MySQL Database Index Server
-cover: http://img.draveness.me/2017-08-06-mysql-cover.jpg-1000width
+cover: https://img.draveness.me/2017-08-06-mysql-cover.jpg-1000width
 desc: 在关系型数据库中设计索引其实并不是复杂的事情，很多开发者都觉得设计索引能够提升数据库的性能，相关的知识一定非常复杂，然而这种想法是不正确的，索引其实并不是一个多么高深莫测的东西，只要我们掌握一定的方法，理解索引的实现就能在不需要 DBA 的情况下设计出高效的索引。
 ---
 
@@ -12,7 +12,7 @@ desc: 在关系型数据库中设计索引其实并不是复杂的事情，很�
 
 在关系型数据库中设计索引其实并不是复杂的事情，很多开发者都觉得设计索引能够提升数据库的性能，相关的知识一定非常复杂。
 
-![Index-and-Performance](http://img.draveness.me/2017-09-11-Index-and-Performance.jpg-1000width)
+![Index-and-Performance](https://img.draveness.me/2017-09-11-Index-and-Performance.jpg-1000width)
 
 然而这种想法是不正确的，索引其实并不是一个多么高深莫测的东西，只要我们掌握一定的方法，理解索引的实现就能在不需要 DBA 的情况下设计出高效的索引。
 
@@ -22,11 +22,11 @@ desc: 在关系型数据库中设计索引其实并不是复杂的事情，很�
 
 一个数据库必须保证其中存储的所有数据都是可以随时读写的，同时因为 MySQL 中所有的数据其实都是以文件的形式存储在磁盘上的，而从磁盘上**随机访问**对应的数据非常耗时，所以数据库程序和操作系统提供了缓冲池和内存以提高数据的访问速度。
 
-![Disk-IO](http://img.draveness.me/2017-09-11-Disk-IO.jpg-1000width)
+![Disk-IO](https://img.draveness.me/2017-09-11-Disk-IO.jpg-1000width)
 
 除此之外，我们还需要知道数据库对数据的读取并不是以行为单位进行的，无论是读取一行还是多行，都会将该行或者多行所在的页全部加载进来，然后再读取对应的数据记录；也就是说，读取所耗费的时间与行数无关，只与页数有关。
 
-![Page-DatabaseBufferPool](http://img.draveness.me/2017-09-11-Page-DatabaseBufferPool.jpg-1000width)
+![Page-DatabaseBufferPool](https://img.draveness.me/2017-09-11-Page-DatabaseBufferPool.jpg-1000width)
 
 在 MySQL 中，页的大小一般为 16KB，不过也可能是 8KB、32KB 或者其他值，这跟 MySQL 的存储引擎对数据的存储方式有很大的关系，文中不会展开介绍，不过**索引或行记录是否在缓存池中极大的影响了访问索引或者数据的成本**。
 
@@ -34,11 +34,11 @@ desc: 在关系型数据库中设计索引其实并不是复杂的事情，很�
 
 数据库等待一个页从磁盘读取到缓存池的所需要的成本巨大的，无论我们是想要读取一个页面上的多条数据还是一条数据，都需要消耗**约** 10ms 左右的时间：
 
-![Disk-Random-IO](http://img.draveness.me/2017-09-11-Disk-Random-IO.jpg-1000width)
+![Disk-Random-IO](https://img.draveness.me/2017-09-11-Disk-Random-IO.jpg-1000width)
 
 10ms 的时间在计算领域其实是一个非常巨大的成本，假设我们使用脚本向装了 SSD 的磁盘上顺序写入字节，那么在 10ms 内可以写入大概 3MB 左右的内容，但是数据库程序在 10ms 之内只能将一页的数据加载到数据库缓冲池中，从这里可以看出随机读取的代价是巨大的。
 
-![Disk-IO-Total-Time](http://img.draveness.me/2017-09-11-Disk-IO-Total-Time.jpg-1000width)
+![Disk-IO-Total-Time](https://img.draveness.me/2017-09-11-Disk-IO-Total-Time.jpg-1000width)
 
 这 10ms 的一次随机读取是按照每秒 50 次的读取计算得到的，其中等待时间为 3ms、磁盘的实际繁忙时间约为 6ms，最终数据页从磁盘传输到缓冲池的时间为 1ms 左右，在对查询进行估算时并不需要准确的知道随机读取的时间，只需要知道估算出的 10ms 就可以了。
 
@@ -46,7 +46,7 @@ desc: 在关系型数据库中设计索引其实并不是复杂的事情，很�
 
 如果在数据库的**缓存池**中没有找到对应的数据页，那么会去内存中寻找对应的页面：
 
-![Read-from-Memory](http://img.draveness.me/2017-09-11-Read-from-Memory.jpg-1000width)
+![Read-from-Memory](https://img.draveness.me/2017-09-11-Read-from-Memory.jpg-1000width)
 
 当对应的页面存在于内存时，数据库程序就会使用内存中的页，这能够将数据的读取时间降低一个数量级，将 10ms 降低到 1ms；MySQL 在执行读操作时，会先从数据库的缓冲区中读取，如果不存在与缓冲区中就会尝试从内存中加载页面，如果前面的两个步骤都失败了，最后就只能执行随机 IO 从磁盘中获取对应的数据页。
 
@@ -54,11 +54,11 @@ desc: 在关系型数据库中设计索引其实并不是复杂的事情，很�
 
 从磁盘读取数据并不是都要付出很大的代价，当数据库管理程序一次性从磁盘中**顺序**读取大量的数据时，读取的速度会异常的快，大概在 40MB/s 左右。
 
-![Sequential-Reads-from-Disk](http://img.draveness.me/2017-09-11-Sequential-Reads-from-Disk.jpg-1000width)
+![Sequential-Reads-from-Disk](https://img.draveness.me/2017-09-11-Sequential-Reads-from-Disk.jpg-1000width)
 
 如果一个页面的大小为 4KB，那么 1s 的时间就可以读取 10000 个页，读取一个页面所花费的平均时间就是 0.1ms，相比随机读取的 10ms 已经降低了两个数量级，甚至比内存中读取数据还要快。
 
-![Random-to-Sequentia](http://img.draveness.me/2017-09-11-Random-to-Sequential.jpg-1000width)
+![Random-to-Sequentia](https://img.draveness.me/2017-09-11-Random-to-Sequential.jpg-1000width)
 
 数据页面的顺序读取有两个非常重要的优势：
 
@@ -77,7 +77,7 @@ desc: 在关系型数据库中设计索引其实并不是复杂的事情，很�
 
 索引片其实就是 SQL 查询在执行过程中扫描的一个索引片段，在这个范围中的索引将被顺序扫描，根据索引片包含的列数不同，[数据库索引设计与优化](https://www.amazon.cn/图书/dp/B00ZH27RH0) 书中对将索引分为宽索引和窄索引：
 
-![Thin-Index-and-Fat-Index](http://img.draveness.me/2017-09-11-Thin-Index-and-Fat-Index.jpg-1000width)
+![Thin-Index-and-Fat-Index](https://img.draveness.me/2017-09-11-Thin-Index-and-Fat-Index.jpg-1000width)
 
 > 主键列 `id` 在所有的 MySQL 索引中都是一定会存在的。
 
@@ -85,7 +85,7 @@ desc: 在关系型数据库中设计索引其实并不是复杂的事情，很�
 
 宽索引能够避免二次的随机 IO，而窄索引就需要在对索引进行顺序读取之后再根据主键 id 从主键索引中查找对应的数据：
 
-![Thin-Index-and-Clustered-Index](http://img.draveness.me/2017-09-11-Thin-Index-and-Clustered-Index.jpg-1000width)
+![Thin-Index-and-Clustered-Index](https://img.draveness.me/2017-09-11-Thin-Index-and-Clustered-Index.jpg-1000width)
 
 对于窄索引，每一个在索引中匹配到的记录行最终都需要执行另外的随机读取从聚集索引中获得剩余的数据，如果结果集非常大，那么就会导致随机读取的次数过多进而影响性能。
 
@@ -95,11 +95,11 @@ desc: 在关系型数据库中设计索引其实并不是复杂的事情，很�
 
 一个 SQL 查询扫描的索引片大小其实是由过滤因子决定的，也就是满足查询条件的记录行数所占的比例：
 
-![Filter-Facto](http://img.draveness.me/2017-09-11-Filter-Factor.jpg-1000width)
+![Filter-Facto](https://img.draveness.me/2017-09-11-Filter-Factor.jpg-1000width)
 
 对于 users 表来说，sex="male" 就不是一个好的过滤因子，它会选择整张表中一半的数据，所以**在一般情况下**我们最好不要使用 sex 列作为整个索引的第一列；而 name="draven" 的使用就可以得到一个比较好的过滤因子了，它的使用能过滤整个数据表中 99.9% 的数据；当然我们也可以将这三个过滤进行组合，创建一个新的索引 (name, age, sex) 并同时使用这三列作为过滤条件：
 
-![Combined-Filter-Facto](http://img.draveness.me/2017-09-11-Combined-Filter-Factor.jpg-1000width)
+![Combined-Filter-Facto](https://img.draveness.me/2017-09-11-Combined-Filter-Factor.jpg-1000width)
 
 > 当三个过滤条件都是等值谓词时，几个索引列的顺序其实是无所谓的，索引列的顺序不会影响同一个 SQL 语句对索引的选择，也就是索引 (name, age, sex) 和 (age, sex, name) 对于上图中的条件来说是完全一样的，这两个索引在执行查询时都有着完全相同的效果。
 
@@ -107,7 +107,7 @@ desc: 在关系型数据库中设计索引其实并不是复杂的事情，很�
 
 对于一张表中的同一个列，不同的值也会有不同的过滤因子，这也就造成了同一列的不同值最终的查询性能也会有很大差别：
 
-![Same-Columns-Filter-Facto](http://img.draveness.me/2017-09-11-Same-Columns-Filter-Factor.jpg-1000width)
+![Same-Columns-Filter-Facto](https://img.draveness.me/2017-09-11-Same-Columns-Filter-Factor.jpg-1000width)
 
 当我们评估一个索引是否合适时，需要考虑极端情况下查询语句的性能，比如 0% 或者 50% 等；最差的输入往往意味着最差的性能，在平均情况下表现良好的 SQL 语句在极端的输入下可能就完全无法正常工作，这也是在设计索引时需要注意的问题。
 
@@ -124,7 +124,7 @@ WHERE name = "draven" AND sex = "male" AND age > 20;
 
 虽然我们有 (name, sex, age) 索引包含了上述查询条件中的全部列，但是在这里只有 name 和 sex 两列才是匹配列，MySQL 在执行上述查询时，会选择 name 和 sex 作为匹配列，扫描所有满足条件的数据行，然后将 age 当做过滤列（Filtering Column）：
 
-![Match-Columns-Filter-Columns](http://img.draveness.me/2017-09-11-Match-Columns-Filter-Columns.jpg-1000width)
+![Match-Columns-Filter-Columns](https://img.draveness.me/2017-09-11-Match-Columns-Filter-Columns.jpg-1000width)
 
 过滤列虽然不能够减少索引片的大小，但是能够减少从表中随机读取数据的次数，所以在索引中也扮演着非常重要的角色。
 
@@ -136,7 +136,7 @@ WHERE name = "draven" AND sex = "male" AND age > 20;
 
 三星索引是对于一个查询语句可能的最好索引，如果一个查询语句的索引是三星索引，那么它只需要进行**一次磁盘的随机读及一个窄索引片的顺序扫描**就可以得到全部的结果集；因此其查询的响应时间比普通的索引会少几个数量级；根据书中对三星索引的定义，我们可以理解为主键索引对于 `WHERE id = 1` 就是一个特殊的三星索引，我们只需要对主键索引树进行一次索引访问并且顺序读取一条数据记录查询就结束了。
 
-![Three-Star-Index](http://img.draveness.me/2017-09-11-Three-Star-Index.jpg-1000width)
+![Three-Star-Index](https://img.draveness.me/2017-09-11-Three-Star-Index.jpg-1000width)
 
 为了满足三星索引中的三颗星，我们分别需要做以下几件事情：
 
@@ -148,7 +148,7 @@ WHERE name = "draven" AND sex = "male" AND age > 20;
 
 如果对于一个查询语句我们依照上述的三个条件进行设计，那么就可以得到该查询的三星索引，这三颗星中的最后一颗星往往都是最容易获得的，满足第三颗星的索引也就是上面提到的宽索引，能够避免大量的随机 IO，如果我们遵循这个顺序为一个 SQL 查询设计索引那么我们就可以得到一个完美的索引了；这三颗星的获得其实也没有表面上这么简单，每一颗星都有自己的意义：
 
-![Behind-Three-Star-Index](http://img.draveness.me/2017-09-11-Behind-Three-Star-Index.jpg-1000width)
+![Behind-Three-Star-Index](https://img.draveness.me/2017-09-11-Behind-Three-Star-Index.jpg-1000width)
 
 1. 第一颗星不只是将等值谓词的列加入索引，它的作用是减少索引片的大小以减少需要扫描的数据行；
 2. 第二颗星用于避免排序，减少磁盘 IO 和内存的使用；
@@ -165,7 +165,7 @@ ORDER BY name;
 
 在上述查询中，我们总可以通过增加索引中的列以获得第三颗星，但是如果我们想要获得第一颗星就需要最小化索引片的大小，这时索引的前缀必须为 (city, age)，在这时再想获得第三颗星就不可能了，哪怕在 age 的后面添加索引列 name，也会因为 name 在范围索引列 age 后面必须进行一次排序操作，最终得到的索引就是 (city, age, name, id)：
 
-![Different-Stars-Index](http://img.draveness.me/2017-09-11-Different-Stars-Index.jpg-1000width)
+![Different-Stars-Index](https://img.draveness.me/2017-09-11-Different-Stars-Index.jpg-1000width)
 
 如果我们需要在内存中避免排序的话，就需要交换 age 和 name 的位置了，在这时就可以得到索引 (city, name, age, id)，当一个 SQL 查询中**同时拥有范围谓词和 ORDER BY 时**，无论如何我们都是没有办法获得一个三星索引的，我们能够做的就是在这两者之间做出选择，是牺牲第一颗星还是第二颗星。
 

@@ -11,7 +11,7 @@ tags: iOS RAC
 
 ReactiveCocoa 将 Cocoa 中的 Target-Action、KVO、通知中心以及代理等设计模式都桥接到了 RAC 的世界中，我们在随后的几篇文章中会介绍 RAC 如何做到了上面的这些事情，而本篇文章会介绍 ReactiveCocoa 是如何把**代理**转换为信号的。
 
-![Delegate-To-RACSigna](http://img.draveness.me/2017-02-25-Delegate-To-RACSignal.png-1000width)
+![Delegate-To-RACSigna](https://img.draveness.me/2017-02-25-Delegate-To-RACSignal.png-1000width)
 
 ## RACDelegateProxy
 
@@ -28,7 +28,7 @@ ReactiveCocoa 将 Cocoa 中的 Target-Action、KVO、通知中心以及代理等
 
 从初始化方法中，我们可以看出 `RACDelegateProxy` 是一个包含实例变量 `_protocol` 的类：
 
-![RACDelegateProxy](http://img.draveness.me/2017-02-25-RACDelegateProxy.png-1000width)
+![RACDelegateProxy](https://img.draveness.me/2017-02-25-RACDelegateProxy.png-1000width)
 
 在整个 `RACDelegateProxy` 类的实现中，你都不太能看出与这个实例变量 `_protocol` 的关系；稍微对 iOS 有了解的人可能都知道，在 Cocoa 中有一个非常特别的根类 `NSProxy`，而从它的名字我们也可以推断出来，`NSProxy` 一般用于实现代理（主要是对消息进行转发），但是 ReactiveCocoa 中这个 `delegate` 的代理 `RACDelegateProxy` 并没有继承这个 `NSProxy` 根类：
 
@@ -40,7 +40,7 @@ ReactiveCocoa 将 Cocoa 中的 Target-Action、KVO、通知中心以及代理等
 
 那么 `RACDelegateProxy` 是如何作为 Cocoa 中组件的代理，并为原生组件添加 `RACSignal` 的支持呢？我们以 `UITableView` 为例来展示 `RACDelegateProxy` 是如何与 UIKit 组件互动的，我们需要实现的是以下功能：
 
-![RACDelegateProxy-UITableVie](http://img.draveness.me/2017-02-25-RACDelegateProxy-UITableView.gif)
+![RACDelegateProxy-UITableVie](https://img.draveness.me/2017-02-25-RACDelegateProxy-UITableView.gif)
 
 在点击所有的 `UITableViewCell` 时都会自动取消点击状态，通常情况下，我们可以直接在代理方法 `-tableView:didSelectRowAtIndexPath:` 中执行 `-deselectRowAtIndexPath:animated:` 方法：
 
@@ -70,7 +70,7 @@ self.tableView.delegate = (id<UITableViewDelegate>)proxy;
 
 在 `UITableViewDelgate` 中的代理方法执行时，实际上会被 `RACDelegateProxy` 拦截，并根据情况决定是处理还是转发：
 
-![UITableViewDelegate-With-RACDelegateProxy](http://img.draveness.me/2017-02-25-UITableViewDelegate-With-RACDelegateProxy.png-1000width)
+![UITableViewDelegate-With-RACDelegateProxy](https://img.draveness.me/2017-02-25-UITableViewDelegate-With-RACDelegateProxy.png-1000width)
 
 如果 `RACDelegateProxy` 实现了该代理方法就会交给它处理，如：`-tableView:didSelectRowAtIndexPath:`；否则，当前方法就会被转发到原 `delegate` 上，在这里就是 `UIViewController` 对象。
 
@@ -103,7 +103,7 @@ self.tableView.delegate = (id<UITableViewDelegate>)proxy;
 
 整个方法决议和消息转发的过程如下图所示，在整个方法决议和消息转发的过程中 Objective-C 运行时会再次提供执行该方法的机会。
 
-![Message-Forwarding](http://img.draveness.me/2017-02-25-Message-Forwarding.png-1000width)
+![Message-Forwarding](https://img.draveness.me/2017-02-25-Message-Forwarding.png-1000width)
 
 例子中的代理方法最后也被 `-forwardInvocation:` 方法成功的转发到了 `UITableView` 的原代理上。
 
@@ -159,7 +159,7 @@ static RACSignal *NSObjectRACSignalForSelector(NSObject *self, SEL selector, Pro
 
 这个 C 函数总共做了两件非常重要的事情，第一个是将传入的选择子对应的实现变为 `_objc_msgForward`，也就是在调用该方法时，会直接进入消息转发流程，第二是用 `RACSwizzleClass` 调剂当前类的一些方法。
 
-![NSObjectRACSignalForSelecto](http://img.draveness.me/2017-02-25-NSObjectRACSignalForSelector.png-1000width)
+![NSObjectRACSignalForSelecto](https://img.draveness.me/2017-02-25-NSObjectRACSignalForSelector.png-1000width)
 
 ### 从 selector 到 _objc_msgForward
 
@@ -186,7 +186,7 @@ Method targetMethod = class_getInstanceMethod(class, selector);
 
 在进行了以上的准备工作之后，我们就开始修改选择子对应的实现了，整个的修改过程会分为三种情况：
 
-![Swizzle-objc_msgForward](http://img.draveness.me/2017-02-25-Swizzle-objc_msgForward.png-1000width)
+![Swizzle-objc_msgForward](https://img.draveness.me/2017-02-25-Swizzle-objc_msgForward.png-1000width)
 
 下面会按照这三种情况依次介绍在不同情况下，如何将对应选择子的实现改为 `_objc_msgForward` 完成消息转发的。
 
@@ -219,11 +219,11 @@ static const char *RACSignatureForUndefinedSelector(SEL selector) {
 
 该方法在生成类型编码时，会按照 `:` 的个数来为 `v@:` 这个类型编码添加 `@` 字符；简单说明一下它的意思，ReactiveCocoa 默认所有的方法的返回值类型都为空 `void`，都会传入 `self` 以及当前方法的选择子 `SEL`，它们的类型编码可以在下图中找到，分别是 `v@:`；而 `@` 代表 `id` 类型，也就是我们默认代理方法中的所有参数都是 `NSObject` 类型的。
 
-![TypeEncoding](http://img.draveness.me/2017-02-25-TypeEncoding.png-1000width)
+![TypeEncoding](https://img.draveness.me/2017-02-25-TypeEncoding.png-1000width)
 
 生成了类型编码之后，由于我们并没有在当前类中找到该选择子对应的方法，所以会使用 `class_addMethod` 为当前类提供一个方法的实现，直接将当前选择子的实现改为 `_objc_msgForward`。
 
-![Selector-To-ObjC-Message-Forward](http://img.draveness.me/2017-02-25-Selector-To-ObjC-Message-Forward.png-1000width)
+![Selector-To-ObjC-Message-Forward](https://img.draveness.me/2017-02-25-Selector-To-ObjC-Message-Forward.png-1000width)
 
 #### targetMethod == NULL && protocol != NULL
 
@@ -241,7 +241,7 @@ class_addMethod(class, selector, _objc_msgForward, typeEncoding);
 
 这里会使用 `protocol_getMethodDescription` 两次从协议中获取可选和必须实现的方法的描述，并从结构体中拿出类型编码，最后为类添加这个之前不存在的方法：
 
-![Selector-To-ObjC-Message-Forward](http://img.draveness.me/2017-02-25-Selector-To-ObjC-Message-Forward.png-1000width)
+![Selector-To-ObjC-Message-Forward](https://img.draveness.me/2017-02-25-Selector-To-ObjC-Message-Forward.png-1000width)
 
 在这种情况下，其最后的结果与上一种的完全相同，因为它们都是对不存在该方法，只需要获得方法的类型编码并将实现添加为 `_objc_msgForward`，交给消息转发流程进行处理即可。
 
@@ -258,7 +258,7 @@ class_replaceMethod(class, selector, _objc_msgForward, method_getTypeEncoding(ta
 
 同样，我们需要获得目标方法的方法签名、添加 `aliasSelector` 这个新方法，最后在修改原方法的实现到 `_objc_msgForward`。
 
-![Selector-To-ObjC-Message-Forward-With-RACSelecto](http://img.draveness.me/2017-02-25-Selector-To-ObjC-Message-Forward-With-RACSelector.png-1000width)
+![Selector-To-ObjC-Message-Forward-With-RACSelecto](https://img.draveness.me/2017-02-25-Selector-To-ObjC-Message-Forward-With-RACSelector.png-1000width)
 
 上图展示了在目标方法不为空并且其实现不为 `_objc_msgForward` 时，`NSObjectRACSignalForSelector` 是如何修改原方法实现的。
 
@@ -409,11 +409,11 @@ IMP newIMP = imp_implementationWithBlock(^(id self, SEL selector) {
 
 在一般情况下，Objective-C 中某一消息被发送到一个对象时，它会先获取当前对象对应的类，然后从类的选择子表查找该方法对应的实现并执行。
 
-![Selector-To-IMP](http://img.draveness.me/2017-02-25-Selector-To-IMP.png-1000width)
+![Selector-To-IMP](https://img.draveness.me/2017-02-25-Selector-To-IMP.png-1000width)
 
 与正常的方法实现查找以及执行过程的简单不同，如果我们对某一个方法调用了 `-rac_signalForSelector:` 方法，那么对于同一个对象对应的类的所有方法，它们的执行过程会变得非常复杂：
 
-![After-Call-RACSignalForSelecto](http://img.draveness.me/2017-02-25-After-Call-RACSignalForSelector.png-1000width)
+![After-Call-RACSignalForSelecto](https://img.draveness.me/2017-02-25-After-Call-RACSignalForSelector.png-1000width)
 
 1. 由于当前对象对应的类已经被改成了 `Subclass`，即 `Class_RACSelectorSignal`，所以会在子类中查找方法的实现；
 2. 方法对应的实现已经被改成了 `-forwardInvocation:`，会直接进入消息转发流程中处理；

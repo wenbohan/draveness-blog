@@ -2,7 +2,7 @@
 layout: post
 title: 如何优雅地使用 KVO
 date: 2017-03-06 00:34:44.000000000 +08:00
-cover: http://img.draveness.me/kvoobserver-cover.jpg-1000width
+cover: https://img.draveness.me/kvoobserver-cover.jpg-1000width
 permalink: /:title
 tags: iOS KVO
 ---
@@ -14,7 +14,7 @@ KVO 作为 iOS 中一种强大并且有效的机制，为 iOS 开发者们提供
 
 但是在大多数情况下，除非遇到不用 KVO 无法解决的问题，笔者都会尽量避免它的使用，这并不是因为 KVO 有性能问题或者使用场景不多，总重要的原因是 KVO 的使用是在是太 ** **麻烦**了。
 
-![trouble](http://img.draveness.me/2017-03-06-trouble.jpg-1000width)
+![trouble](https://img.draveness.me/2017-03-06-trouble.jpg-1000width)
 
 使用 KVO 时，既需要进行**注册成为某个对象属性的观察者**，还要在合适的时间点将自己**移除**，再加上需要**覆写一个又臭又长的方法**，并在方法里**判断这次是不是自己要观测的属性发生了变化**，每次想用 KVO 解决一些问题的时候，作者的第一反应就是头疼，这篇文章会为各位为 KVO 所苦的开发者提供一种更优雅的解决方案。
 
@@ -113,7 +113,7 @@ fizz.number = @2;
 
 在 `Fizz` 类的接口中添加一个 `observer` 弱引用来持有对象的观察者，并在对象 `-dealloc` 时将它移除，重新运行这段代码，就不会发生崩溃了。
 
-![not-crash-with-remove-observer-when-deallo](http://img.draveness.me/2017-03-06-not-crash-with-remove-observer-when-dealloc.png-1000width)
+![not-crash-with-remove-observer-when-deallo](https://img.draveness.me/2017-03-06-not-crash-with-remove-observer-when-dealloc.png-1000width)
 
 由于没有移除观察者导致崩溃使用 KVO 时经常会遇到的问题之一，解决办法其实有很多，我们在这里简单介绍一个，使用当前对象持有被观测的对象，并在当前对象 `-dealloc` 时，移除观察者：
 
@@ -217,7 +217,7 @@ KVOController 不止为 Cocoa Touch 中所有的对象提供了 `-KVOController`
 
 两者的 `setter` 方法都只是使用 `objc_setAssociatedObject` 按照键值简单地存一下，而 `getter` 中不同的其实也就是对于 `FBKVOController` 的初始化了。
 
-![easy](http://img.draveness.me/2017-03-06-easy.jpg-1000width)
+![easy](https://img.draveness.me/2017-03-06-easy.jpg-1000width)
 
 到这里这个整个 FBKVOController 框架中的两个实现文件中的一个就介绍完了，接下来要看一下其中的另一个文件中的类 `KVOController`。
 
@@ -225,7 +225,7 @@ KVOController 不止为 Cocoa Touch 中所有的对象提供了 `-KVOController`
 
 `KVOController` 是整个框架中提供 KVO 接口的类，作为 KVO 的管理者，其必须持有当前对象所有与 KVO 有关的信息，而在 `KVOController` 中，用于存储这个信息的数据结构就是 `NSMapTable`。
 
-![KVOControlle](http://img.draveness.me/2017-03-06-KVOController.png-1000width)
+![KVOControlle](https://img.draveness.me/2017-03-06-KVOController.png-1000width)
 
 为了使 `KVOController` 达到线程安全，它还必须持有一把 `pthread_mutex_t` 锁，用于在操作 `_objectInfosMap` 时使用。
 
@@ -262,7 +262,7 @@ KVOController 不止为 Cocoa Touch 中所有的对象提供了 `-KVOController`
 
 这个方法中就涉及到另外一个私有的数据结构 `_FBKVOInfo`，这个类中包含着所有与 KVO 有关的信息：
 
-![_FBKVOInfo](http://img.draveness.me/2017-03-06-_FBKVOInfo.png-1000width)
+![_FBKVOInfo](https://img.draveness.me/2017-03-06-_FBKVOInfo.png-1000width)
 
 `_FBKVOInfo` 在 `KVOController` 中充当的作用仅仅是一个数据结构，我们主要用它来存储整个 KVO 过程中所需要的全部信息，其内部没有任何值得一看的代码，需要注意的是，`_FBKVOInfo` 覆写了 `-isEqual:` 方法用于对象之间的判等以及方便 `NSMapTable` 的存储。
 
@@ -280,7 +280,7 @@ typedef NS_ENUM(uint8_t, _FBKVOInfoState) {
 
 在使用 `-observer:keyPath:options:block:` 监听某一个对象属性的变化时，该过程的核心调用栈其实还是比较简单：
 
-![KVOController-Observe-Stack](http://img.draveness.me/2017-03-06-KVOController-Observe-Stack.png-1000width)
+![KVOController-Observe-Stack](https://img.draveness.me/2017-03-06-KVOController-Observe-Stack.png-1000width)
 
 我们从栈底开始简单分析一下整个封装 KVO 的过程，其中栈底的方法，也就是我们上面提到的 `-observer:keyPath:options:block:` 初始化了一个名为 `_FBKVOInfo` 的对象：
 
@@ -317,7 +317,7 @@ typedef NS_ENUM(uint8_t, _FBKVOInfoState) {
 
 这个私有方法通过自身持有的 `_objectInfosMap` 来判断当前对象、属性以及各种上下文是否已经注册在表中存在了，在这个 `_objectInfosMap` 中保存着对象以及与对象有关的 `_FBKVOInfo` 集合：
 
-![objectInfosMap](http://img.draveness.me/2017-03-06-objectInfosMap.png-1000width)
+![objectInfosMap](https://img.draveness.me/2017-03-06-objectInfosMap.png-1000width)
 
 在操作了当前 `KVOController` 持有的 `_objectInfosMap` 之后，才会执行私有的 `_FBKVOSharedController` 类的实例方法 `-observe:info:`：
 
@@ -383,7 +383,7 @@ typedef NS_ENUM(uint8_t, _FBKVOInfoState) {
 
 在这个 `-observeValueForKeyPath:ofObject:change:context:` 回调方法中，`_FBKVOSharedController` 会根据 KVO 的信息 `_KVOInfo` 选择不同的方式分发事件，如果观察者没有传入 block 或者选择子，就会调用观察者 KVO 回调方法。
 
-![KVOSharedControlle](http://img.draveness.me/2017-03-06-KVOSharedController.png-1000width)
+![KVOSharedControlle](https://img.draveness.me/2017-03-06-KVOSharedController.png-1000width)
 
 上图就是在使用 KVOController 时，如果一个 KVO 事件触发之后，整个框架是如何对这个事件进行处理以及回调的。
 
@@ -391,7 +391,7 @@ typedef NS_ENUM(uint8_t, _FBKVOInfoState) {
 
 在使用 KVOController 时，我们并不需要手动去处理 KVO 观察者的移除，因为所有的 KVO 事件都由私有的 `_KVOSharedController` 来处理；
 
-![KVOController-Unobserve-Stack](http://img.draveness.me/2017-03-06-KVOController-Unobserve-Stack.png-1000width)
+![KVOController-Unobserve-Stack](https://img.draveness.me/2017-03-06-KVOController-Unobserve-Stack.png-1000width)
 
 当每一个 `KVOController` 对象被释放时，都会将它自己持有的所有 KVO 的观察者交由 `_KVOSharedController` 的 `-unobserve:infos:` 方法处理：
 
@@ -416,7 +416,7 @@ typedef NS_ENUM(uint8_t, _FBKVOInfoState) {
 
 除了在 `KVOController` 析构时会自动移除观察者，我们也可以通过它的实例方法 `-unobserve:keyPath:` 操作达到相同的效果；不过在调用这个方法时，我们能够得到一个不同的调用栈：
 
-![KVOController-Unobserve-Object-Stack](http://img.draveness.me/2017-03-06-KVOController-Unobserve-Object-Stack.png-1000width)
+![KVOController-Unobserve-Object-Stack](https://img.draveness.me/2017-03-06-KVOController-Unobserve-Object-Stack.png-1000width)
 
 功能的实现过程其实都是类似的，都是通过 `-removeObserver:forKeyPath:context:` 方法移除观察者：
 

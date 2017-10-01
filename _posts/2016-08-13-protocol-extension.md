@@ -9,7 +9,7 @@ tags: iOS
 + TOC
 {:toc}
 
-![](http://img.draveness.me/2016-08-13-protocol-recordings.jpeg)
+![](https://img.draveness.me/2016-08-13-protocol-recordings.jpeg)
 
 Swift 中的协议扩展为 iOS 开发带来了非常多的可能性，它为我们提供了一种类似多重继承的功能，帮助我们减少一切可能导致重复代码的地方。
 
@@ -83,7 +83,7 @@ let titleLabel = UILabel().then {
 
 这样所有遵循 `TestProtocol` 协议的对象都可以调用 `buzz` 方法，哪怕它们没有实现：
 
-![protocol-demo](http://img.draveness.me/2016-08-13-protocol-demo.jpeg)
+![protocol-demo](https://img.draveness.me/2016-08-13-protocol-demo.jpeg)
 
 上面的 `XXObject` 虽然没有实现 `buzz` 方法，但是该方法仍然成功执行了。
 

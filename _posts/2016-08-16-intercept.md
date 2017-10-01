@@ -18,7 +18,7 @@ tags: iOS HTTP
 
 `NSURLProtocol` 是苹果为我们提供的 [URL Loading System](https://developer.apple.com/library/ios/documentation/Cocoa/Conceptual/URLLoadingSystem/URLLoadingSystem.html) 的一部分，这是一张从官方文档贴过来的图片：
 
-![URL-loading-syste](http://img.draveness.me/2016-08-16-URL-loading-system.png-1000width)
+![URL-loading-syste](https://img.draveness.me/2016-08-16-URL-loading-system.png-1000width)
 
 官方文档对 `NSURLProtocol` 的描述是这样的：
 

@@ -15,7 +15,7 @@ tags: iOS ASDK
 
 而这篇文章就要从 iOS 中影响性能的另一大杀手，也就是万恶之源 Auto Layout（自动布局）来分析如何对 iOS 应用的性能进行优化以及 Auto Layout 到底为什么会影响性能？
 
-![box-layout](http://img.draveness.me/2016-08-31-box-layout.jpg-1000width)
+![box-layout](https://img.draveness.me/2016-08-31-box-layout.jpg-1000width)
 
 ## 把 Auto Layout 批判一番
 
@@ -25,13 +25,13 @@ Auto Layout 的诞生并没有如同苹果的其它框架一样收到开发者�
 
 真正使 Auto Layout 大规模投入使用的应该还是 [Masonry](https://github.com/SnapKit/Masonry)，它使用了链式的语法对 Auto Layout 进行了很好的封装，使得 Auto Layout 更加简单易用；时至今日，开发者也在日常使用中发现了 Masonry 的各种问题，于是出现了各种各样的布局框架，不过这都是后话了。
 
-![masonry](http://img.draveness.me/2016-08-31-masonry.jpg-1000width)
+![masonry](https://img.draveness.me/2016-08-31-masonry.jpg-1000width)
 
 ## Auto Layout 的原理和 Cassowary
 
 Auto Layout 的原理其实非常简单，在这里通过一个例子先简单的解释一下：
 
-![view-demonstrate](http://img.draveness.me/2016-08-31-view-demonstrate.png-1000width)
+![view-demonstrate](https://img.draveness.me/2016-08-31-view-demonstrate.png-1000width)
 
 iOS 中视图所需要的布局信息只有两个，分别是 `origin/center` 和 `size`，在这里我们以 `origin & size` 为例，也就是 `frame` 时代下布局的需要的两个信息；这两个信息由四部分组成：
 
@@ -56,7 +56,7 @@ B.height = A.height
 
 我们仍然需要知道布局信息所需要的四部分 `x`、`y`、`width` 以及 `height`。换句话说，我们要求解上述的**八元一次**方程组，将每个视图所需要的信息解出来；Cocoa 会在运行时求解上述的方程组，最终使用 `frame` 来绘制视图。
 
-![layout-phase](http://img.draveness.me/2016-08-31-layout-phase.png-1000width)
+![layout-phase](https://img.draveness.me/2016-08-31-layout-phase.png-1000width)
 
 ### Cassowary 算法
 
@@ -74,7 +74,7 @@ Auto Layout 其实就是对 Cassowary 算法的一种实现，但是这里并不
 
 因为布局系统在最后仍然需要通过 `frame` 来进行，所以 Auto Layout 虽然为开发者在描述布局时带来了一些好处，不过它相比原有的布局系统加入了从约束计算 `frame` 的过程，而在这里，我们需要了解 Auto Layout 的布局性能如何。
 
-![performance-loss](http://img.draveness.me/2016-08-31-performance-loss.jpeg)
+![performance-loss](https://img.draveness.me/2016-08-31-performance-loss.jpeg)
 
 因为使用 Cassowary 算法解决约束问题就是对线性等式或不等式求解，所以其时间复杂度就是**多项式时间**的，不难推测出，在处理极其复杂的 UI 界面时，会造成性能上的巨大损失。
 
@@ -90,7 +90,7 @@ Auto Layout 其实就是对 Cassowary 算法的一种实现，但是这里并不
 
 > 这里的数据是在 OS X EL Captain，Macbook Air (13-inch Mid 2013）上的 iPhone 6s Plus 模拟器上采集的， Xcode 版本为 7.3.1。在其他设备上可能不会获得一致的信息，由于笔者的 iPhone 升级到了 iOS 10，所以没有办法真机测试，最后的结果可能会有一定的偏差。
 
-![performance-chart-100-1000](http://img.draveness.me/2016-08-31-performance-chart-100-1000.jpeg)
+![performance-chart-100-1000](https://img.draveness.me/2016-08-31-performance-chart-100-1000.jpeg)
 
 从图中可以看到，使用 Auto Layout 进行布局的时间会是只使用 `frame` 的 **16 倍**左右，虽然这里的测试结果可能**受外界条件影响差异**比较大，不过 Auto Layout 的性能相比 `frame` 确实差很多，如果去掉设置 `frame` 的过程消耗的时间，Auto Layout 过程进行的计算量也是非常巨大的。
 
@@ -100,7 +100,7 @@ Auto Layout 其实就是对 Cassowary 算法的一种实现，但是这里并不
 
 我们更关心的是，在日常开发中难免会使用 Auto Layout 进行布局，既然有 16.67 ms 这个限制，那么在界面上出现了多少个视图时，我才需要考虑其它的布局方式呢？在这里，我们将需要布局的视图数量减少一个量级，重新绘制一个图表：
 
-![performance-layout-10-90](http://img.draveness.me/2016-08-31-performance-layout-10-90.jpeg)
+![performance-layout-10-90](https://img.draveness.me/2016-08-31-performance-layout-10-90.jpeg)
 
 从图中可以看出，当对 **30 个左右视图**使用 Auto Layout 进行布局时，所需要的时间就会在 16.67 ms 左右，当然这里不排除一些其它因素的影响；到目前为止，会得出一个大致的结论，使用 Auto Layout 对复杂的 UI 界面进行布局时（大于 30 个视图）就会对性能有严重的影响（同时与设备有关，文章中不会考虑设备性能的差异性）。
 
@@ -110,7 +110,7 @@ Auto Layout 其实就是对 Cassowary 算法的一种实现，但是这里并不
 
 我们对嵌套视图数量在 100~500 之间布局时间进行测量，并与 Auto Layout 进行比较：
 
-![performance-nested-autolayout-frame](http://img.draveness.me/2016-08-31-performance-nested-autolayout-frame.jpeg)
+![performance-nested-autolayout-frame](https://img.draveness.me/2016-08-31-performance-nested-autolayout-frame.jpeg)
 
 在视图数量大于 200 之后，随着视图数量的增加，使用 Auto Layout 对嵌套视图进行布局的时间相比非嵌套的布局成倍增长。
 
@@ -122,7 +122,7 @@ Auto Layout 其实就是对 Cassowary 算法的一种实现，但是这里并不
 
 Auto Layout 不止在复杂 UI 界面布局的表现不佳，它还会强制视图在主线程上布局；所以在 ASDK 中提供了另一种可以在后台线程中运行的布局引擎，它的结构大致是这样的：
 
-![layout-hierarchy](http://img.draveness.me/2016-08-31-layout-hierarchy.png-1000width)
+![layout-hierarchy](https://img.draveness.me/2016-08-31-layout-hierarchy.png-1000width)
 
 `ASLayoutSpec` 与下面的所有的 Spec 类都是继承关系，在视图需要布局时，会调用 `ASLayoutSpec` 或者它的子类的 `- measureWithSizeRange:` 方法返回一个用于布局的对象 [ASLayout](#aslayout)。
 
@@ -250,7 +250,7 @@ ASDK 的文档中推荐在子类中覆写 `- layoutSpecThatFits:` 方法，返�
 
 笔者不打算一行一行代码深入讲解其内容，简单介绍一下最重要的 `ASStackLayoutSpec`。
 
-![stack](http://img.draveness.me/2016-08-31-stack.jpg-1000width)
+![stack](https://img.draveness.me/2016-08-31-stack.jpg-1000width)
 
 `ASStackLayoutSpec` 从 `Flexbox` 中获得了非常多的灵感，比如说 `justifyContent`、`alignItems` 等属性，它和苹果的 `UIStackView` 比较类似，不过底层并没有使用 Auto Layout 进行计算。如果没有接触过 `ASStackLayoutSpec` 的开发者，可以通过这个小游戏 [Foggy-ASDK-Layout](http://nguyenhuy.github.io/froggy-asdk-layout/) 快速学习 `ASStackLayoutSpec` 的使用。
 
@@ -301,7 +301,7 @@ ASDK 的文档中推荐在子类中覆写 `- layoutSpecThatFits:` 方法，返�
 
 由于 ASDK 的布局引擎的问题，其性能比较难以测试，在这里只对 ASDK 使用 `ASStackLayoutSpec` 的**布局计算时间**进行了测试，不包括视图的渲染以及其它时间：
 
-![async-node-calculate](http://img.draveness.me/2016-08-31-async-node-calculate.jpeg)
+![async-node-calculate](https://img.draveness.me/2016-08-31-async-node-calculate.jpeg)
 
 测试结果表明 `ASStackLayoutSpec` 花费的布局时间与结点的数量成正比，哪怕计算 100 个视图的布局也只需要 **8.89 ms**，虽然这里没有包括视图的渲染时间，不过与 Auto Layout 相比性能还是有比较大的提升。
 
