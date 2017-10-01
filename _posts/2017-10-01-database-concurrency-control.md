@@ -2,7 +2,7 @@
 layout: post
 title: 浅谈数据库并发控制 - 锁和 MVCC
 permalink: /database-concurrency-control.html
-tags: Database MySQL PostgreSQL MVCC
+tags: Database MySQL PostgreSQL MVCC Server
 cover: https://img.draveness.me/2017-08-06-mysql-cover.jpg-1000width
 desc: 在学习几年编程之后，你会发现所有的问题都没有简单、快捷的解决方案，很多问题都需要权衡和妥协，而本文介绍的就是数据库在并发性能和可串行化之间做的权衡和妥协 - 并发控制机制。如果数据库中的所有事务都是串行执行的，那么它非常容易成为整个应用的性能瓶颈，虽然说没法水平扩展的节点在最后都会成为瓶颈，但是串行执行事务的数据库会加速这一过程；而并发（Concurrency）使一切事情的发生都有了可能，它能够解决一定的性能问题，但是它会带来更多诡异的错误。
 ---
