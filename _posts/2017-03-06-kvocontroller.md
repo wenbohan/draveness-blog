@@ -2,7 +2,7 @@
 layout: post
 title: 如何优雅地使用 KVO
 date: 2017-03-06 00:34:44.000000000 +08:00
-cover: https://img.draveness.me/kvoobserver-cover.jpg-1000width
+cover: https://img.draveness.me/kvoobserver-cover.jpg
 permalink: /:title
 tags: iOS KVO
 ---

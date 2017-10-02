@@ -3,7 +3,7 @@ layout: post
 title: MySQL 索引性能分析概要
 permalink: /sql-index-performance.html
 tags: MySQL Database Index Server
-cover: https://img.draveness.me/2017-08-06-mysql-cover.jpg-1000width
+cover: https://img.draveness.me/2017-08-06-mysql-cover.jpg
 desc: 上一篇文章 MySQL 索引设计概要介绍了影响索引设计的几大因素，包括过滤因子、索引片的宽窄与大小以及匹配列和过滤列。在文章的后半部分介绍了数据库索引设计与优化一书中，理想的三星索引的设计流程和套路，到目前为止虽然我们掌握了单表索引的设计方法，但是却没有分析预估索引耗时的能力。在本文中，我们将介绍书中提到的两种分析索引性能的方法：基本问题法（BQ）和快速估算上限法（QUBE），这两种方法能够帮助我们快速分析、估算索引的性能，及时发现问题。
 
 ---
@@ -100,5 +100,3 @@ QUBE 在计算的过程中会忽略除了磁盘排队时间的其他排队时间
 ## Reference
 
 + [数据库索引设计与优化](https://www.amazon.cn/图书/dp/B00ZH27RH0)
-
-

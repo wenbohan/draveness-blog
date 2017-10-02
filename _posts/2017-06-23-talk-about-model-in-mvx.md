@@ -4,8 +4,8 @@ title: 谈谈 MVX 中的 Model
 date: 2017-06-23 00:34:44.000000000 +08:00
 permalink: /mvx-model.html
 desc: 在大多数 iOS 的项目中，Model 层只是一个单纯的数据结构，你可以看到的绝大部分模型都是这样的；模型起到了定义一堆『坑』的作用，只是一个简单的模板，并没有参与到实际的业务逻辑，只是在模型层进行了一层抽象，将服务端发回的 JSON 或者说 Dictionary 对象中的字段一一取出并装填到预先定义好的模型中。
-cover: https://img.draveness.me/JSON-to-Model.jpg-1000width
-tags: iOS MVC
+cover: https://img.draveness.me/JSON-to-Model.jpg
+tags: MVC MVVM iOS
 ---
 
 + TOC
