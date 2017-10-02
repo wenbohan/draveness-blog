@@ -33,7 +33,7 @@ MongoDB 虽然也是数据库，但是它与传统的 RDBMS 相比有着巨大�
 
 在不同的存储引擎上层的就是 MongoDB 的数据模型和查询语言了，与关系型数据库不同，由于 MongoDB 对数据的存储与 RDBMS 有较大的差异，所以它创建了一套不同的查询语言；虽然 MongoDB 查询语言非常强大，支持的功能也很多，同时也是可编程的，不过其中包含的内容非常繁杂、API 设计也不是非常优雅，所以还是需要一些学习成本的，对于长时间使用 MySQL 的开发者肯定会有些不习惯。
 
-~~~js
+~~~javascript
 db.collection.updateMany(
    <filter>,
    <update>,
@@ -57,7 +57,7 @@ MongoDB 使用面向文档的的数据模型，导致很多概念都与 RDBMS �
 
 RDBMS 和 MongoDB 中的概念都有着相互对应的关系，数据库、表、行和索引的概念在两中数据库中都非常相似，唯独最后的 `JOIN` 和 `Embedded Document` 或者 `Reference` 有着巨大的差别。这一点差别其实也影响了在使用 MongoDB 时对集合（Collection）Schema 的设计，如果我们在 MongoDB 中遵循了与 RDBMS 中相同的思想对 Collection 进行设计，那么就不可避免的使用很多的 "JOIN" 语句，而 MongoDB 是不支持 "JOIN" 的，在应用内做这种查询的性能非常非常差，在这时使用嵌入式的文档其实就可以解决这种问题了，嵌入式的文档虽然可能会造成很多的数据冗余导致我们在更新时会很痛苦，但是查询时确实非常迅速。
 
-~~~js
+~~~javascript
 {
   _id: <ObjectId1>,
   name: "draveness",
