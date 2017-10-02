@@ -198,6 +198,7 @@ MySQL 中实现的多版本两阶段锁协议（Multiversion 2PL）将 MVCC 和 
 数据库的并发控制机制到今天已经有了非常成熟、完善的解决方案，我们并不需要自己去设计一套新的协议来处理不同事务之间的冲突问题，从数据库的并发控制机制中学习到的相关知识，无论是锁还是乐观并发控制在其他的领域或者应用中都被广泛使用，所以了解、熟悉不同的并发控制机制的原理是很有必要的。
 
 > 原文链接：[浅谈数据库并发控制 - 锁和 MVCC · 面向信仰编程](https://draveness.me/database-concurrency-control.html)
+> 
 > Follow: [Draveness · GitHub](https://github.com/Draveness)
 
 ## Reference
