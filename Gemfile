@@ -8,6 +8,6 @@ gem "rake", "~> 12.1.0"
 group :jekyll_plugins do
   gem 'jekyll-compose'
   gem 'jekyll-redirect-from'
-  gem 'jekyll-admin'
+  # gem 'jekyll-admin'
   gem 'jekyll-paginate'
 end
