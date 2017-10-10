@@ -22,7 +22,7 @@ desc: 文中会介绍作者在迁移数据库的过程中遇到的一些问题�
 
 在迁移的过程中可以将 MySQL 中的全部数据以 csv 的格式导出，然后再将所有 csv 格式的数据使用 `mongoimport` 全部导入到 MongoDB 中：
 
-~~~
+~~~shell
 $ mysqldump -u<username> -p<password> \
     -T <output_directory> \
     --fields-terminated-by ',' \
