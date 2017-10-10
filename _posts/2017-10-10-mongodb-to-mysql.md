@@ -2,7 +2,7 @@
 layout: post
 title: 如何从 MongoDB 迁移到 MySQL
 permalink: /mongodb-to-mysql.html
-tags: Database MongoDB MySQL Rails Server
+tags: Database MongoDB MySQL Rails Ruby Server
 cover: https://img.draveness.me/2017-10-10-mysql-and-mongodb-cover.png
 desc: 文中会介绍作者在迁移数据库的过程中遇到的一些问题，并为各位读者提供需要停机迁移数据库的可行方案，如果需要不停机迁移数据库还是需要别的方案来解决，在这里提供的方案用于百万数据量的 MongoDB，预计的停机时间在两小时左右，如果数据量在千万级别以上，过长的停机时间可能是无法接受的，应该设计不停机的迁移方案；无论如何，作者希望这篇文章能够给想要做数据库迁移的开发者带来一些思路，少走一些坑。
 
