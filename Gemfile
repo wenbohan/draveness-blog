@@ -2,7 +2,6 @@ source "https://rubygems.org"
 
 gem "jekyll", "~> 3.6.0"
 #gem "rdiscount", "~> 2.1.7"
-# gem "github-pages", "~> 161", group: :jekyll_plugins
 gem "rake", "~> 12.1.0"
 
 group :jekyll_plugins do
@@ -11,4 +10,5 @@ group :jekyll_plugins do
   # gem 'jekyll-admin'
   gem 'jekyll-sitemap'
   gem 'jekyll-paginate'
+  # gem "github-pages", '~> 163'
 end
