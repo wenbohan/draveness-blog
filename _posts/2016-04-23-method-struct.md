@@ -158,7 +158,7 @@ cls->setData(rw);
 
 下图是 `realizeClass` 方法执行过后的类所占用内存的布局，你可以与上面调用方法前的内存布局对比以下，看有哪些更改：
 
-<p align='center'>
+
 ![objc-method-after-realize-class](http://7xrlu3.com1.z0.glb.clouddn.com/2016-04-23-objc-method-after-realize-class.png)
 
 但是，在这段代码运行之后 `class_rw_t` 中的方法，属性以及协议列表均为空。这时需要 `realizeClass` 调用 `methodizeClass` 方法来**将类自己实现的方法（包括分类）、属性和遵循的协议加载到 `methods`、 `properties` 和 `protocols` 列表中**。
@@ -192,7 +192,7 @@ cls->setData(rw);
 
 > 这段代码是运行在 Mac OS X 10.11.3 (x86_64)版本中，而不是运行在 iPhone 模拟器或者真机上的，如果你在 iPhone 或者真机上运行，可能有一定差别。
 
-<p align='center'>
+
 ![objc-method-target](http://7xrlu3.com1.z0.glb.clouddn.com/2016-04-23-objc-method-target.png)
 
 这是主程序的代码：
