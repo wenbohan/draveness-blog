@@ -7,7 +7,11 @@
 
     <!-- [[! Page Meta ]] -->
     <title>{% if page.title %}{{ page.title }}{% elsif site.name %}{{ site.name }}{% endif %}</title>
+    {% if page.desc %}
+    <meta name="description" content="{{ page.desc }}" />
+    {% else %}
     <meta name="description" content="{{ site.name }} - {{ site.description }}" />
+    {% endif %}
 
     <meta name="HandheldFriendly" content="True" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
