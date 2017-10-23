@@ -3,7 +3,7 @@ layout: post
 title: 浅析 Bigtable 和 LevelDB 的实现
 permalink: /bigtable-leveldb
 tags: Server LevelDB Database NoSQL
-cover: https://img.draveness.me/2017-08-12-Bigtable-LevelDB-Cover.jpg
+
 desc: 在 2006 年的 OSDI 上，Google 发布了名为 Bigtable 的论文，其中描述了一个用于管理结构化数据的分布式存储系统 Bigtable 的数据模型、接口以及实现等内容。本文会先对文中描述的分布式存储系统进行简单的描述，然后对 Google 开源的 KV 存储数据库 LevelDB 进行分析；LevelDB 可以理解为单点的 Bigtable 的系统，虽然其中没有 Bigtable 中与 tablet 管理以及一些分布式相关的逻辑，不过我们可以通过对 LevelDB 源代码的阅读增加对 Bigtable 的理解。
 ---
 
