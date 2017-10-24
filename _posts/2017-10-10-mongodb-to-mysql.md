@@ -40,7 +40,7 @@ $ mongoimport --db <database_name> --collection <collection_name> \
 
 虽然整个过程看起来只需要两个命令非常简单，但是等到你真要去做的时候你会遇到非常多的问题，作者没有过从 MySQL 或者其他关系型数据库迁移到 MongoDB 的经验，但是 Google 上相关的资料特别多，所以这总是一个有无数前人踩过坑的问题，而前人的经验也能够帮助我们节省很多时间。
 
-![mysql-to-mongodb](https://img.draveness.me/2017-10-10-mysql-to-mongodb.png)
+![mysql-to-mongodb](https://img.draveness.me/2017-10-24-mysql-to-mongodb.png)
 
 > 使用 csv 的方式导出数据在绝大多数的情况都不会出现问题，但是如果数据库中的某些文档中存储的是富文本，那么虽然在导出数据时不会出现问题，最终导入时可能出现一些比较奇怪的错误。
 
