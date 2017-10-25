@@ -1,5 +1,6 @@
 ---
 layout: post
+toc: true
 title: 懒惰的 initialize 方法
 date: 2016-04-30 17:50:08.000000000 +08:00
 permalink: /:title
@@ -7,7 +8,7 @@ tags: iOS Runtime
 ---
 
 + TOC
-{:toc}
+
 
 <iframe src="http://ghbtns.com/github-btn.html?user=draveness&type=follow&size=large" height="30" width="240" frameborder="0" scrolling="0" style="width:240px; height: 30px;" allowTransparency="true"></iframe>
 

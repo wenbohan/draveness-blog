@@ -1,5 +1,6 @@
 ---
 layout: post
+toc: true
 title: 浅谈 MVC、MVP 和 MVVM 架构模式
 permalink: /mvx
 date: 2017-07-12 09:00:00.000000000 +08:00
@@ -10,7 +11,7 @@ tags: MVC MVVM iOS
 ---
 
 + TOC
-{:toc}
+
 
 
 + [谈谈 MVX 中的 Model](http://draveness.me/mvx-model.html)

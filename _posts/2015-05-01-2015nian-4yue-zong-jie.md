@@ -1,12 +1,13 @@
 ---
 layout: post
+toc: true
 title: 2015 年 4 月总结
 date: 2015-05-01 23:27:55.000000000 +08:00
 permalink: /:title
 ---
 
 + TOC
-{:toc}
+
 
 又过去了一个月, 到了一个月一次的总结时间.
 

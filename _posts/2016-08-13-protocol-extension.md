@@ -1,5 +1,6 @@
 ---
 layout: post
+toc: true
 title: 如何在 Objective-C 中实现协议扩展
 date: 2016-08-13 13:33:58.000000000 +08:00
 permalink: /:title
@@ -7,7 +8,7 @@ tags: iOS
 ---
 
 + TOC
-{:toc}
+
 
 ![](https://img.draveness.me/2016-08-13-protocol-recordings.jpeg)
 

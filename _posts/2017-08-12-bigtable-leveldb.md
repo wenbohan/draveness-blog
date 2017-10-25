@@ -1,5 +1,6 @@
 ---
 layout: post
+toc: true
 title: 浅析 Bigtable 和 LevelDB 的实现
 permalink: /bigtable-leveldb
 tags: Server LevelDB Database NoSQL Bigtable
@@ -8,7 +9,7 @@ desc: 在 2006 年的 OSDI 上，Google 发布了名为 Bigtable 的论文，其
 ---
 
 + TOC
-{:toc}
+
 
 
 在 2006 年的 OSDI 上，Google 发布了名为 [Bigtable: A Distributed Storage System for Structured Data](https://static.googleusercontent.com/media/research.google.com/en//archive/bigtable-osdi06.pdf) 的论文，其中描述了一个用于管理结构化数据的分布式存储系统  - Bigtable 的数据模型、接口以及实现等内容。

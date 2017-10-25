@@ -1,5 +1,6 @@
 ---
 layout: post
+toc: true
 title: 如何实现 iOS 中的 Associated Object
 date: 2016-08-02 23:13:01.000000000 +08:00
 permalink: /:title
@@ -7,7 +8,7 @@ tags: iOS
 ---
 
 + TOC
-{:toc}
+
 
 
 > 关注仓库，及时获得更新：[iOS-Source-Code-Analyze](https://github.com/draveness/iOS-Source-Code-Analyze)

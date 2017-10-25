@@ -64,3 +64,14 @@
   position: fixed;
   top: 20px;
 }
+
+.toc-entry.toc-h1,
+.toc-entry.toc-h2
+{}
+.toc-entry.toc-h3,
+.toc-entry.toc-h4,
+.toc-entry.toc-h5,
+.toc-entry.toc-h6
+{
+  display: none;
+}

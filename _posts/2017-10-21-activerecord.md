@@ -1,5 +1,6 @@
 ---
 layout: post
+toc: true
 title: 全面理解 ActiveRecord
 permalink: /activerecord
 tags: ActiveRecord Rails Ruby MySQL Database Server
@@ -7,7 +8,7 @@ desc: 文章分四个部分介绍了 ActiveRecord 中的重要内容，模型的
 ---
 
 + TOC
-{:toc}
+
 
 最近事情并不是特别多，看了一些数据库相关的书籍，最后想到自己并不了解每天都在用的 ActiveRecord，对于它是如何创建模型、建立关系、执行 SQL 查询以及完成数据库迁移的，作者一直都有着自己的猜测，但是真正到源代码中去寻找答案一直都是没有做过的。
 

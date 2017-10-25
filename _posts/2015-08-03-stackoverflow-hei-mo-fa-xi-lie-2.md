@@ -1,5 +1,6 @@
 ---
 layout: post
+toc: true
 title: StackOverflow 黑魔法系列 <2>
 date: 2015-08-03 11:08:19.000000000 +08:00
 permalink: /:title
@@ -7,7 +8,7 @@ tags: iOS
 ---
 
 + TOC
-{:toc}
+
 
 距离上一次的 StackOverflow 黑魔法系列的 post 已经很久了, 自己也很久没有写技术博客了, 虽然这次带来的又是一篇水文. 但是好久没有写了, 写写水文也好试试手.
 

@@ -1,5 +1,6 @@
 ---
 layout: post
+toc: true
 title: Ouroboros 的实现 ---- 提供神奇的滚动效果
 date: 2016-03-10 17:40:28.000000000 +08:00
 permalink: /:title
@@ -7,7 +8,7 @@ tags: iOS
 ---
 
 + TOC
-{:toc}
+
 
 [Ouroboros](https://github.com/Draveness/Ouroboros) 是一个根据 `scrollView` 滚动的距离完成动画的一个仓库. 灵感来源于 `javascript` 的第三方框架 [scrollMagic](https://github.com/janpaepke/ScrollMagic).
 

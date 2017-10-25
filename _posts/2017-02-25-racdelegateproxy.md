@@ -1,5 +1,6 @@
 ---
 layout: post
+toc: true
 title: 从代理到 RACSignal
 date: 2017-02-25 22:55:52.000000000 +08:00
 permalink: /:title
@@ -7,7 +8,7 @@ tags: iOS RAC
 ---
 
 + TOC
-{:toc}
+
 
 ReactiveCocoa 将 Cocoa 中的 Target-Action、KVO、通知中心以及代理等设计模式都桥接到了 RAC 的世界中，我们在随后的几篇文章中会介绍 RAC 如何做到了上面的这些事情，而本篇文章会介绍 ReactiveCocoa 是如何把**代理**转换为信号的。
 

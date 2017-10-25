@@ -1,5 +1,6 @@
 ---
 layout: post
+toc: true
 title: NSUserDefaults 的默认值
 date: 2016-03-10 17:39:45.000000000 +08:00
 permalink: /:title
@@ -7,7 +8,7 @@ tags: iOS
 ---
 
 + TOC
-{:toc}
+
 
 `NSUserDefaults` 提供了一个与默认设置交互的接口. 这些默认设置允许一个 App 为每一个单独的用户的设置提供定制化的行为.
 

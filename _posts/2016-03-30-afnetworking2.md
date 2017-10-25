@@ -1,5 +1,6 @@
 ---
 layout: post
+toc: true
 title: AFNetworking 的核心 AFURLSessionManager（二）
 date: 2016-03-30 09:50:43.000000000 +08:00
 permalink: /:title
@@ -7,7 +8,7 @@ tags: iOS AFNetworking
 ---
 
 + TOC
-{:toc}
+
 
 Blog: [Draveness](http://draveness.me)
 

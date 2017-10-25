@@ -1,5 +1,6 @@
 ---
 layout: post
+toc: true
 title: "『状态』驱动的世界：ReactiveCocoa"
 date: 2017-01-30 21:06:48.000000000 +08:00
 permalink: /:title
@@ -7,7 +8,7 @@ tags: iOS RAC
 ---
 
 + TOC
-{:toc}
+
 
 这篇以及之后的文章主要会对 ReactiveObjc v2.1.2 的实现进行分析，从最简单的例子中了解 ReactiveCocoa 的工作原理以及概念，也是笔者个人对于 RAC 学习的总结与理解。本文主要会围绕 RAC 中核心概念 `RACSignal` 展开，详细了解其底层实现。
 

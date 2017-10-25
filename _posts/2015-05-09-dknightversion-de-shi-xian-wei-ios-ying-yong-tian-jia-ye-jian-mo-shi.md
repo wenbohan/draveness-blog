@@ -1,5 +1,6 @@
 ---
 layout: post
+toc: true
 title: DKNightVersion 的实现 --- 如何为 iOS 应用添加夜间模式
 date: 2015-05-09 15:13:35.000000000 +08:00
 permalink: /:title
@@ -7,7 +8,7 @@ tags: iOS
 ---
 
 + TOC
-{:toc}
+
 
 **最新: [成熟的夜间模式解决方案](http://draveness.me/night)**
 

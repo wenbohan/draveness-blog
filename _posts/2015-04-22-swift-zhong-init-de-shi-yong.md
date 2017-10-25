@@ -1,5 +1,6 @@
 ---
 layout: post
+toc: true
 title: Swift 类构造器的使用
 date: 2015-04-22 20:21:15.000000000 +08:00
 permalink: /:title
@@ -7,7 +8,7 @@ tags: iOS
 ---
 
 + TOC
-{:toc}
+
 
 这几天在使用 Swift 重写原来的一个运动社交应用 SportJoin.
 

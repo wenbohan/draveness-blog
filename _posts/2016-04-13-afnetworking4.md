@@ -1,5 +1,6 @@
 ---
 layout: post
+toc: true
 title: AFNetworkReachabilityManager 监控网络状态（四）
 date: 2016-04-13 22:58:12.000000000 +08:00
 permalink: /:title
@@ -7,7 +8,7 @@ tags: iOS AFNetworking
 ---
 
 + TOC
-{:toc}
+
 
 
 Blog: [Draveness](http://draveness.me)

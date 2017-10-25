@@ -1,5 +1,6 @@
 ---
 layout: post
+toc: true
 title: iOS 中的 block 是如何持有对象的
 date: 2016-08-09 22:02:56.000000000 +08:00
 permalink: /:title
@@ -7,7 +8,7 @@ tags: iOS Runtime
 ---
 
 + TOC
-{:toc}
+
 
 
 > 关注仓库，及时获得更新：[iOS-Source-Code-Analyze](https://github.com/draveness/iOS-Source-Code-Analyze)

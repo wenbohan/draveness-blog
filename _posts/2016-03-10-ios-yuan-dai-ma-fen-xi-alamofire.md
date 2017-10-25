@@ -1,5 +1,6 @@
 ---
 layout: post
+toc: true
 title: iOS 源代码分析 ---- Alamofire
 date: 2016-03-10 17:41:36.000000000 +08:00
 permalink: /:title
@@ -7,7 +8,7 @@ tags: iOS Alamofire
 ---
 
 + TOC
-{:toc}
+
 
 
 

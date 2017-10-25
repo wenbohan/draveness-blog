@@ -1,5 +1,6 @@
 ---
 layout: post
+toc: true
 title: 谈谈 MVX 中的 Model
 date: 2017-06-23 00:34:44.000000000 +08:00
 permalink: /mvx-model
@@ -9,7 +10,7 @@ tags: MVC MVVM iOS
 ---
 
 + TOC
-{:toc}
+
 
 
 + [谈谈 MVX 中的 Model](http://draveness.me/mvx-model.html)

@@ -1,12 +1,13 @@
 ---
 layout: post
+toc: true
 title: Prolog 匹配 <2>
 date: 2015-04-07 18:45:48.000000000 +08:00
 permalink: /:title
 ---
 
 + TOC
-{:toc}
+
 
 
 

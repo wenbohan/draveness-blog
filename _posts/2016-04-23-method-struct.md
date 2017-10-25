@@ -1,5 +1,6 @@
 ---
 layout: post
+toc: true
 title: 深入解析 ObjC 中方法的结构
 date: 2016-04-23 13:26:37.000000000 +08:00
 permalink: /:title
@@ -7,7 +8,7 @@ tags: iOS Runtime
 ---
 
 + TOC
-{:toc}
+
 
 Blog: [Draveness](http://draveness.me)
 

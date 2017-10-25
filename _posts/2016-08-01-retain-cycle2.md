@@ -1,5 +1,6 @@
 ---
 layout: post
+toc: true
 title: 检测 NSObject 对象持有的强指针
 date: 2016-08-01 20:16:22.000000000 +08:00
 permalink: /:title
@@ -7,7 +8,7 @@ tags: iOS
 ---
 
 + TOC
-{:toc}
+
 
 > 关注仓库，及时获得更新：[iOS-Source-Code-Analyze](https://github.com/draveness/iOS-Source-Code-Analyze)
 >

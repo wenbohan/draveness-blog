@@ -1,12 +1,13 @@
 ---
 layout: post
+toc: true
 title: Prolog 递归 <3>
 date: 2015-04-09 02:22:14.000000000 +08:00
 permalink: /:title
 ---
 
 + TOC
-{:toc}
+
 
 
 

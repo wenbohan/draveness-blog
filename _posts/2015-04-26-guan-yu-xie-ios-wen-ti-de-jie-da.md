@@ -1,5 +1,6 @@
 ---
 layout: post
+toc: true
 title: 关于一些 iOS 面试问题的解答
 date: 2015-04-26 21:59:29.000000000 +08:00
 permalink: /:title
@@ -7,7 +8,7 @@ tags: iOS
 ---
 
 + TOC
-{:toc}
+
 
 这篇 post 主要是对知乎上 [iOS程序员的问题列表](http://www.zhihu.com/question/19604641) 的回答, 也算是对自己已有的知识进行整理.
 

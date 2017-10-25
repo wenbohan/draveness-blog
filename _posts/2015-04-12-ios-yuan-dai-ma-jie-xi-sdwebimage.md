@@ -1,5 +1,6 @@
 ---
 layout: post
+toc: true
 title: iOS 源代码分析----SDWebImage
 date: 2015-04-12 13:44:09.000000000 +08:00
 permalink: /:title
@@ -7,7 +8,7 @@ tags: iOS SDWebImage
 ---
 
 + TOC
-{:toc}
+
 
 世人都说阅读源代码对于功力的提升是十分显著的, 但是很多的著名开源框架源代码动辄上万行, 复杂度实在太高, 在暑假的时候我曾经试图读一些开源框架的源代码, 比如说 `AFNetworking`, `SDWebImage`, `ReactiveCocoa` 但是由于当时比较浮躁, 实在没法静下心来看, 而且有一些急功近利, 所以面对宝藏实在无力挖掘.
 

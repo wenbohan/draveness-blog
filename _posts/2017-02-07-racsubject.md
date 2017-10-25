@@ -1,5 +1,6 @@
 ---
 layout: post
+toc: true
 title: "『可变』的热信号 RACSubject"
 date: 2017-02-07 19:46:08.000000000 +08:00
 permalink: /:title
@@ -7,7 +8,7 @@ tags: iOS RAC
 ---
 
 + TOC
-{:toc}
+
 
 在 ReactiveCocoa 中除了不可变的信号 `RACSignal`，也有用于桥接非 RAC 代码到 ReactiveCocoa 世界的『可变』信号 `RACSubject`。
 
