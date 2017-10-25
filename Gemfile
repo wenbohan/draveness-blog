@@ -10,5 +10,7 @@ group :jekyll_plugins do
   # gem 'jekyll-admin'
   gem 'jekyll-sitemap'
   gem 'jekyll-paginate'
+  gem 'jekyll-toc'
+
  # gem "github-pages", '~> 163'
 end

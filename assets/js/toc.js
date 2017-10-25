@@ -1,4 +1,4 @@
-var toc = $("#markdown-toc");
+var toc = $(".section-nav");
 var absoluteY = toc.offset().top;
 
 $(window).scroll(function (event) {
@@ -11,7 +11,7 @@ $(window).scroll(function (event) {
     }
 });
 
-$("#markdown-toc a").click(function() {
+$(".section-nav a").click(function() {
   $("html, body").animate({
     scrollTop: $($(this).attr("href")).offset().top + "px"
   }, {

@@ -38,14 +38,13 @@ class: "post-template"
 
     <section class="post-content">
 
-      {{ content }}
+      {{ content | toc_only }}
 
       <blockquote>
         <p>原文链接：<a href="{{ page.permalink }}">{{ page.title }} · {{ site.name }}</a></p>
 
         <p>Follow: <a href="https://github.com/Draveness">Draveness · GitHub</a></p>
       </blockquote>
-
 
       <h4>关于评论和留言</h4>
 
