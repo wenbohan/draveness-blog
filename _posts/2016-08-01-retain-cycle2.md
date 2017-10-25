@@ -11,7 +11,7 @@ tags: iOS
 
 > 关注仓库，及时获得更新：[iOS-Source-Code-Analyze](https://github.com/draveness/iOS-Source-Code-Analyze)
 >
-> Follow: [Draveness · Github](https://github.com/Draveness)
+
 
 在上一篇文章中介绍了 `FBRetainCycleDetector` 的基本工作原理，这一篇文章中我们开始分析它是如何从每一个对象中获得它持有的强指针的。
 

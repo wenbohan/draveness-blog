@@ -332,6 +332,6 @@ Redis 对于事件的处理方式十分精巧，通过传入函数指针以及�
 
 ## 其它
 
-> Follow: [Draveness · GitHub](https://github.com/Draveness)
+
 >
 > Source: http://draveness.me/redis-eventloop

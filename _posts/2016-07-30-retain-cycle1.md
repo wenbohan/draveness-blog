@@ -11,7 +11,7 @@ tags: iOS
 
 > 关注仓库，及时获得更新：[iOS-Source-Code-Analyze](https://github.com/draveness/iOS-Source-Code-Analyze)
 >
-> Follow: [Draveness · Github](https://github.com/Draveness)
+
 
 稍有常识的人都知道在 iOS 开发时，我们经常会遇到循环引用的问题，比如两个强指针相互引用，但是这种简单的情况作为稍有经验的开发者都会轻松地查找出来。
 
@@ -243,4 +243,4 @@ NSLog(@"%@", retainCycles);
 
 > 关注仓库，及时获得更新：[iOS-Source-Code-Analyze](https://github.com/draveness/iOS-Source-Code-Analyze)
 >
-> Follow: [Draveness · Github](https://github.com/Draveness)
+

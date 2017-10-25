@@ -12,7 +12,7 @@ tags: iOS
 
 > 关注仓库，及时获得更新：[iOS-Source-Code-Analyze](https://github.com/draveness/iOS-Source-Code-Analyze)
 >
-> Follow: [Draveness · Github](https://github.com/Draveness)
+
 
 这一篇文章是对 [FBRetainCycleDetector]([https://github.com/facebook/FBRetainCycleDetector]) 中实现的关联对象机制的分析；因为追踪的需要， FBRetainCycleDetector 重新实现了关联对象，本文主要就是对其实现关联对象的方法进行分析。
 
@@ -232,4 +232,4 @@ FBRetainCycleDetector 为了追踪某一 `NSObject` 对关联对象的引用，�
 
 > 关注仓库，及时获得更新：[iOS-Source-Code-Analyze](https://github.com/draveness/iOS-Source-Code-Analyze)
 >
-> Follow: [Draveness · Github](https://github.com/Draveness)
+

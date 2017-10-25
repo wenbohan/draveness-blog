@@ -321,6 +321,6 @@ ASDK 的文档中推荐在子类中覆写 `- layoutSpecThatFits:` 方法，返�
 
 > Github Repo：[iOS-Source-Code-Analyze](https://github.com/draveness/iOS-Source-Code-Analyze)
 >
-> Follow: [Draveness · GitHub](https://github.com/Draveness)
+
 >
 > Source: http://draveness.me/layout-performance

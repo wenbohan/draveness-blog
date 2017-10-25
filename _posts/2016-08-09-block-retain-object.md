@@ -12,7 +12,7 @@ tags: iOS Runtime
 
 > 关注仓库，及时获得更新：[iOS-Source-Code-Analyze](https://github.com/draveness/iOS-Source-Code-Analyze)
 >
-> Follow: [Draveness · Github](https://github.com/Draveness)
+
 
 Block 是 Objective-C 中笔者最喜欢的特性，它为 Objective-C 这门语言提供了强大的函数式编程能力，而最近苹果推出的很多新的 API 都已经开始原生的支持 block 语法，可见它在 Objective-C 中变得越来越重要。
 
@@ -393,4 +393,4 @@ FBRetainCycleDetector *detector = [FBRetainCycleDetector new];
 
 > 关注仓库，及时获得更新：[iOS-Source-Code-Analyze](https://github.com/draveness/iOS-Source-Code-Analyze)
 >
-> Follow: [Draveness · Github](https://github.com/Draveness)
+

@@ -292,6 +292,6 @@ RACSignal *signal = [[RACSignal createSignal:...] replay];
 
 > Github Repo：[iOS-Source-Code-Analyze](https://github.com/draveness/iOS-Source-Code-Analyze)
 >
-> Follow: [Draveness · GitHub](https://github.com/Draveness)
+
 >
 > Source: http://draveness.me/racconnection

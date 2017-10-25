@@ -177,8 +177,6 @@ ORDER BY name;
 
 如果对文章内容的有疑问，可以在博客下面评论留言（评论系统使用 Disqus，需要翻墙）。
 
-> Follow: [Draveness · GitHub](https://github.com/Draveness)
-
 ## Reference
 
 + [数据库索引设计与优化](https://www.amazon.cn/图书/dp/B00ZH27RH0)

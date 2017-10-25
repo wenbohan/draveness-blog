@@ -467,7 +467,7 @@ struct TableBuilder::Rep {
 
 LevelDB 的源代码非常易于阅读，也是学习 C++ 语言非常优秀的资源，如果对文章的内容有疑问，可以翻墙后在博客下面的 Disqus 中留言。
 
-> Follow: [Draveness · GitHub](https://github.com/Draveness)
+
 
 ## Reference
 

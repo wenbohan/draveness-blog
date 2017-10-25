@@ -811,6 +811,6 @@ ASDK 对于绘制过程的优化有三部分：分别是栅格化子视图、绘
 
 > Github Repo：[iOS-Source-Code-Analyze](https://github.com/draveness/iOS-Source-Code-Analyze)
 >
-> Follow: [Draveness · Github](https://github.com/Draveness)
+
 >
 > Source: http://draveness.me/asdk-rendering

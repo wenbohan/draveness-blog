@@ -95,7 +95,7 @@ QUBE 在计算的过程中会忽略除了磁盘排队时间的其他排队时间
 
 如果对文章的内容有疑问，可以在评论中留言，评论系统使用 Disqus 需要梯子。
 
-> Follow: [Draveness · GitHub](https://github.com/Draveness)
+
 
 ## Reference
 

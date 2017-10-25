@@ -450,7 +450,7 @@ public extension Relation where Container == AbsoluteContainer {
 
 Cocoa Touch 中的 UIKit 对视图层的设计在一开始确实是没有问题的，主要原因是在 iOS 早期的布局方式并不复杂，只有单一的 `frame` 布局，而这种方式也恰好能够满足整个平台对于 iOS 应用开发的需要，但是随着屏幕尺寸的增多，苹果逐渐引入的其它布局方式与原有的体系发生了一些冲突，导致在开发时可能遇到奇怪的问题，而这也是本文想要解决的，将原有属于 `UIView` 的职责抽离出来，提供更合理的抽象。
 
-> Follow: [Draveness · GitHub](https://github.com/Draveness)
+
 
 ## References
 

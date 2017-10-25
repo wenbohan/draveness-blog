@@ -144,6 +144,6 @@ tags: iOS HTTP
 
 > Github Repo：[iOS-Source-Code-Analyze](https://github.com/draveness/iOS-Source-Code-Analyze)
 >
-> Follow: [Draveness · Github](https://github.com/Draveness)
+
 >
 > Source: http://draveness.me/intercept

@@ -434,6 +434,6 @@ ReactiveCocoa 使用了一种非常神奇的办法把原有的代理模式成功
 
 > Github Repo：[iOS-Source-Code-Analyze](https://github.com/draveness/iOS-Source-Code-Analyze)
 >
-> Follow: [Draveness · GitHub](https://github.com/Draveness)
+
 >
 > Source: http://draveness.me/racdelegateproxy

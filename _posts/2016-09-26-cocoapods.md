@@ -668,6 +668,6 @@ CocoaPods 工程的代码虽然非常多，不过代码的逻辑非常清晰，�
 
 > Github Repo：[iOS-Source-Code-Analyze](https://github.com/draveness/iOS-Source-Code-Analyze)
 >
-> Follow: [Draveness · GitHub](https://github.com/Draveness)
+
 >
 > Source: http://draveness.me/cocoapods

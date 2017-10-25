@@ -300,6 +300,6 @@ Redis 对于 I/O 多路复用模块的设计非常简洁，通过宏保证了 I/
 
 ## 其它
 
-> Follow: [Draveness · GitHub](https://github.com/Draveness)
+
 >
 > Source: http://draveness.me/redis-io-multiplexing
