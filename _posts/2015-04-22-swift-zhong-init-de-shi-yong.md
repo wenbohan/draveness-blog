@@ -7,8 +7,6 @@ permalink: /:title
 tags: iOS
 ---
 
-+ TOC
-
 
 这几天在使用 Swift 重写原来的一个运动社交应用 SportJoin.
 

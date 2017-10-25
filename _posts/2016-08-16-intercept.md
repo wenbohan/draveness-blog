@@ -7,8 +7,6 @@ permalink: /:title
 tags: iOS HTTP
 ---
 
-+ TOC
-
 
 
 这篇文章会提供一种在 Cocoa 层拦截所有 HTTP 请求的方法，其实标题已经说明了拦截 HTTP 请求需要的了解的就是 `NSURLProtocol`。

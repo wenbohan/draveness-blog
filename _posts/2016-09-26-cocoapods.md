@@ -7,8 +7,6 @@ permalink: /:title
 tags: iOS Ruby Cocoapods
 ---
 
-+ TOC
-
 
 稍有 iOS 开发经验的人应该都是用过 CocoaPods，而对于 CI、CD 有了解的同学也都知道 Fastlane。而这两个在 iOS 开发中非常便捷的第三方库都是使用 Ruby 来编写的，这是为什么？
 

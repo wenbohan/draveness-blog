@@ -7,8 +7,6 @@ permalink: /:title
 tags: iOS
 ---
 
-+ TOC
-
 
 [Ouroboros](https://github.com/Draveness/Ouroboros) 是一个根据 `scrollView` 滚动的距离完成动画的一个仓库. 灵感来源于 `javascript` 的第三方框架 [scrollMagic](https://github.com/janpaepke/ScrollMagic).
 

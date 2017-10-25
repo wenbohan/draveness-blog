@@ -9,8 +9,6 @@ desc: 在大多数 iOS 的项目中，Model 层只是一个单纯的数据结构
 tags: MVC MVVM iOS
 ---
 
-+ TOC
-
 
 
 + [谈谈 MVX 中的 Model](http://draveness.me/mvx-model.html)

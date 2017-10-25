@@ -7,8 +7,6 @@ permalink: /:title
 tags: Node.js
 ---
 
-+ TOC
-
 
 这几天没有什么别的事情, 接的几个项目也没有给我 UI 设计图. 最近听说Node.js 这么~~火~~优雅, 兴趣也很大, 就来尝试学习一下.
 

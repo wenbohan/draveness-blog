@@ -7,8 +7,6 @@ permalink: /:title
 tags: iOS Runtime
 ---
 
-+ TOC
-
 
 Blog: [Draveness](http://draveness.me)
 

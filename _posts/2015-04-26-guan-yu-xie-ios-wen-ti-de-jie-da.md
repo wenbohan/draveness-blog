@@ -7,8 +7,6 @@ permalink: /:title
 tags: iOS
 ---
 
-+ TOC
-
 
 这篇 post 主要是对知乎上 [iOS程序员的问题列表](http://www.zhihu.com/question/19604641) 的回答, 也算是对自己已有的知识进行整理.
 

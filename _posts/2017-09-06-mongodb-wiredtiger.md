@@ -8,8 +8,6 @@ tags: MongoDB WiredTiger Database Server NoSQL
 desc: MongoDB 是目前主流的 NoSQL 数据库之一，与关系型数据库和其它的 NoSQL 不同，MongoDB 使用了面向文档的数据存储方式，将数据以类似 JSON 的方式存储在磁盘上，因为项目上的一些历史遗留问题，作者在最近的工作中也不得不经常与 MongoDB 打交道，这也是这篇文章出现的原因。
 ---
 
-+ TOC
-
 
 
 MongoDB 是目前主流的 NoSQL 数据库之一，与关系型数据库和其它的 NoSQL 不同，MongoDB 使用了面向文档的数据存储方式，将数据以类似 JSON 的方式存储在磁盘上，因为项目上的一些历史遗留问题，作者在最近的工作中也不得不经常与 MongoDB 打交道，这也是这篇文章出现的原因。

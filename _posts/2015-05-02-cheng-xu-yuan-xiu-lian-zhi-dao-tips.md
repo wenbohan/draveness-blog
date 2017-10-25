@@ -6,8 +6,6 @@ date: 2015-05-02 15:42:21.000000000 +08:00
 permalink: /:title
 ---
 
-+ TOC
-
 
 这一篇文章其实就是记录[程序员修炼之道](http://www.amazon.cn/%E7%A8%8B%E5%BA%8F%E5%91%98%E4%BF%AE%E7%82%BC%E4%B9%8B%E9%81%93-%E4%BB%8E%E5%B0%8F%E5%B7%A5%E5%88%B0%E4%B8%93%E5%AE%B6-%E4%BA%A8%E7%89%B9/dp/B004GV08CY/ref=sr_1_1?ie=UTF8&qid=1430723088&sr=8-1&keywords=%E7%A8%8B%E5%BA%8F%E5%91%98%E4%BF%AE%E7%82%BC%E4%B9%8B%E9%81%93)中的所有 Tips, 我讲会在之后的每周实践两个 Tip, 并对这两个 Tips 进行补充和说明自己的体会, 最终成为书中所说的**卓有成效**的程序员.
 

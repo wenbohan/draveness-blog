@@ -7,8 +7,6 @@ permalink: /:title
 tags: iOS RAC
 ---
 
-+ TOC
-
 
 ReactiveCocoa 在设计上很大程度借鉴了 Reactive Extension 中的概念，可以说 ReactiveCocoa 是 Rx 在 Objective-C 语言中的实现。
 

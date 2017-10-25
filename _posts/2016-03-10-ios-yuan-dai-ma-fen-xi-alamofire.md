@@ -7,8 +7,6 @@ permalink: /:title
 tags: iOS Alamofire
 ---
 
-+ TOC
-
 
 
 

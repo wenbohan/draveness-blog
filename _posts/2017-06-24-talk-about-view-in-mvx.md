@@ -9,8 +9,6 @@ desc: 这是谈谈 MVX 系列的第二篇文章，上一篇文章中对 iOS 中 
 tags: MVC MVVM iOS
 ---
 
-+ TOC
-
 
 
 + [谈谈 MVX 中的 Model](http://draveness.me/mvx-model.html)

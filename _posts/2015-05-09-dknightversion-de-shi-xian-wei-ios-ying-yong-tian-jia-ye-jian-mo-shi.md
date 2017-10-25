@@ -7,8 +7,6 @@ permalink: /:title
 tags: iOS
 ---
 
-+ TOC
-
 
 **最新: [成熟的夜间模式解决方案](http://draveness.me/night)**
 

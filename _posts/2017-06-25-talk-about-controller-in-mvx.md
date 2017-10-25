@@ -9,8 +9,6 @@ desc: 在前两篇文章中，我们已经对 iOS 中的 Model 层以及 View �
 tags: MVC MVVM iOS
 ---
 
-+ TOC
-
 
 
 + [谈谈 MVX 中的 Model](http://draveness.me/mvx-model.html)

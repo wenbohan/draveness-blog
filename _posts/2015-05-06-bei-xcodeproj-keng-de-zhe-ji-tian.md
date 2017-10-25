@@ -7,8 +7,6 @@ permalink: /:title
 tags: iOS
 ---
 
-+ TOC
-
 
 这几天在持续更新 [DKNightVersion](https://github.com/Draveness/DKNightVersion) 这个仓库, 我对这个框架投入了很多的时间和精力.
 

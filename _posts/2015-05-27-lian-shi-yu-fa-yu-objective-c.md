@@ -7,8 +7,6 @@ permalink: /:title
 tags: iOS
 ---
 
-+ TOC
-
 
 作为一个 Objective-C 语言的使用者已经有近两年的时间了. 在逐渐熟悉手中的工具, Objective-C 语言的同时, 我也开始从更高的角度来观察这一门语言.
 

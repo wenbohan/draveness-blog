@@ -7,8 +7,6 @@ permalink: /:title
 tags: iOS
 ---
 
-+ TOC
-
 
 ![](https://img.draveness.me/2016-08-13-protocol-recordings.jpeg)
 

@@ -7,8 +7,6 @@ permalink: /:title
 tags: iOS ASDK
 ---
 
-+ TOC
-
 
 > 这是使用 ASDK 性能调优系列的第二篇文章，前一篇文章中讲到了如何提升 iOS 应用的渲染性能，你可以点击 [这里](https://github.com/Draveness/iOS-Source-Code-Analyze/blob/master/contents/AsyncDisplayKit/提升%20iOS%20界面的渲染性能.md) 了解这部分的内容。
 

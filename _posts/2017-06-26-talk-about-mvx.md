@@ -10,8 +10,6 @@ tags: MVC MVVM iOS
 
 ---
 
-+ TOC
-
 
 
 + [谈谈 MVX 中的 Model](http://draveness.me/mvx-model.html)

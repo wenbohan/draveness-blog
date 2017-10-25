@@ -7,8 +7,6 @@ permalink: /:title
 tags: iOS
 ---
 
-+ TOC
-
 
 最近由于去武汉参加 hackday, 十多天没有更新博客了. 今天就来说一说, 我在 hackday 上使用 swift 开发 App 遇到的哪些问题吧.
 

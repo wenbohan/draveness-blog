@@ -7,8 +7,6 @@ permalink: /:title
 tags: iOS RAC
 ---
 
-+ TOC
-
 
 `RACCommand` 是一个在 ReactiveCocoa 中比较复杂的类，大多数使用 ReactiveCocoa 的人，尤其是初学者并不会经常使用它。
 

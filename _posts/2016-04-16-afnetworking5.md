@@ -7,8 +7,6 @@ permalink: /:title
 tags: iOS AFNetworking
 ---
 
-+ TOC
-
 
 
 Blog: [Draveness](http://draveness.me)

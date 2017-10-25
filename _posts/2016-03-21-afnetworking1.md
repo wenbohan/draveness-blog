@@ -7,8 +7,6 @@ permalink: /:title
 tags: iOS AFNetworking
 ---
 
-+ TOC
-
 
 
 ![afnetworking-logo](http://7xrlu3.com1.z0.glb.clouddn.com/2016-03-21-afnetworking-logo.png)

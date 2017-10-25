@@ -7,8 +7,6 @@ permalink: /:title
 tags: iOS RAC
 ---
 
-+ TOC
-
 
 在 ReactiveCocoa 中除了不可变的信号 `RACSignal`，也有用于桥接非 RAC 代码到 ReactiveCocoa 世界的『可变』信号 `RACSubject`。
 
