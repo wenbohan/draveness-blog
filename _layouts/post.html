@@ -40,9 +40,16 @@ class: "post-template"
 
       {{ content }}
 
+      <blockquote>
+        <p>原文链接：<a href="{{ page.permalink }}">{{ page.title }}</a></p>
+
+        <p>Follow: <a href="https://github.com/Draveness">Draveness · GitHub</a></p>
+      </blockquote>
+
+
       <h4>关于评论和留言</h4>
 
-      博客使用 Disqus 作为评论系统（需要翻墙），如果对文章的内容有疑问，请直接在博客下面留言，为了能让更多的读者能从评论中找到问题的答案，作者<strong>不会处理博客之外其他平台的留言和评论</strong>，谢谢。
+      如果对本文 <a href="{{ page.permalink }}">{{ page.title }}</a> 的内容有疑问，请在下面的 Disqus 中留言（需要翻墙），为了能让更多的读者能从评论中找到问题的答案，作者<strong>不会处理博客之外其他平台的留言和评论</strong>，谢谢。
 
     </section>
 
