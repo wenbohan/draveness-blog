@@ -106,7 +106,8 @@ class: "post-template"
          owner: 'Draveness',
          admin: ['Draveness'],
          tags: ["{{ page.tags | join: '","'}}"],
-         id: location.origin + location.pathname,
+         // id: location.origin + location.pathname,
+         id: "{{ page.permalink | prepend: site.host_url }}",
          // facebook-like distraction free mode
          distractionFreeMode: false
        });

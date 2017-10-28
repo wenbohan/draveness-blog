@@ -11,6 +11,7 @@ kramdown:
 highlighter: none
 paginate: 20
 language: 'en-uk'
+host_url: 'https://draveness.me'
 
 # Website info
 name: '面向信仰编程'
