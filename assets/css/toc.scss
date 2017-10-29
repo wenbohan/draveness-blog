@@ -2,7 +2,10 @@
 ---
 
 .section-nav {
-  transform: translateX(-120%);
+  // transform: translateX(-120%);
+  float: right;
+  right: -220px;
+  position: absolute;
   margin: 0em;
   min-width: 200px;
 
@@ -58,12 +61,12 @@
 //}
 
 .markdown-toc-relative {
-  position: absolute;
+  // position: absolute;
 }
 
 .markdown-toc-fixed {
-  position: fixed;
-  top: 20px;
+  //position: fixed;
+  //top: 20px;
 }
 
 .toc-entry.toc-h1,
