@@ -2,7 +2,7 @@
 layout: post
 toc: true
 permalink: /git-comments-initialize
-title: 如何自动初始化 Gitalk/Gitment 评论
+title: 自动初始化 Gitalk 和 Gitment 评论
 tags: Blog Gitalk Gitment
 desc: 昨天将博客的评论迁移到了 Gitalk，最开始选择了使用 Gitment 作为评论系统，但是由于其开发者很久没有维护、代码七个月也没有更新，所以就选择了有更多人维护的 Gitalk 作为目前博客的评论系统。无论是 Gitalk 还是 Gitment 都只能手动初始化所有文章的评论或者一个一个点开界面，作者觉得这件事情非常麻烦，所以手动抓了一下 Gitalk 和 Gitment 在初始化评论时发出的网络请求后写了一个用于自动化初始评论的脚本。
 ---
