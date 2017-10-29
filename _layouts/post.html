@@ -105,7 +105,7 @@ class: "post-template"
          repo: 'blog-comments',
          owner: 'Draveness',
          admin: ['Draveness'],
-         // labels: ['Gitalk', 'gitment', "{{ page.url | prepend: site.host_url }}"].concat(["{{ page.tags | join: '","'}}"]),
+         // labels: ['Gitalk', 'gitment'].concat(["{{ page.tags | join: '","'}}"]),
          // id: location.origin + location.pathname,
          id: "{{ page.url | prepend: site.host_url }}",
          // facebook-like distraction free mode
