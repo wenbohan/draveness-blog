@@ -9,7 +9,7 @@ kramdown:
   toc_levels: 1..2
 
 highlighter: none
-paginate: 20
+paginate: 15
 language: 'en-uk'
 host_url: 'https://draveness.me'
 
