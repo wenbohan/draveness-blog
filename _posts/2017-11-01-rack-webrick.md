@@ -26,7 +26,7 @@ Comments  1927 lines
 Code      4001 lines
 ```
 
-## 从 Rack Handler 开始
+## WEBrick 的实现
 
 由于 WEBrick 是 Rack 中内置的处理器，所以与 Unicorn 和 Puma 这种第三方开发的 webserver 不同，WEBrick 的处理器是在 Rack 中实现的，而 WEBrick 的运行也都是从这个处理器的开始的。
 
