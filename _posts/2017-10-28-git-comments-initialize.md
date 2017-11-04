@@ -29,9 +29,9 @@ desc: 昨天将博客的评论迁移到了 Gitalk，最开始选择了使用 Git
 
 本文中提供的自动化脚本使用的是 Ruby 代码，请确定自己的机器上已经安装了 Ruby，并且使用如下的命令安装脚本所需要的所有依赖：
 
-```ruby
+~~~ruby
 $ sudo gem install faraday activesupport sitemap-parser
-```
+~~~
 
 ### 使用 sitemap 文件
 
@@ -39,7 +39,7 @@ $ sudo gem install faraday activesupport sitemap-parser
 
 有 sitemap 文件之后就非常好办了，在任意目录下创建 `comment.rb` 文件后，将下面的代码粘贴到文件中：
 
-```ruby
+~~~ruby
 username = "draveness" # GitHub 用户名
 new_token = "xxxxxxx"  # GitHub Token
 repo_name = "github-comments-repo" # 存放 issues
@@ -68,7 +68,7 @@ urls.each_with_index do |url, index|
   puts response.body
   sleep 15 if index % 20 == 0
 end
-```
+~~~
 
 在这里有 5 个配置项，分别是 GitHub 用户名、在上一步获得的 Token、存放 issues 的仓库、sitemap 的地址以及最后你在博客中使用了哪个评论插件，不同的插件拥有标签，可以选择 `"Gitalk"` 或者 `"gitment"`，对于其他评论的插件应该如何设置，作者就并不清楚了。
 
@@ -76,9 +76,9 @@ end
 
 在配置完成后就可以在命令行中的当前目录下输入以下命令：
 
-```ruby
+~~~ruby
 $ ruby comment.rb
-```
+~~~
 
 然后当前脚本就会运行并初始化所有的评论了。
 
@@ -86,7 +86,7 @@ $ ruby comment.rb
 
 如果博客中不包含任何的 sitemap 文件，或者想要手动选择想要初始化的一些文章其实也是可以的，可以使用简化的代码**批量初始化指定博客**的评论：
 
-```ruby
+~~~ruby
 username = "draveness" # GitHub 用户名
 new_token = "xxxxxxx"  # GitHub Token
 repo_name = "github-comments-repo" # 存放 issues
@@ -111,11 +111,11 @@ urls.each_with_index do |url, index|
   puts response.body
   sleep 15 if index % 20 == 0
 end
-```
+~~~
 
 在这里就需要**手动填入需要初始化文章的数组**了，当然如果你有 sitemap 文件，其实可以在 irb 中运行以下的代码得到全部的文章数组，再手动从其中剔除不想要创建评论的页面：
 
-```ruby
+~~~ruby
 $ irb
 2.3.3 :001 > require 'sitemap-parser'
  => true
@@ -123,13 +123,13 @@ $ irb
  => "https://draveness.me/sitemap.xml"
 2.3.3 :003 > SitemapParser.new(sitemap_url).to_a
  => ["https://draveness.me/prolog-ji-chu-1", "https://draveness.me/prolog-pi-pei-2", "https://draveness.me/prolog-di-gui-3", ..., "https://draveness.me/dynamo"]
- ```
+ ~~~
 
 当我们将上述结果中不想要创建评论的文章删除之后，将结果填到 `urls` 这个临时变量中，运行下面的命令就可以了。
 
-```ruby
+~~~ruby
 $ ruby comment.rb
-```
+~~~
 
 ## 其他
 
