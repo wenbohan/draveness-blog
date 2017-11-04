@@ -3,7 +3,7 @@ layout: post
 title: 浅谈 Unicorn 的实现
 toc: true
 permalink: /rack-unicorn
-tags: Rack系列 Unicorn Rack Ruby Rails Server
+tags: Rack系列 Unicorn Rack Ruby Server
 ---
 
 + [谈谈 Rack 协议与实现](https://draveness.me/rack)
