@@ -9,7 +9,7 @@ desc: 这篇文章会介绍在开发环境中最常用的应用容器 WEBrick �
 
 + [谈谈 Rack 协议与实现](https://draveness.me/rack)
 + [浅谈 WEBrick 的实现](https://draveness.me/rack-webrick)
-+ [浅谈 Thin 的实现](https://draveness.me/rack-thin)
++ [浅谈 Thin 和 EventMachine 的实现](https://draveness.me/rack-thin)
 + [浅谈 Unicorn 的实现](https://draveness.me/rack-unicorn)
 + [浅谈 Puma 的实现](https://draveness.me/rack-puma)
 
@@ -443,7 +443,7 @@ end
 
 从解析 HTTP 请求、调用 Rack 应用、创建 Response 到最后向 Socket 中写回数据，WEBrick 处理 HTTP 请求的部分就结束了。
 
-## WEBrick 的模型
+## I/O 模型
 
 通过对 WEBrick 源代码的阅读，我们其实已经能够了解整个 webserver 的工作原理，当我们启动一个 WEBrick 服务时只会启动一个进程，该进程会在指定的 ip 和端口上使用 `.select` 监听来自用户的所有 HTTP 请求：
 
