@@ -13,14 +13,6 @@ desc: 作为 Ruby 社区中老牌的 webserver，在今天也有很多开发者�
 + [浅谈 Unicorn 的多进程模型](https://draveness.me/rack-unicorn)
 + [浅谈 Puma 的实现](https://draveness.me/rack-puma)
 
-# 浅谈 Unicorn 的多进程模型
-
-+ [谈谈 Rack 协议与实现](https://draveness.me/rack)
-+ [浅谈 WEBrick 的实现](https://draveness.me/rack-webrick)
-+ [浅谈 Thin 的事件驱动模型](https://draveness.me/rack-thin)
-+ [浅谈 Unicorn 的多进程模型](https://draveness.me/rack-unicorn)
-+ [浅谈 Puma 的实现](https://draveness.me/rack-puma)
-
 作为 Ruby 社区中老牌的 webserver，在今天也有很多开发者在生产环境使用 Unicorn 处理客户端的发出去的 HTTP 请求，与 WEBrick 和 Thin 不同，Unicorn 使用了完全不同的模型，提供了多进程模型批量处理来自客户端的请求。
 
 ![unicorn](https://img.draveness.me/2017-11-08-unicorn.jpeg)
