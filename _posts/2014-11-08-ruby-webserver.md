@@ -1,9 +1,9 @@
 ---
 layout: post
-title: 浅谈 Puma 的实现
+title: 聊聊 Ruby Web 服务器的并发模型
 toc: true
-permalink: /rack-puma
-tags: Rack系列 Puma Rack Ruby Server
+permalink: /ruby-webserver
+tags: Rack系列 Rack Ruby Webserver Server
 ---
 
 + [谈谈 Rack 协议与实现](https://draveness.me/rack)
