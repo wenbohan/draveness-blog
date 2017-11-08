@@ -2,13 +2,13 @@
 layout: post
 toc: true
 permalink: /rack-webrick
-title: 浅谈 WEBrick 的实现
+title: 浅谈 WEBrick 的多线程模型
 tags: Rack系列 WEBrick Rack Ruby Server
 desc: 这篇文章会介绍在开发环境中最常用的应用容器 WEBrick 的实现原理，除了通过源代码分析之外，我们也会介绍它的 IO 模型以及一些特点。在 GitHub 上，WEBrick 从 2003 年的六月份就开始开发了，有着十几年历史的 WEBrick 的实现非常简单，总共只有 4000 多行的代码。
 ---
 
 + [谈谈 Rack 协议与实现](https://draveness.me/rack)
-+ [浅谈 WEBrick 的实现](https://draveness.me/rack-webrick)
++ [浅谈 WEBrick 的多线程模型](https://draveness.me/rack-webrick)
 + [浅谈 Thin 的事件驱动模型](https://draveness.me/rack-thin)
 + [浅谈 Unicorn 的多进程模型](https://draveness.me/rack-unicorn)
 + [浅谈 Puma 的并发模型与实现](https://draveness.me/rack-puma)

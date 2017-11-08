@@ -8,7 +8,7 @@ desc: 作为 Ruby 社区中老牌的 webserver，在今天也有很多开发者�
 ---
 
 + [谈谈 Rack 协议与实现](https://draveness.me/rack)
-+ [浅谈 WEBrick 的实现](https://draveness.me/rack-webrick)
++ [浅谈 WEBrick 的多线程模型](https://draveness.me/rack-webrick)
 + [浅谈 Thin 的事件驱动模型](https://draveness.me/rack-thin)
 + [浅谈 Unicorn 的多进程模型](https://draveness.me/rack-unicorn)
 + [浅谈 Puma 的并发模型与实现](https://draveness.me/rack-puma)
