@@ -24,7 +24,7 @@ Unicorn 为 Rails 应用提供并发的方式是使用 `fork` 创建多个 worke
 
 ## 实现原理
 
-Unicorn 虽然也是一个遵循 Rack 协议的 Ruby webserver，但是因为它本身并没有提供 Rack 处理器，随意没有办法直接通过 `rackup -s Unicorn` 来启动 Unicorn 的进程。
+Unicorn 虽然也是一个遵循 Rack 协议的 Ruby webserver，但是因为它本身并没有提供 Rack 处理器，所以没有办法直接通过 `rackup -s Unicorn` 来启动 Unicorn 的进程。
 
 ```ruby
 $ unicorn -c unicorn.rb
