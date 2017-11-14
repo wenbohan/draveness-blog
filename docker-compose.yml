@@ -1,0 +1,11 @@
+jekyll:
+  build: .
+  volumes:
+    - /usr/share/nginx/html
+
+nginx:
+  image: nginx:alpine
+  ports:
+    - 80
+  volumes_from:
+    - jekyll
