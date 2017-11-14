@@ -16,7 +16,8 @@ RUN mkdir -p $APP_DIR
 ADD . $APP_DIR
 WORKDIR $APP_DIR
 
-RUN mkdir -p /usr/share/nginx/html
+RUN mkdir -p "/var/www/blog"
+VOLUME ["/var/www/blog"]
 
 # Install bundler
 RUN gem sources --add https://gems.ruby-china.org/ --remove https://rubygems.org/
@@ -24,4 +25,4 @@ RUN bundle config mirror.https://rubygems.org https://ruby.taobao.org
 RUN gem install bundler
 RUN bundle install
 
-CMD ["bundle", "exec", "jekyll", "build", "--destination=/usr/share/nginx/html"]
+CMD ["bundle", "exec", "jekyll", "build", "--destination=/var/www/blog"]
