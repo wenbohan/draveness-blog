@@ -12,7 +12,7 @@ desc: 这篇文章会介绍在开发环境中最常用的应用容器 WEBrick �
 + [浅谈 Thin 的事件驱动模型](https://draveness.me/rack-thin)
 + [浅谈 Unicorn 的多进程模型](https://draveness.me/rack-unicorn)
 + [浅谈 Puma 的并发模型与实现](https://draveness.me/rack-puma)
-+ [Ruby Web 服务器的并发模型](https://draveness.me/ruby-webserver)
++ [Ruby Web 服务器的并发模型与性能](https://draveness.me/ruby-webserver)
 
 这篇文章会介绍在开发环境中最常用的应用容器 WEBrick 的实现原理，除了通过源代码分析之外，我们也会介绍它的 IO 模型以及一些特点。
 
