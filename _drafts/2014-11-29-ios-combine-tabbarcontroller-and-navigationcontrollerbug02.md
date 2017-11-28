@@ -2,7 +2,7 @@
 layout: post
 title: iOS Combine TabbarController and NavigationController<Bug02>
 date: 2014-11-29 04:36:59.000000000 +08:00
-permalink: /:title
+permalink: /ios-combine-tabbarcontroller-and-navigationcontrollerbug02
 ---
 
 
