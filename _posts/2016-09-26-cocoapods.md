@@ -4,7 +4,7 @@ toc: true
 title: CocoaPods 都做了什么？
 date: 2016-09-26 14:19:06.000000000 +08:00
 permalink: /:title
-tags: iOS Ruby Cocoapods
+tags: iOS ruby Cocoapods
 ---
 
 

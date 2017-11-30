@@ -3,7 +3,7 @@ layout: post
 toc: true
 title: 全面理解 ActiveRecord
 permalink: /activerecord
-tags: ActiveRecord Rails Ruby MySQL Database Server
+tags: ActiveRecord rails ruby mysql database server
 desc: 文章分四个部分介绍了 ActiveRecord 中的重要内容，模型的创建过程、Scope 和查询的实现、模型关系的实现以及最后的 Migrations 任务的实现和执行过程，各个模块之间没有太多的关联，由于文章内容比较多，如果读者只对某一部分的内容感兴趣，可以只挑选一部分进行阅读。
 ---
 

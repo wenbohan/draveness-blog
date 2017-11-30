@@ -3,7 +3,7 @@ layout: post
 title: 浅谈 Unicorn 的多进程模型
 toc: true
 permalink: /rack-unicorn
-tags: Rack系列 Unicorn Rack Ruby Server
+tags: Rack系列 Unicorn rack ruby server
 desc: 作为 Ruby 社区中老牌的 webserver，在今天也有很多开发者在生产环境使用 Unicorn 处理客户端的发出去的 HTTP 请求，与 WEBrick 和 Thin 不同，Unicorn 使用了完全不同的模型，提供了多进程模型批量处理来自客户端的请求。Unicorn 为 Rails 应用提供并发的方式是使用 fork 创建多个 worker 线程，监听同一个 Socket 上的输入。
 ---
 

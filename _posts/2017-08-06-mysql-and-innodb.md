@@ -3,7 +3,7 @@ layout: post
 toc: true
 title: 『浅入浅出』MySQL 和 InnoDB
 permalink: /mysql-innodb
-tags: Server MySQL InnoDB Database
+tags: server mysql innodb database
 
 ---
 

@@ -4,7 +4,7 @@ toc: true
 title: 自动释放池的前世今生 ---- 深入解析 autoreleasepool
 date: 2016-05-16 01:20:23.000000000 +08:00
 permalink: /:title
-tags: iOS Runtime
+tags: iOS runtime
 ---
 
 

@@ -3,7 +3,7 @@ layout: post
 toc: true
 title: MySQL 索引设计概要
 permalink: /sql-index-intro
-tags: MySQL Database Index Server
+tags: mysql database index server
 
 desc: 在关系型数据库中设计索引其实并不是复杂的事情，很多开发者都觉得设计索引能够提升数据库的性能，相关的知识一定非常复杂，然而这种想法是不正确的，索引其实并不是一个多么高深莫测的东西，只要我们掌握一定的方法，理解索引的实现就能在不需要 DBA 的情况下设计出高效的索引。
 ---
