@@ -225,10 +225,10 @@ end
 当我们为 `quote` 函数传入一个表达式的时候，它会将当前的表达式转换成一个抽象语法树：
 
 ```elixir
-{{:., [], [{:__aliases__, [alias: false], [:Unless]}, :macro_unless]}, [],
+{% raw %}{{:., [], [{:__aliases__, [alias: false], [:Unless]}, :macro_unless]}, [],
  [true,
   [do: {{:., [], [{:__aliases__, [alias: false], [:IO]}, :puts]}, [],
-    ["this should never be printed"]}]]}
+    ["this should never be printed"]}]]}{% endraw %}
 ```
 
 在 Elixir 中，抽象语法数是可以直接通过下面的 `Code.eval_quoted` 方法运行：
@@ -249,7 +249,7 @@ iex> Code.eval_quoted [quote(do: require Unless), expr]
 在最开始对当前的宏进行定义时，我们就会发现宏其实输入的是一些语法元素，实现内部也通过 `quote` 和 `unquote` 方法对当前的语法树进行修改，最后返回新的语法树：
 
 ```elixir
-defmacro macro_unless(clause, do: expression) do
+{% raw %}defmacro macro_unless(clause, do: expression) do
   quote do
     if(!unquote(clause), do: unquote(expression))
   end
@@ -266,7 +266,7 @@ iex> Macro.expand_once expr, __ENV__
  [{:!, [context: Unless, import: Kernel], [true]},
   [do: {{:., [],
      [{:__aliases__, [alias: false, counter: -576460752303422687], [:IO]},
-      :puts]}, [], ["this should never be printed"]}]]}
+      :puts]}, [], ["this should never be printed"]}]]}{% endraw %}
 ```
 
 Elixir 中的宏相比于 C 语言中的宏更强大，这是因为它不是对代码中的文本直接进行替换，它能够为我们直接提供操作 Elixir 抽象语法树的能力，让我们能够参与到 Elixir 的编译过程，影响编译的结果；除此之外，Elixir 中的宏还是卫生宏（Hygiene Macro），宏中定义的参数并不会影响当前代码执行的上下文。
@@ -339,7 +339,7 @@ fn main() {
 为了实现功能更强大的宏系统，Rust 的宏还提供了重复操作符和递归宏的功能，结合这两个宏系统的特性，我们能直接使用宏构建一个生成 HTML 的 DSL：
 
 ```rust
-macro_rules! write_html {
+{% raw %}macro_rules! write_html {
     ($w:expr, ) => (());
 
     ($w:expr, $e:tt) => (write!($w, "{}", $e));
@@ -350,7 +350,7 @@ macro_rules! write_html {
         write!($w, "</{}>", stringify!($tag));
         write_html!($w, $($rest)*);
     }};
-}
+}{% endraw %}
 ```
 
 在上述的 `write_html` 宏中，我们总共有三个匹配条件，其中前两个是宏的终止条件，第一个条件不会做任何的操作，第二个条件会将匹配到的 Token 树求值并写回到传入的字符串引用 `$w` 中，最后的条件就是最有意思的部分了，在这里我们使用了形如的 `$(...)*` 语法来**匹配零个或多个相同的语法元素**，例如 `$($inner:tt)*` 就是匹配零个以上的 Token 树（tt）；在右侧的代码中递归调用了 `write_html` 宏并分别传入 `$($inner)*` 和 `$($rest)*` 两个参数，这样我们的 `write_html` 就能够解析 DSL 了。 
