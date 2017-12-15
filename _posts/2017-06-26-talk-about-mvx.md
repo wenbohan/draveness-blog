@@ -85,7 +85,7 @@ Rails 作为著名的 MVC 框架，视图层和模型层没有直接的耦合，
 
 这种 MVC 的设计分离了视图层和模型层之间的耦合，作为承担数据存储功能的模型层，可以通过控制器同时为多种不同的视图提供数据：
 
-![MVC-in-Rails-with-different-view](https://raw.githubusercontent.com/Draveness/analyze/master/contents/architecture/images/mvx/MVC-in-Rails-with-different-view.jpg)
+![MVC-in-Rails-with-different-view](https://img.draveness.me/MVC-%05in-Rails-with-different-view.jpg)
 
 控制器根据用户发出的 HTTP 请求，从模型中取出相同的数据，然后传给不同的视图以渲染出不同的结果。Rails 中的 MVC 架构模式能够很好地将用于展示的视图和用于存储数据的数据库进行分离，两者之间通过控制器解耦，能够实现同一数据库对应多种视图的架构。
 
